@@ -17,7 +17,6 @@ namespace ScrapYard
         public float DryCost { get { return _dryCost; } }
 
         private List<ConfigNode> savedModules = new List<ConfigNode>();
-        private List<String> importantModules = new List<string>() { "TWEAKSCALE", "PROCEDURAL" }; //TODO: Move this to settings
 
         /// <summary>
         /// Creates an empty InventoryPart.
@@ -42,7 +41,7 @@ namespace ScrapYard
             {
                 foreach (PartModule module in originPart.Modules)
                 {
-                    foreach (string trackedModuleName in importantModules)
+                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
                     {
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module.snapshot.moduleValues);
@@ -66,7 +65,7 @@ namespace ScrapYard
             {
                 foreach (ProtoPartModuleSnapshot module in originPartSnapshot.modules)
                 {
-                    foreach (string trackedModuleName in importantModules)
+                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
                     {
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module.moduleValues);
@@ -94,7 +93,7 @@ namespace ScrapYard
             {
                 foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
                 {
-                    foreach (string trackedModuleName in importantModules)
+                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
                     {
                         if (module.GetValue("name").ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module);
@@ -140,7 +139,7 @@ namespace ScrapYard
             //set the modules to the ones we've saved
             foreach (PartModule mod in retPart.Modules)
             {
-                foreach (string trackedModuleName in importantModules)
+                foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
                 {
                     if (mod.moduleName.ToUpper().Contains(trackedModuleName))
                     {

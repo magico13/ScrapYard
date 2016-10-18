@@ -9,18 +9,13 @@ namespace ScrapYard
     class ScrapYard : ScenarioModule
     {
         private const string TAG = "ScrapYard";
-        private static ScrapYard instance;
-        public static ScrapYard Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public static ScrapYard Instance { get; private set; }
         public PartInventory TheInventory = new PartInventory();
+        public Settings Settings = new Settings();
         void Start()
         {
-            instance = this;
+            Instance = this;
+            
             EventListeners.Instance.RegisterListeners();
         }
 

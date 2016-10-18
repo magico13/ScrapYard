@@ -15,14 +15,14 @@ namespace ScrapYard
 
         public void RegisterListeners()
         {
-            GameEvents.onVesselRecoveryProcessing.Add(VesselRecoverProcessingEvent);
+            //GameEvents.onVesselRecoveryProcessing.Add(VesselRecoverProcessingEvent);
             GameEvents.onVesselRecovered.Add(VesselRecovered);
             //if (KCT2Utils.fetch(KCT2)
             //On KCT Vessel Added To Build List -> remove parts
             //On KCT Vessel Build Complete -> Increment tracker
             //else
             GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
-            GameEvents.onGUIRecoveryDialogSpawn.Add(RecoveryDialogSpawn);
+            //GameEvents.onGUIRecoveryDialogSpawn.Add(RecoveryDialogSpawn);
             
             Events.InventoryChangedEvent.Add(InventoryChangedEventListener);
 
@@ -32,9 +32,9 @@ namespace ScrapYard
 
         public void DeregisterListeners()
         {
-            GameEvents.onVesselRecoveryProcessing.Remove(VesselRecoverProcessingEvent);
+            //GameEvents.onVesselRecoveryProcessing.Remove(VesselRecoverProcessingEvent);
             GameEvents.OnVesselRollout.Remove(VesselRolloutEvent);
-            GameEvents.onGUIRecoveryDialogSpawn.Remove(RecoveryDialogSpawn);
+            //GameEvents.onGUIRecoveryDialogSpawn.Remove(RecoveryDialogSpawn);
             GameEvents.onVesselRecovered.Remove(VesselRecovered);
 
             Events.InventoryChangedEvent.Remove(InventoryChangedEventListener);
@@ -47,87 +47,93 @@ namespace ScrapYard
             Debug.Log($"InventoryChangedEvent - part: {p.Name} - old: {o} - new: {n}");
         }
 
-        private void RecoveryDialogSpawn(MissionRecoveryDialog dialog)
-        {
-            Debug.Log("ScrapYard: dialog spawn");
-            Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
-            object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
-            if (value == null)
-                Debug.Log("Value is null :/");
-            List<PartWidget> partWidgets = value as List<PartWidget>;
-            if (partWidgets != null)
-            {
-                foreach (PartWidget widget in partWidgets)
-                {
-                    //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
-                    widget.partValue = 0;
-                }
-            }
-            else
-            {
-                Debug.Log("Widgets were null :(");
-            }
-        }
+        //private void RecoveryDialogSpawn(MissionRecoveryDialog dialog)
+        //{
+        //    Debug.Log("ScrapYard: dialog spawn");
+        //    Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
+        //    object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
+        //    if (value == null)
+        //        Debug.Log("Value is null :/");
+        //    List<PartWidget> partWidgets = value as List<PartWidget>;
+        //    if (partWidgets != null)
+        //    {
+        //        foreach (PartWidget widget in partWidgets)
+        //        {
+        //            //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
+        //            widget.partValue = 0;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Widgets were null :(");
+        //    }
+        //}
 
-        public void VesselRecoverProcessingEvent(ProtoVessel recovered, MissionRecoveryDialog dialog, float someNum)
-        {
-            Debug.Log("ScrapYard: Vessel Recovery Processing!");
-            Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
-            LastRecoveryUI = dialog;
-            foreach (ProtoPartSnapshot pps in recovered.protoPartSnapshots)
-            {
-                InventoryPart recoveredPart = new InventoryPart(pps);
-                ScrapYard.Instance.TheInventory.AddPart(recoveredPart, 1);
-                Funding.Instance.AddFunds(-1*recoveredPart.DryCost, TransactionReasons.VesselRecovery);
-                //dialog.fundsEarned -= recoveredPart.DryCost;
-                
-            }
+        //public void VesselRecoverProcessingEvent(ProtoVessel recovered, MissionRecoveryDialog dialog, float someNum)
+        //{
+        //    Debug.Log("ScrapYard: Vessel Recovery Processing!");
+        //    Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
+        //    LastRecoveryUI = dialog;
+        //    foreach (ProtoPartSnapshot pps in recovered.protoPartSnapshots)
+        //    {
+        //        InventoryPart recoveredPart = new InventoryPart(pps);
+        //        ScrapYard.Instance.TheInventory.AddPart(recoveredPart, 1);
+        //        Funding.Instance.AddFunds(-1*recoveredPart.DryCost, TransactionReasons.VesselRecovery);
+        //        //dialog.fundsEarned -= recoveredPart.DryCost;
 
-            /* foreach (MemberInfo mi in dialog.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Instance) )
-             {
-                 Debug.Log($"{mi.Name} {mi.MemberType.ToString()}");
-             }*/
-
-            //Debug.Log($"Type is {(dialog.GetType().GetMember("partWidgets", BindingFlags.NonPublic)?.GetValue(0) as MemberInfo)?.MemberType ?? default(MemberTypes) }");
-            object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
-            if (value == null)
-                Debug.Log("Value is null :/");
-            List<PartWidget> partWidgets = value as List<PartWidget>;
-            if (partWidgets != null)
-            {
-                foreach (PartWidget widget in partWidgets)
-                {
-                    //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
-                    widget.partValue = 0;
-                }
-            }
-            else
-            {
-                Debug.Log("Widgets were null :(");
-            }
-        }
+        //    }
+        //    //Debug.Log($"Type is {(dialog.GetType().GetMember("partWidgets", BindingFlags.NonPublic)?.GetValue(0) as MemberInfo)?.MemberType ?? default(MemberTypes) }");
+        //    object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
+        //    if (value == null)
+        //        Debug.Log("Value is null :/");
+        //    List<PartWidget> partWidgets = value as List<PartWidget>;
+        //    if (partWidgets != null)
+        //    {
+        //        foreach (PartWidget widget in partWidgets)
+        //        {
+        //            //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
+        //            widget.partValue = 0;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Widgets were null :(");
+        //    }
+        //}
 
         public void VesselRecovered(ProtoVessel vessel, bool someBool)
         {
-            MissionRecoveryDialog dialog = LastRecoveryUI;
             Debug.Log("ScrapYard: Recovered");
-            Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
-            object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
-            if (value == null)
-                Debug.Log("Value is null :/");
-            List<PartWidget> partWidgets = value as List<PartWidget>;
-            if (partWidgets != null)
+            foreach (ProtoPartSnapshot pps in vessel.protoPartSnapshots)
             {
-                foreach (PartWidget widget in partWidgets)
+                InventoryPart recoveredPart = new InventoryPart(pps);
+                ScrapYard.Instance.TheInventory.AddPart(recoveredPart, 1);
+                if (ScrapYard.Instance.Settings.OverrideFunds)
                 {
-                    //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
-                    widget.partValue = 0;
+                    Funding.Instance.AddFunds(-1 * recoveredPart.DryCost, TransactionReasons.VesselRecovery);
                 }
+                //dialog.fundsEarned -= recoveredPart.DryCost;
+
             }
-            else
-            {
-                Debug.Log("Widgets were null :(");
-            }
+            //MissionRecoveryDialog dialog = LastRecoveryUI;
+            //Debug.Log("ScrapYard: Recovered");
+            //Debug.Log($"fm:{dialog.FundsModifier} - rf:{dialog.recoveryFactor} - fe:{dialog.fundsEarned}");
+            //object value = dialog.GetType().GetField("partWidgets", System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(dialog);
+            //if (value == null)
+            //    Debug.Log("Value is null :/");
+            //List<PartWidget> partWidgets = value as List<PartWidget>;
+            //if (partWidgets != null)
+            //{
+            //    foreach (PartWidget widget in partWidgets)
+            //    {
+            //        //widget.partValue = widget.partValue * (dialog.recoveryFactor - 100) / 100.0;
+            //        widget.partValue = 0;
+            //    }
+            //}
+            //else
+            //{
+            //    Debug.Log("Widgets were null :(");
+            //}
         }
 
         public void VesselRolloutEvent(ShipConstruct vessel)
@@ -165,7 +171,10 @@ namespace ScrapYard
                 ScrapYard.Instance.TheInventory.AddPart(part, -1);
 
                 //Refund its cost
-                Funding.Instance.AddFunds(part.DryCost, TransactionReasons.VesselRollout);
+                if (ScrapYard.Instance.Settings.OverrideFunds)
+                {
+                    Funding.Instance.AddFunds(part.DryCost, TransactionReasons.VesselRollout);
+                }
             }
         }
     }
