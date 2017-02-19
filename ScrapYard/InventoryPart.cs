@@ -183,11 +183,11 @@ namespace ScrapYard
                     foreach (ConfigNode module in value.GetNodes("MODULE"))
                         savedModules.Add(module);
 
-                    Debug.Log($"Name: {Name} DryCost: {DryCost}");
+                    Logging.DebugLog($"Name: {Name} DryCost: {DryCost}");
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log("ScrapYard: Error while loading InventoryPart from a ConfigNode. Error: \n" + ex.Message);
+                    Logging.Log("Error while loading InventoryPart from a ConfigNode. Error: \n" + ex.Message);
                 }
             }
         }

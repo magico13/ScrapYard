@@ -46,7 +46,7 @@ namespace ScrapYard
             if (!disableEvents)
             {
                 //OnInventoryQuantityChanged(this, new InventoryChangedEventArgs(existingPart, previousAmount, newAmount));
-                Events.InventoryChangedEvent.Fire(existingPart, previousAmount, newAmount);
+                Events.SYInventoryChanged.Fire(existingPart, previousAmount, newAmount);
             }
             return newAmount;
         }
@@ -111,7 +111,7 @@ namespace ScrapYard
                 if (!disableEvents)
                 {
                     //OnInventoryQuantityChanged(this, new InventoryChangedEventArgs(internalPart, previousAmount, quantity));
-                    Events.InventoryChangedEvent.Fire(internalPart, previousAmount, quantity);
+                    Events.SYInventoryChanged.Fire(internalPart, previousAmount, quantity);
                 }
             }
             else
@@ -185,10 +185,10 @@ namespace ScrapYard
                             internalInventory.Add(loading, count);
                         }
                     }
-                    Debug.Log("Printing PartInventory:");
+                    Logging.DebugLog("Printing PartInventory:");
                     foreach (KeyValuePair<InventoryPart, int> kvp in internalInventory)
                     {
-                        Debug.Log($"{kvp.Key.Name} : {kvp.Value}");
+                        Logging.DebugLog($"{kvp.Key.Name} : {kvp.Value}");
                     }
                 }
                 catch

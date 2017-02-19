@@ -8,10 +8,10 @@ namespace ScrapYard
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT })]
     class ScrapYard : ScenarioModule
     {
-        private const string TAG = "ScrapYard";
         public static ScrapYard Instance { get; private set; }
         public PartInventory TheInventory = new PartInventory();
         public Settings Settings = new Settings();
+        public VesselTracker ProcessedTracker = new VesselTracker();
         void Start()
         {
             Instance = this;
@@ -26,20 +26,24 @@ namespace ScrapYard
 
         public override void OnLoad(ConfigNode node)
         {
-            Debug.Log("ScrapYard: OnLoad");
+            Logging.DebugLog("OnLoad");
             //Logging.DebugLog(TAG, "Loading from persistence.");
             base.OnLoad(node);
 
             TheInventory.State = node.GetNode("PartInventory");
+            //load settings?
+            //load vessel tracker
         }
 
         public override void OnSave(ConfigNode node)
         {
             //Logging.DebugLog(TAG, "Saving to persistence.");
-            Debug.Log("ScrapYard: OnSave");
+            Logging.DebugLog("OnSave");
             base.OnSave(node);
 
             node.AddNode(TheInventory.State);
+            //save settings?
+            //save vessel tracker
         }
     }
 }
