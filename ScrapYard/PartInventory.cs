@@ -83,7 +83,7 @@ namespace ScrapYard
 
         public InventoryPart FindPart(InventoryPart part)
         {
-            return internalInventory.FirstOrDefault(ip => ip.Key.IdenticalTo(part)).Key;
+            return internalInventory.FirstOrDefault(ip => ip.Key.IsSameAs(part, ComparisonStrength.MODULES)).Key;
         }
 
         /*public InventoryPart GetPartByIndex(int index)

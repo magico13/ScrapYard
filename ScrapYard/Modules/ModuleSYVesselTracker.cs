@@ -8,7 +8,7 @@ namespace ScrapYard.Modules
     //A module that stores a unique ID for a vessel
     public class ModuleSYVesselTracker : PartModule
     {
-        [KSPField]
-        public Guid ID;
+        [KSPField(isPersistant = true, guiActive = false)]
+        public string ID;
     }
 }

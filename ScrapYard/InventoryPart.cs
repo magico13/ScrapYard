@@ -6,6 +6,13 @@ using ScrapYard.Utilities;
 
 namespace ScrapYard
 {
+    public enum ComparisonStrength
+    {
+        NAME, //says they're equal if names match
+        COSTS, //says Name and dry costs are the same
+        MODULES, //as above, plus tracked modules (except MdouleSYPartTracker) match
+        STRICT //as above, plus ModuleSYPartTracker matches
+    }
     public class InventoryPart
     {
         [Persistent]
@@ -107,15 +114,31 @@ namespace ScrapYard
         /// </summary>
         /// <param name="comparedPart"></param>
         /// <returns></returns>
-        public bool IdenticalTo(InventoryPart comparedPart)
+        public bool IsSameAs(InventoryPart comparedPart, ComparisonStrength strictness)
         {
-            //Test to ensure the name, dry cost, and number of saved modules are identical
-            if (Name == comparedPart.Name && DryCost == comparedPart.DryCost && savedModules.Count == comparedPart.savedModules.Count)
+            //Test that the name is the same
+            if (Name != comparedPart.Name)
             {
-                //If strict comparison, ensure the quantity and amount used are identical
-                //if (strict && Quantity != comparedPart.Quantity)
-                //    return false;
+                return false;
+            }
+            if (strictness == ComparisonStrength.NAME) //If we're just comparing name then we're done
+            {
+                return true;
+            }
 
+            //Verify the costs are the same
+            if (DryCost != comparedPart.DryCost)
+            {
+                return false;
+            }
+            if (strictness == ComparisonStrength.COSTS)
+            {
+                return true;
+            }
+
+            //Test to ensure the number of saved modules are identical
+            if (savedModules.Count == comparedPart.savedModules.Count)
+            {
                 //Compare the saved modules to ensure they are identical
                 for (int index = 0; index < savedModules.Count; ++index)
                 {
@@ -125,9 +148,20 @@ namespace ScrapYard
                     }
                 }
                 //If everything has passed, they are considered equal
+            }
+            else
+            {
+                return false;
+            }
+            if (strictness == ComparisonStrength.MODULES)
+            {
                 return true;
             }
-            return false;
+
+            //TODO: compare number of times used
+
+
+            return true;
         }
 
         public Part ToPart()

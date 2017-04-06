@@ -11,7 +11,7 @@ namespace ScrapYard.Modules
     /// </summary>
     public class ModuleSYPartTracker : PartModule
     {
-        [KSPField]
-        public long TimesRecovered = 1;
+        [KSPField(isPersistant = true, guiActive = false)]
+        public int TimesRecovered = 1;
     }
 }
