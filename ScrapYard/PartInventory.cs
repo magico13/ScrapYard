@@ -9,9 +9,7 @@ namespace ScrapYard
     public class PartInventory
     {
         private bool disableEvents = false;
-        private Dictionary<InventoryPart, int> internalInventory = new Dictionary<InventoryPart, int>();
-
-        //public event EventHandler<InventoryChangedEventArgs> OnInventoryQuantityChanged;
+        private HashSet<InventoryPart> internalInventory = new HashSet<InventoryPart>();
 
         public PartInventory() { }
         /// <summary>
@@ -23,50 +21,31 @@ namespace ScrapYard
             disableEvents = DisableEvents;
         }
 
-        public int AddPart(InventoryPart part, int quantity = 1)
+        public void AddPart(InventoryPart part)
         {
-            /*if (quantity > int.MinValue)
-                part.SetQuantity(quantity);*/
-            int previousAmount = 0;
-            InventoryPart existingPart = FindPart(part);
-            if (existingPart != null)
-            {
-                //Logging.DebugLog("ScrapYard", "Found existing part.");
-                //existingPart.AddQuantity(part.Quantity);
-                previousAmount = internalInventory[existingPart];
-                internalInventory[existingPart] += quantity;
-            }
-            else
-            {
-                //Logging.DebugLog("ScrapYard", "Didn't find existing part.");
-                internalInventory.Add(part, quantity);
-                existingPart = part;
-            }
-            int newAmount = internalInventory[existingPart];
+            internalInventory.Add(part);
             if (!disableEvents)
             {
-                //OnInventoryQuantityChanged(this, new InventoryChangedEventArgs(existingPart, previousAmount, newAmount));
-                Events.SYInventoryChanged.Fire(existingPart, previousAmount, newAmount);
+                Events.SYInventoryChanged.Fire(part, true);
             }
-            return newAmount;
         }
 
-        public int AddPart(Part part, int quantity = 1)
+        public void AddPart(Part part)
         {
             InventoryPart convertedPart = new InventoryPart(part);
-            return AddPart(convertedPart, quantity);
+            AddPart(convertedPart);
         }
 
-        public int AddPart(ProtoPartSnapshot protoPartSnapshot, int quantity = 1)
+        public void AddPart(ProtoPartSnapshot protoPartSnapshot)
         {
             InventoryPart convertedPart = new InventoryPart(protoPartSnapshot);
-            return AddPart(convertedPart, quantity);
+            AddPart(convertedPart);
         }
 
-        public int AddPart(ConfigNode partNode, int quantity = 1)
+        public void AddPart(ConfigNode partNode)
         {
             InventoryPart convertedPart = new InventoryPart(partNode);
-            return AddPart(convertedPart, quantity);
+            AddPart(convertedPart);
         }
 
        /* public int IncrementUsageCounter(InventoryPart part)
@@ -81,58 +60,23 @@ namespace ScrapYard
             return existingPart.Used;
         }*/
 
-        public InventoryPart FindPart(InventoryPart part)
+        public InventoryPart FindPart(InventoryPart part, ComparisonStrength strength = ComparisonStrength.MODULES)
         {
-            return internalInventory.FirstOrDefault(ip => ip.Key.IsSameAs(part, ComparisonStrength.MODULES)).Key;
+            return internalInventory.FirstOrDefault(ip => ip.IsSameAs(part, strength));
         }
 
-        /*public InventoryPart GetPartByIndex(int index)
+        public InventoryPart RemovePart(InventoryPart part, ComparisonStrength strength = ComparisonStrength.MODULES)
         {
-            return InternalInventory
-        }*/
-
-        /*private int FindPartIndex(InventoryPart part)
-        {
-            InventoryPart target = FindPart(part);
-            if (target == null)
-                return -1;
-            return InternalInventory.IndexOf(target);
-        }*/
-
-        public void SetPartQuantity(InventoryPart part, int quantity)
-        {
-            //int index = FindPartIndex(part);
-            InventoryPart internalPart = FindPart(part);
-            
-            if (internalPart != null)
+            InventoryPart found = FindPart(part, strength);
+            if (found != null && internalInventory.Remove(found))
             {
-                int previousAmount = internalInventory[internalPart];
-                internalInventory[internalPart] = quantity;
                 if (!disableEvents)
                 {
-                    //OnInventoryQuantityChanged(this, new InventoryChangedEventArgs(internalPart, previousAmount, quantity));
-                    Events.SYInventoryChanged.Fire(internalPart, previousAmount, quantity);
+                    Events.SYInventoryChanged.Fire(found, false);
                 }
+                return found;
             }
-            else
-            {
-                //part.SetQuantity(quantity);
-                AddPart(part, quantity);
-            }
-        }
-
-        public int GetPartQuantity(InventoryPart part)
-        {
-            if (part == null)
-                return 0;
-
-            InventoryPart internalPart = FindPart(part);
-
-            if (internalPart != null)
-            {
-                return internalInventory[internalPart];
-            }
-            return 0;
+            return null;
         }
 
         public void SplitParts(List<InventoryPart> input, out List<InventoryPart> inInventory, out List<InventoryPart> notInInventory)
@@ -143,10 +87,9 @@ namespace ScrapYard
             InventoryCopy.State = State; //TODO: Make a copy method
             foreach (InventoryPart inputPart in input)
             {
-                if (InventoryCopy.GetPartQuantity(inputPart) > 0)
+                if (InventoryCopy.RemovePart(inputPart) != null)
                 {
                     inInventory.Add(inputPart);
-                    InventoryCopy.AddPart(inputPart, -1);
                 }
                 else
                 {
@@ -161,10 +104,9 @@ namespace ScrapYard
             {
                 ConfigNode returnNode = new ConfigNode("PartInventory");
                 //Add module nodes
-                foreach (KeyValuePair<InventoryPart, int> kvp in internalInventory)
+                foreach (InventoryPart part in internalInventory)
                 {
-                    ConfigNode toAdd = kvp.Key.State;
-                    toAdd.AddValue("quantity", kvp.Value);
+                    ConfigNode toAdd = part.State;
                     returnNode.AddNode(toAdd);
                 }
                 return returnNode;
@@ -173,27 +115,22 @@ namespace ScrapYard
             {
                 try
                 {
-                    internalInventory = new Dictionary<InventoryPart, int>();
+                    internalInventory = new HashSet<InventoryPart>();
                     foreach (ConfigNode inventoryPartNode in value.GetNodes(typeof(InventoryPart).FullName))
                     {
                         InventoryPart loading = new InventoryPart();
                         loading.State = inventoryPartNode;
-                        //loading.Load(inventoryPart);
-                        int count = 0;
-                        if (int.TryParse(inventoryPartNode.GetValue("quantity"), out count))
-                        {
-                            internalInventory.Add(loading, count);
-                        }
+                        internalInventory.Add(loading);
                     }
                     Logging.DebugLog("Printing PartInventory:");
-                    foreach (KeyValuePair<InventoryPart, int> kvp in internalInventory)
+                    foreach (InventoryPart part in internalInventory)
                     {
-                        Logging.DebugLog($"{kvp.Key.Name} : {kvp.Value}");
+                        Logging.DebugLog(part.Name);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    //Logging.Log("ScrapYard", "Error while loading PartInventory from a ConfigNode. Error: \n"+ex.Message);
+                    Logging.LogException(ex);
                 }
             }
         }

@@ -44,9 +44,9 @@ namespace ScrapYard
             Logging.DebugLog("Event Listeners De-Registered!");
         }
 
-        private void InventoryChangedEventListener(InventoryPart p, int o, int n)
+        private void InventoryChangedEventListener(InventoryPart p, bool added)
         {
-            Logging.DebugLog($"InventoryChangedEvent - part: {p.Name} - old: {o} - new: {n}");
+            Logging.DebugLog($"InventoryChangedEvent - part: {p.Name} - added: {added}");
         }
 
         public void VesselRecovered(ProtoVessel vessel, bool someBool)
@@ -64,11 +64,11 @@ namespace ScrapYard
                 else
                 {
                     //add the module, no idea if this works at all
-                    pps.modules.Add(new ProtoPartModuleSnapshot(new ModuleSYPartTracker() { TimesRecovered = 1 }));
+                    //pps.modules.Add(new ProtoPartModuleSnapshot(new ModuleSYPartTracker() { TimesRecovered = 1 }));
                 }
 
                 InventoryPart recoveredPart = new InventoryPart(pps);
-                ScrapYard.Instance.TheInventory.AddPart(recoveredPart, 1);
+                ScrapYard.Instance.TheInventory.AddPart(recoveredPart);
                 if (ScrapYard.Instance.Settings.OverrideFunds)
                 {
                     Funding.Instance.AddFunds(-1 * recoveredPart.DryCost, TransactionReasons.VesselRecovery);
@@ -118,7 +118,7 @@ namespace ScrapYard
                 //Remove part
                 //part.SetQuantity(-1);
                 //Logging.DebugLog("ScrapYard", ScrapYard.instance.TheInventory.GetPartByIndex(0).Quantity);
-                ScrapYard.Instance.TheInventory.AddPart(part, -1);
+                ScrapYard.Instance.TheInventory.RemovePart(part);
 
                 //Refund its cost
                 if (ScrapYard.Instance.Settings.OverrideFunds)

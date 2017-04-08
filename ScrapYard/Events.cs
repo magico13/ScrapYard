@@ -7,6 +7,6 @@ namespace ScrapYard
 {
     public static class Events
     {
-        public static EventData<InventoryPart, int, int> SYInventoryChanged = new EventData<InventoryPart, int, int>("SYInventoryChanged");
+        public static EventData<InventoryPart, bool> SYInventoryChanged = new EventData<InventoryPart, bool>("SYInventoryChanged");
     }
 }

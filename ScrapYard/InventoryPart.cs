@@ -225,5 +225,20 @@ namespace ScrapYard
                 }
             }
         }
+
+        public override int GetHashCode()
+        { //TODO: Cache hash
+            int hash = 0;
+            foreach (char s in Name ?? string.Empty)
+            {
+                hash += s;
+            }
+            return hash * 13;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj);
+        }
     }
 }
