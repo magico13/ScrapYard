@@ -25,5 +25,11 @@ namespace ScrapYard.Modules
                 ID = Guid.NewGuid().ToString();
             }
         }
+
+        public override void OnCopy(PartModule fromModule)
+        {
+            base.OnCopy(fromModule);
+            ID = Guid.NewGuid().ToString();
+        }
     }
 }
