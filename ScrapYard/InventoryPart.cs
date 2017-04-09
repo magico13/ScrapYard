@@ -11,7 +11,8 @@ namespace ScrapYard
         NAME, //says they're equal if names match
         COSTS, //says Name and dry costs are the same
         MODULES, //as above, plus tracked modules (except MdouleSYPartTracker) match
-        STRICT //as above, plus ModuleSYPartTracker matches
+        TRACKER, //as above, plus the number of times used must match
+        STRICT //as above, plus the ids match
     }
     public class InventoryPart
     {
@@ -22,8 +23,13 @@ namespace ScrapYard
 
         public string Name { get { return _name; } }
         public float DryCost { get { return _dryCost; } }
+        public ConfigNode TrackerModule { get { return trackerModule; } }
+
 
         private List<ConfigNode> savedModules = new List<ConfigNode>();
+        private ConfigNode trackerModule = null;
+
+        private int _hash = 0;
 
         /// <summary>
         /// Creates an empty InventoryPart.
@@ -53,6 +59,12 @@ namespace ScrapYard
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module.snapshot.moduleValues);
                     }
+
+                    //check for the part tracker and add it
+                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    {
+                        trackerModule = module.snapshot.moduleValues;
+                    }
                 }
             }
         }
@@ -76,6 +88,12 @@ namespace ScrapYard
                     {
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module.moduleValues);
+                    }
+
+                    //check for the part tracker and add it
+                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    {
+                        trackerModule = module.moduleValues;
                     }
                 }
             }
@@ -104,6 +122,12 @@ namespace ScrapYard
                     {
                         if (module.GetValue("name").ToUpper().Contains(trackedModuleName))
                             savedModules.Add(module);
+                    }
+
+                    //check for the part tracker and add it
+                    if (module.GetValue("name").Equals("ModuleSYPartTracker"))
+                    {
+                        trackerModule = module;
                     }
                 }
             }
@@ -158,9 +182,27 @@ namespace ScrapYard
                 return true;
             }
 
-            //TODO: compare number of times used
+            //Tracker comparison, the times used must match
+            if (trackerModule == null || comparedPart.trackerModule == null)
+            {
+                return false;
+            }
+            if (trackerModule.GetValue("TimesRecovered") != comparedPart.trackerModule.GetValue("TimesRecovered"))
+            {
+                return false;
+            }
+            if (strictness == ComparisonStrength.TRACKER)
+            {
+                return true;
+            }
 
+            //Strict comparison, the ids must be the same
+            if (trackerModule.GetValue("ID") != comparedPart.trackerModule.GetValue("ID"))
+            {
+                return false;
+            }
 
+            //Every must match, they are the same
             return true;
         }
 
@@ -204,6 +246,10 @@ namespace ScrapYard
                 {
                     returnNode.AddNode(module);
                 }
+                if (trackerModule != null)
+                {
+                    returnNode.AddNode(trackerModule);
+                }
                 return returnNode;
             }
             set
@@ -215,7 +261,16 @@ namespace ScrapYard
                     ConfigNode.LoadObjectFromConfig(this, value);
                     savedModules = new List<ConfigNode>();
                     foreach (ConfigNode module in value.GetNodes("MODULE"))
-                        savedModules.Add(module);
+                    {
+                        if (module.GetValue("name").Equals("ModuleSYPartTracker"))
+                        {
+                            trackerModule = module;
+                        }
+                        else
+                        {
+                            savedModules.Add(module);
+                        }
+                    }
 
                     Logging.DebugLog($"Name: {Name} DryCost: {DryCost}");
                 }
@@ -228,12 +283,15 @@ namespace ScrapYard
 
         public override int GetHashCode()
         { //TODO: Cache hash
-            int hash = 0;
-            foreach (char s in Name ?? string.Empty)
+            if (_hash == 0)
             {
-                hash += s;
+                foreach (char s in Name ?? string.Empty)
+                {
+                    _hash += s;
+                }
+                _hash *= 31;
             }
-            return hash * 13;
+            return _hash;
         }
 
         public override bool Equals(object obj)

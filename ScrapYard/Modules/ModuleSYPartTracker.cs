@@ -11,7 +11,19 @@ namespace ScrapYard.Modules
     /// </summary>
     public class ModuleSYPartTracker : PartModule
     {
-        [KSPField(isPersistant = true, guiActive = false)]
-        public int TimesRecovered = 1;
+        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        public string ID;
+        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        public int TimesRecovered = 0;
+
+
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
+            if (string.IsNullOrEmpty(ID))
+            {
+                ID = Guid.NewGuid().ToString();
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using UnityEngine;
+using ScrapYard.Modules;
 
 namespace ScrapYard
 {
@@ -94,6 +95,40 @@ namespace ScrapYard
                 else
                 {
                     notInInventory.Add(inputPart);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the inventory to a vessel, specifically the part tracker
+        /// </summary>
+        /// <param name="input">The vessel as a list of parts</param>
+        public void ApplyInventoryToVessel(List<Part> input)
+        {
+            foreach (Part part in input)
+            {
+                //convert it to an inventorypart
+                InventoryPart iPart = new InventoryPart(part);
+                //find a corresponding one in the inventory and remove it
+                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.MODULES);
+
+                //if one was found...
+                if (inInventory != null)
+                {
+                    Logging.DebugLog("Found a part in inventory for " + inInventory.Name);
+                    //copy it's part tracker over
+                    if (inInventory.TrackerModule != null && part.Modules?.Contains("ModuleSYPartTracker") == true)
+                    {
+                        ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
+                        tracker.ID = inInventory.TrackerModule.GetValue("ID");
+                        int.TryParse(inInventory.TrackerModule.GetValue("TimesRecovered"), out tracker.TimesRecovered);
+                        Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
+                    }
+                    //add funds back if active
+                    if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+                    {
+                        Funding.Instance.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                    }
                 }
             }
         }
