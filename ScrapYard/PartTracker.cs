@@ -7,16 +7,22 @@ namespace ScrapYard
 {
     public class PartTracker
     {
+        #region Fields
         private ComparisonStrength _strictness = ComparisonStrength.NAME;
         private Dictionary<InventoryPart, int> _buildTracker = new Dictionary<InventoryPart, int>();
         private Dictionary<InventoryPart, int> _useTracker = new Dictionary<InventoryPart, int>();
-        
+        #endregion Fields
+
+        #region Public Methods
+
+        #region Add
         /// <summary>
         /// Takes a list of parts and registers it as a build
         /// </summary>
         /// <param name="parts">The vessel as a list of parts</param>
         public void AddBuild(List<Part> parts)
         {
+            Logging.DebugLog("Adding build (parts)");
             List<InventoryPart> uniqueParts = new List<InventoryPart>();
             foreach (Part part in parts) //add a use for each part and get the unique parts for the build tracker
             {
@@ -31,18 +37,84 @@ namespace ScrapYard
             //Increment the build tracker
             foreach (InventoryPart part in uniqueParts)
             {
-                InventoryPart found = _buildTracker.Keys.FirstOrDefault(ip => ip.IsSameAs(part, _strictness));
-                if (found != null)
-                {
-                    _buildTracker[found] += 1; //increment it
-                }
-                else
-                {
-                    _buildTracker[part] = 1; //add it
-                }
+                addBuild(part);
             }
         }
 
+        /// <summary>
+        /// Takes a list of part ConfigNodes and registers it as a build
+        /// </summary>
+        /// <param name="parts">The vessel as a list of part ConfigNodes</param>
+        public void AddBuild(List<ConfigNode> partNodes)
+        {
+            Logging.DebugLog("Adding build (nodes)");
+            List<InventoryPart> uniqueParts = new List<InventoryPart>();
+            foreach (ConfigNode partNode in partNodes) //add a use for each part and get the unique parts for the build tracker
+            {
+                InventoryPart converted = new InventoryPart(partNode);
+                InventoryPart found = addUse(converted);
+                if (!uniqueParts.Exists(ip => ip.IsSameAs(converted, _strictness)))
+                {
+                    uniqueParts.Add(found);
+                }
+            }
+
+            //Increment the build tracker
+            foreach (InventoryPart part in uniqueParts)
+            {
+                addBuild(part);
+            }
+        }
+        #endregion Add
+
+        #region Get
+        /// <summary>
+        /// Gets the number of builds for a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>Number of builds</returns>
+        public int GetBuildsForPart(Part part)
+        {
+            InventoryPart ip = new InventoryPart(part);
+            return getBuilds(ip);
+        }
+
+        /// <summary>
+        /// Gets the number of builds for a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>Number of builds</returns>
+        public int GetBuildsForPart(ConfigNode part)
+        {
+            InventoryPart ip = new InventoryPart(part);
+            return getBuilds(ip);
+        }
+
+        /// <summary>
+        /// Gets the number of uses of a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>Number of uses</returns>
+        public int GetUsesForPart(Part part)
+        {
+            InventoryPart ip = new InventoryPart(part);
+            return getUses(ip);
+        }
+
+        /// <summary>
+        /// Gets the number of uses of a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>Number of uses</returns>
+        public int GetUsesForPart(ConfigNode part)
+        {
+            InventoryPart ip = new InventoryPart(part);
+            return getUses(ip);
+        }
+        #endregion Get
+        #endregion Public Methods
+
+        #region Private Methods
         /// <summary>
         /// Adds a single use to the useTracker
         /// </summary>
@@ -57,11 +129,66 @@ namespace ScrapYard
             }
             else
             {
+                found = source;
                 _useTracker[source] = 1; //add it
             }
-            return found ?? source;
+            Logging.DebugLog($"{found.Name} has been used {_useTracker[found]} total times.");
+            return found;
         }
 
+        /// <summary>
+        /// Adds a single build to the buildTracker
+        /// </summary>
+        /// <param name="source">The InventoryPart to increment</param>
+        /// <returns>The corresponding InventoryPart that's actually stored</returns>
+        private InventoryPart addBuild(InventoryPart source)
+        {
+            InventoryPart found = _buildTracker.Keys.FirstOrDefault(ip => ip.IsSameAs(source, _strictness));
+            if (found != null)
+            {
+                _buildTracker[found] += 1; //increment it
+            }
+            else
+            {
+                found = source;
+                _buildTracker[source] = 1; //add it
+            }
+            Logging.DebugLog($"{found.Name} has been used in {_useTracker[found]} builds.");
+            return found;
+        }
+
+        /// <summary>
+        /// Gets the number of builds for an InventoryPart
+        /// </summary>
+        /// <param name="part">Part to get builds for</param>
+        /// <returns>Number of builds</returns>
+        private int getBuilds(InventoryPart part)
+        {
+            InventoryPart found = _buildTracker.Keys.FirstOrDefault(ip => ip.IsSameAs(part, _strictness));
+            if (found != null)
+            {
+                return _buildTracker[found];
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Gets the number of uses for an InventoryPart
+        /// </summary>
+        /// <param name="part">Part to get uses for</param>
+        /// <returns>Number of uses</returns>
+        private int getUses(InventoryPart part)
+        {
+            InventoryPart found = _useTracker.Keys.FirstOrDefault(ip => ip.IsSameAs(part, _strictness));
+            if (found != null)
+            {
+                return _useTracker[found];
+            }
+            return 0;
+        }
+        #endregion Private Methods
+
+        #region State
         public ConfigNode State
         {
             get
@@ -96,6 +223,11 @@ namespace ScrapYard
                 _buildTracker.Clear();
                 _useTracker.Clear();
 
+                if (value == null)
+                {
+                    return;
+                }
+
                 foreach (ConfigNode node in value.GetNodes("TrackedItem"))
                 {
                     try
@@ -120,5 +252,6 @@ namespace ScrapYard
                 }
             }
         }
+        #endregion State
     }
 }

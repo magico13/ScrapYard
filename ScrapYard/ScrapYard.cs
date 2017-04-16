@@ -28,25 +28,24 @@ namespace ScrapYard
         public override void OnLoad(ConfigNode node)
         {
             Logging.DebugLog("OnLoad");
-            //Logging.DebugLog(TAG, "Loading from persistence.");
             base.OnLoad(node);
 
             TheInventory.State = node.GetNode("PartInventory");
-            PartTracker.State = node.GetNode("PartTracler");
+            PartTracker.State = node.GetNode("PartTracker");
+            ProcessedTracker.State = node.GetNode("VesselTracker");
             //load settings?
-            //load vessel tracker
+            
         }
 
         public override void OnSave(ConfigNode node)
         {
-            //Logging.DebugLog(TAG, "Saving to persistence.");
             Logging.DebugLog("OnSave");
             base.OnSave(node);
 
             node.AddNode(TheInventory.State);
             node.AddNode(PartTracker.State);
+            node.AddNode(ProcessedTracker.State);
             //save settings?
-            //save vessel tracker
         }
     }
 }

@@ -89,5 +89,49 @@ namespace ScrapYard
 
             return tracker.Remove(vesselID.GetValueOrDefault());
         }
+
+        /// <summary>
+        /// Returns a ConfigNode representing the current state, or sets the state from a ConfigNode
+        /// </summary>
+        public ConfigNode State
+        {
+            get
+            {
+                ConfigNode node = new ConfigNode("VesselTracker");
+                foreach (KeyValuePair<Guid, bool> kvp in tracker)
+                {
+                    node.AddValue(kvp.Key.ToString(), kvp.Value);
+                }
+                return node;
+            }
+            internal set
+            {
+                try
+                {
+                    tracker.Clear();
+                    if (value == null)
+                    {
+                        return;
+                    }
+                    foreach (ConfigNode.Value val in value.values)
+                    {
+                        Guid? id = Utilities.Utils.StringToGuid(val.name);
+                        if (id.HasValue)
+                        {
+                            bool tracked;
+                            if (bool.TryParse(val.value, out tracked))
+                            {
+                                tracker[(Guid)id] = tracked;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logging.Log("Exception while assigning VesselTracker");
+                    Logging.LogException(ex);
+                }
+            }
+        }
     }
 }

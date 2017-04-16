@@ -27,6 +27,7 @@ namespace ScrapYard
             GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
             //GameEvents.onGUIRecoveryDialogSpawn.Add(RecoveryDialogSpawn);
             
+            //For debugging
             Events.SYInventoryChanged.Add(InventoryChangedEventListener);
 
             Logging.DebugLog("Event Listeners Registered!");

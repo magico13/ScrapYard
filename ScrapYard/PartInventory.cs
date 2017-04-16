@@ -170,6 +170,9 @@ namespace ScrapYard
             }
         }
 
+        /// <summary>
+        /// Returns a ConfigNode representing the current state, or sets the state from a ConfigNode
+        /// </summary>
         public ConfigNode State
         {
             get
@@ -188,6 +191,11 @@ namespace ScrapYard
                 try
                 {
                     internalInventory = new HashSet<InventoryPart>();
+                    if (value == null)
+                    {
+                        return;
+                    }
+
                     foreach (ConfigNode inventoryPartNode in value.GetNodes(typeof(InventoryPart).FullName))
                     {
                         InventoryPart loading = new InventoryPart();
