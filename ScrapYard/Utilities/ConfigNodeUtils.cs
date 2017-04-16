@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Linq;
 
 namespace ScrapYard.Utilities
 {
@@ -68,6 +68,17 @@ namespace ScrapYard.Utilities
 
             //If all these tests pass, we consider the nodes to be identical
             return true;
+        }
+
+        /// <summary>
+        /// Extracts a Module node from a Part node
+        /// </summary>
+        /// <param name="partNode">The part ConfigNode</param>
+        /// <param name="moduleName">The module to extract</param>
+        /// <returns>The Module node or null if could not be found</returns>
+        public static ConfigNode GetModuleNode(this ConfigNode partNode, string moduleName)
+        {
+            return partNode.GetNodes("MODULE")?.FirstOrDefault(n => n.GetValue("name").Equals(moduleName, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

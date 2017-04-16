@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using UnityEngine;
 using ScrapYard.Modules;
+using ScrapYard.Utilities;
 
 namespace ScrapYard
 {
@@ -123,6 +124,42 @@ namespace ScrapYard
                         tracker.ID = inInventory.TrackerModule.GetValue("ID");
                         int.TryParse(inInventory.TrackerModule.GetValue("TimesRecovered"), out tracker.TimesRecovered);
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
+                    }
+                    //add funds back if active
+                    if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+                    {
+                        Funding.Instance.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the inventory to a vessel, specifically the part tracker
+        /// </summary>
+        /// <param name="input">The vessel as a list of part ConfigNodes</param>
+        public void ApplyInventoryToVessel(List<ConfigNode> input)
+        {
+            foreach (ConfigNode partNode in input)
+            {
+                //convert it to an inventorypart
+                InventoryPart iPart = new InventoryPart(partNode);
+                //find a corresponding one in the inventory and remove it
+                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.MODULES);
+
+                //if one was found...
+                if (inInventory != null)
+                {
+                    Logging.DebugLog("Found a part in inventory for " + inInventory.Name);
+                    //copy it's part tracker over
+                    ConfigNode trackerNode;
+                    if (inInventory.TrackerModule != null && (trackerNode = partNode.GetModuleNode("ModuleSYPartTracker")) != null)
+                    {
+                        string id = inInventory.TrackerModule.GetValue("ID");
+                        string recovered = inInventory.TrackerModule.GetValue("TimesRecovered");
+                        trackerNode.SetValue("ID", id);
+                        trackerNode.SetValue("TimesRecovered", recovered);
+                        Logging.DebugLog($"Copied tracker. Recovered {recovered} times with id {id}");
                     }
                     //add funds back if active
                     if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
