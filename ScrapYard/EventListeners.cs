@@ -1,6 +1,7 @@
 ﻿using KSP.UI.Screens;
 using KSP.UI.Screens.SpaceCenter.MissionSummaryDialog;
 using ScrapYard.Modules;
+using ScrapYard.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -83,13 +84,14 @@ namespace ScrapYard
             //If vessel not processed, then take parts
             //If already processed, just return
 
-            if (ScrapYard.Instance.ProcessedTracker.GetOrAdd(Utilities.Utils.StringToGuid(
-                vessel.Parts[0].Modules.GetModule<ModuleSYVesselTracker>()?.ID)))
+            if (ScrapYard.Instance.ProcessedTracker.Remove(Utils.StringToGuid(
+                vessel.Parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID)))
             {
                 return;
             }
 
             ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(vessel.parts);
+            ScrapYard.Instance.PartTracker.AddBuild(vessel.parts);
 
             //List<InventoryPart> UniqueParts = new List<InventoryPart>(),
             //List< InventoryPart > UsedParts = new List<InventoryPart>();
@@ -129,7 +131,7 @@ namespace ScrapYard
             //    }
             //}
 
-            ScrapYard.Instance.ProcessedTracker.TrackVessel(Utilities.Utils.StringToGuid(vessel.Parts[0].Modules.GetModule<ModuleSYVesselTracker>()?.ID), true);
+            //ScrapYard.Instance.ProcessedTracker.TrackVessel(Utilities.Utils.StringToGuid(vessel.Parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID), true);
         }
     }
 }

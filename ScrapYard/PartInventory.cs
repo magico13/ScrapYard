@@ -146,7 +146,7 @@ namespace ScrapYard
                 }
                 return returnNode;
             }
-            set
+            internal set
             {
                 try
                 {

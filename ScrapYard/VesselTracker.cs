@@ -74,5 +74,20 @@ namespace ScrapYard
                 return partsProcessed;
             }
         }
+
+        /// <summary>
+        /// Removes a vessel from the tracker (typically when launched).
+        /// </summary>
+        /// <param name="vesselID">The vessel to remove</param>
+        /// <returns>True if removed, false otherwise.</returns>
+        public bool Remove(Guid? vesselID)
+        {
+            if (!IsProcessed(vesselID))
+            {
+                return false;
+            }
+
+            return tracker.Remove(vesselID.GetValueOrDefault());
+        }
     }
 }

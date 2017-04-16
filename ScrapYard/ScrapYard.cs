@@ -9,9 +9,10 @@ namespace ScrapYard
     class ScrapYard : ScenarioModule
     {
         public static ScrapYard Instance { get; private set; }
-        public PartInventory TheInventory = new PartInventory();
-        public Settings Settings = new Settings();
-        public VesselTracker ProcessedTracker = new VesselTracker();
+        public PartInventory TheInventory { get; } = new PartInventory();
+        public Settings Settings { get; } = new Settings();
+        public VesselTracker ProcessedTracker { get; } = new VesselTracker();
+        public PartTracker PartTracker { get; } = new PartTracker();
         void Start()
         {
             Instance = this;
@@ -31,6 +32,7 @@ namespace ScrapYard
             base.OnLoad(node);
 
             TheInventory.State = node.GetNode("PartInventory");
+            PartTracker.State = node.GetNode("PartTracler");
             //load settings?
             //load vessel tracker
         }
@@ -42,6 +44,7 @@ namespace ScrapYard
             base.OnSave(node);
 
             node.AddNode(TheInventory.State);
+            node.AddNode(PartTracker.State);
             //save settings?
             //save vessel tracker
         }
