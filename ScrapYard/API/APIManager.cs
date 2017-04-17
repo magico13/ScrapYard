@@ -22,6 +22,52 @@ namespace ScrapYard
             }
         }
 
+        #region Inventory Manipulation
+        /// <summary>
+        /// Takes a List of Parts and returns the Parts that are present in the inventory. 
+        /// Assumes the default strictness.
+        /// </summary>
+        /// <param name="sourceParts">Source list of parts</param>
+        /// <returns>List of Parts that are in the inventory</returns>
+        public List<Part> GetPartsInInventory_Parts(List<Part> sourceParts)
+        {
+            List<Part> inInventory = new List<Part>();
+            PartInventory InventoryCopy = new PartInventory(true);
+            InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
+            foreach (Part part in sourceParts)
+            {
+                InventoryPart inputPart = new InventoryPart(part);
+                if (InventoryCopy.RemovePart(inputPart) != null)
+                {
+                    inInventory.Add(part);
+                }
+            }
+            return inInventory;
+        }
+
+        /// <summary>
+        /// Takes a List of part ConfigNodes and returns the ConfigNodes that are present in the inventory. 
+        /// Assumes the default strictness.
+        /// </summary>
+        /// <param name="sourceParts">Source list of parts</param>
+        /// <returns>List of part ConfigNodes that are in the inventory</returns>
+        public List<ConfigNode> GetPartsInInventory_ConfigNodes(List<ConfigNode> sourceParts)
+        {
+            List<ConfigNode> inInventory = new List<ConfigNode>();
+            PartInventory InventoryCopy = new PartInventory(true);
+            InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
+            foreach (ConfigNode part in sourceParts)
+            {
+                InventoryPart inputPart = new InventoryPart(part);
+                if (InventoryCopy.RemovePart(inputPart) != null)
+                {
+                    inInventory.Add(part);
+                }
+            }
+            return inInventory;
+        }
+
+        #endregion Inventory Manipulation
 
         #region Vessel Processing
         /// <summary>
@@ -30,7 +76,7 @@ namespace ScrapYard
         /// <param name="parts">The vessel as a List of Parts</param>
         /// <param name="applyInventory">If true, applies inventory parts.</param>
         /// <returns>True if processed, false otherwise</returns>
-        public bool ProcessVessel(List<Part> parts, bool applyInventory)
+        public bool ProcessVessel_Parts(List<Part> parts, bool applyInventory)
         {
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID);
@@ -68,7 +114,7 @@ namespace ScrapYard
         /// <param name="parts">The vessel as a List of Parts</param>
         /// <param name="applyInventory">If true, applies inventory parts.</param>
         /// <returns>True if processed, false otherwise</returns>
-        public bool ProcessVessel(List<ConfigNode> partNodes, bool applyInventory)
+        public bool ProcessVessel_Nodes(List<ConfigNode> partNodes, bool applyInventory)
         {
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(
@@ -108,7 +154,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="part">The part to check</param>
         /// <returns>Number of builds for the part</returns>
-        public int GetBuildCount(Part part)
+        public int GetBuildCount_Part(Part part)
         {
             return ScrapYard.Instance.PartTracker.GetBuildsForPart(part);
         }
@@ -118,7 +164,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="partNode">The ConfigNode of the part to check</param>
         /// <returns>Number of builds for the part</returns>
-        public int GetBuildCount(ConfigNode partNode)
+        public int GetBuildCount_Node(ConfigNode partNode)
         {
             return ScrapYard.Instance.PartTracker.GetBuildsForPart(partNode);
         }
@@ -128,7 +174,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="part">The part to check</param>
         /// <returns>Number of uses of the part</returns>
-        public int GetUseCount(Part part)
+        public int GetUseCount_Part(Part part)
         {
             return ScrapYard.Instance.PartTracker.GetUsesForPart(part);
         }
@@ -138,7 +184,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="partNode">The ConfigNode of the part to check</param>
         /// <returns>Number of uses of the part</returns>
-        public int GetUseCount(ConfigNode partNode)
+        public int GetUseCount_Node(ConfigNode partNode)
         {
             return ScrapYard.Instance.PartTracker.GetUsesForPart(partNode);
         }

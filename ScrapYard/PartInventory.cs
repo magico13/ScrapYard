@@ -81,14 +81,21 @@ namespace ScrapYard
             return null;
         }
 
-        public void SplitParts(List<InventoryPart> input, out List<InventoryPart> inInventory, out List<InventoryPart> notInInventory)
+        /// <summary>
+        /// Splits a list of parts into a list of those that are in the inventory and those that are not
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="inInventory"></param>
+        /// <param name="notInInventory"></param>
+        public void SplitParts(List<Part> input, out List<InventoryPart> inInventory, out List<InventoryPart> notInInventory)
         {
             inInventory = new List<InventoryPart>();
             notInInventory = new List<InventoryPart>();
             PartInventory InventoryCopy = new PartInventory(true);
-            InventoryCopy.State = State; //TODO: Make a copy method
-            foreach (InventoryPart inputPart in input)
+            InventoryCopy.State = State;
+            foreach (Part part in input)
             {
+                InventoryPart inputPart = new InventoryPart(part);
                 if (InventoryCopy.RemovePart(inputPart) != null)
                 {
                     inInventory.Add(inputPart);
