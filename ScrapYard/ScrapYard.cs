@@ -47,5 +47,14 @@ namespace ScrapYard
             node.AddNode(ProcessedTracker.State);
             //save settings?
         }
+
+        #region GUI Code
+        public UI.InventoryApplyUI ApplyInventoryUI { get; } = new UI.InventoryApplyUI();
+
+        private void OnGUI()
+        {
+            ApplyInventoryUI.OnGUIHandler();
+        }
+        #endregion GUI Code
     }
 }

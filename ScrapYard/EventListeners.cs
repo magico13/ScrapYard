@@ -11,21 +11,18 @@ namespace ScrapYard
 {
     public class EventListeners
     {
-        private static EventListeners instance = new EventListeners();
-        public static EventListeners Instance { get { return instance; } }
+        public static EventListeners Instance { get; } = new EventListeners();
+
+        public ApplicationLauncherButton Button { get; set; }
 
         //private static MissionRecoveryDialog LastRecoveryUI = null;
 
         public void RegisterListeners()
         {
-            //GameEvents.onVesselRecoveryProcessing.Add(VesselRecoverProcessingEvent);
             GameEvents.onVesselRecovered.Add(VesselRecovered);
-            //if (KCT2Utils.fetch(KCT2)
-            //On KCT Vessel Added To Build List -> remove parts
-            //On KCT Vessel Build Complete -> Increment tracker
-            //else
             GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
-            //GameEvents.onGUIRecoveryDialogSpawn.Add(RecoveryDialogSpawn);
+            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
             
             //For debugging
             Events.SYInventoryChanged.Add(InventoryChangedEventListener);
@@ -40,6 +37,8 @@ namespace ScrapYard
             GameEvents.OnVesselRollout.Remove(VesselRolloutEvent);
             //GameEvents.onGUIRecoveryDialogSpawn.Remove(RecoveryDialogSpawn);
             GameEvents.onVesselRecovered.Remove(VesselRecovered);
+            GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Remove(OnGUIAppLauncherUnReadying);
 
             Events.SYInventoryChanged.Remove(InventoryChangedEventListener);
 
@@ -91,8 +90,9 @@ namespace ScrapYard
                 return;
             }
 
-            ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(vessel.parts);
-            ScrapYard.Instance.PartTracker.AddBuild(vessel.parts);
+            //ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(vessel.parts);
+            ScrapYard.Instance.TheInventory.RemovePartsFromInventory(vessel.Parts);
+            ScrapYard.Instance.PartTracker.AddBuild(vessel.Parts);
 
             //List<InventoryPart> UniqueParts = new List<InventoryPart>(),
             //List< InventoryPart > UsedParts = new List<InventoryPart>();
@@ -133,6 +133,28 @@ namespace ScrapYard
             //}
 
             //ScrapYard.Instance.ProcessedTracker.TrackVessel(Utilities.Utils.StringToGuid(vessel.Parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID), true);
+        }
+
+        public void OnGUIAppLauncherReady()
+        {
+            bool vis;
+            if (ApplicationLauncher.Ready && (Button == null || !ApplicationLauncher.Instance.Contains(Button, out vis))) //Add Stock button
+            {
+                Button = ApplicationLauncher.Instance.AddModApplication(
+                    () => { ScrapYard.Instance.ApplyInventoryUI.Show(); },
+                    () => { ScrapYard.Instance.ApplyInventoryUI.Close(); },
+                    null,
+                    null,
+                    null,
+                    null,
+                    (ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB),
+                    GameDatabase.Instance.GetTexture("ScrapYard/icon", false));
+            }
+        }
+
+        public void OnGUIAppLauncherUnReadying(GameScenes scene)
+        {
+            ApplicationLauncher.Instance.RemoveModApplication(Button);
         }
     }
 }

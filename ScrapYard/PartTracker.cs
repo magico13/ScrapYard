@@ -153,7 +153,7 @@ namespace ScrapYard
                 found = source;
                 _buildTracker[source] = 1; //add it
             }
-            Logging.DebugLog($"{found.Name} has been used in {_useTracker[found]} builds.");
+            Logging.DebugLog($"{found.Name} has been used in {_buildTracker[found]} builds.");
             return found;
         }
 

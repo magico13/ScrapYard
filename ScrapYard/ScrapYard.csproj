@@ -51,12 +51,16 @@
     <Compile Include="Events.cs" />
     <Compile Include="InventoryPart.cs" />
     <Compile Include="Modules\ModuleSYPartTracker.cs" />
+    <Compile Include="Modules\TrackerModuleWrapper.cs" />
     <Compile Include="PartInventory.cs" />
     <Compile Include="PartTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SceneModules\EditorModule.cs" />
     <Compile Include="ScrapYard.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="UI\InventoryApplyUI.cs" />
+    <Compile Include="UI\InventoryApplyVM.cs" />
+    <Compile Include="UI\WindowBase.cs" />
     <Compile Include="Utilities\ConfigNodeUtils.cs" />
     <Compile Include="Utilities\Logging.cs" />
     <Compile Include="Utilities\Utils.cs" />

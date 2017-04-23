@@ -108,17 +108,19 @@ namespace ScrapYard
         }
 
         /// <summary>
-        /// Applies the inventory to a vessel, specifically the part tracker
+        /// Applies the inventory to a vessel, specifically the part tracker. Happens in the Editor
         /// </summary>
         /// <param name="input">The vessel as a list of parts</param>
         public void ApplyInventoryToVessel(List<Part> input)
         {
+            PartInventory copy = new PartInventory(true);
+            copy.State = State;
             foreach (Part part in input)
             {
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(part);
                 //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.MODULES);
+                InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
 
                 //if one was found...
                 if (inInventory != null)
@@ -128,15 +130,10 @@ namespace ScrapYard
                     if (inInventory.TrackerModule != null && part.Modules?.Contains("ModuleSYPartTracker") == true)
                     {
                         ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                        tracker.ID = inInventory.TrackerModule.GetValue("ID");
-                        int.TryParse(inInventory.TrackerModule.GetValue("TimesRecovered"), out tracker.TimesRecovered);
+                        tracker.ID = inInventory.ID?.ToString();
+                        tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
-                    }
-                    //add funds back if active
-                    if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
-                    {
-                        Funding.Instance.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
-                    }
+                    }   
                 }
             }
         }
@@ -147,12 +144,14 @@ namespace ScrapYard
         /// <param name="input">The vessel as a list of part ConfigNodes</param>
         public void ApplyInventoryToVessel(List<ConfigNode> input)
         {
+            PartInventory copy = new PartInventory(true);
+            copy.State = State;
             foreach (ConfigNode partNode in input)
             {
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(partNode);
                 //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.MODULES);
+                InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
 
                 //if one was found...
                 if (inInventory != null)
@@ -162,12 +161,53 @@ namespace ScrapYard
                     ConfigNode trackerNode;
                     if (inInventory.TrackerModule != null && (trackerNode = partNode.GetModuleNode("ModuleSYPartTracker")) != null)
                     {
-                        string id = inInventory.TrackerModule.GetValue("ID");
-                        string recovered = inInventory.TrackerModule.GetValue("TimesRecovered");
+                        string id = inInventory.ID?.ToString();
+                        int recovered = inInventory.TrackerModule.TimesRecovered;
                         trackerNode.SetValue("ID", id);
                         trackerNode.SetValue("TimesRecovered", recovered);
                         Logging.DebugLog($"Copied tracker. Recovered {recovered} times with id {id}");
                     }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Removes any inventory parts from the inventory (vessel rollout, KCT construction)
+        /// </summary>
+        /// <param name="input">The vessel as a list of parts.</param>
+        public void RemovePartsFromInventory(List<Part> input)
+        {
+            foreach (Part part in input)
+            {
+                InventoryPart iPart = new InventoryPart(part);
+                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
+
+                if (inInventory != null)
+                {
+                    Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
+                    //add funds back if active
+                    if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+                    {
+                        Funding.Instance.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                    }
+                }
+            }
+        }
+
+        public void RemovePartsFromInventory(List<ConfigNode> input)
+        {
+            foreach (ConfigNode partNode in input)
+            {
+                //convert it to an inventorypart
+                InventoryPart iPart = new InventoryPart(partNode);
+                //find a corresponding one in the inventory and remove it
+                InventoryPart inInventory = RemovePart(iPart, ComparisonStrength.STRICT);
+
+                //if one was found...
+                if (inInventory != null)
+                {
+                    Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
                     //add funds back if active
                     if (ScrapYard.Instance.Settings.OverrideFunds && HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
                     {

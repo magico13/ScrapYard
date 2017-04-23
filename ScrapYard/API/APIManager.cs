@@ -74,9 +74,8 @@ namespace ScrapYard
         /// Removes inventory parts, refunds funds, marks it as tracked
         /// </summary>
         /// <param name="parts">The vessel as a List of Parts</param>
-        /// <param name="applyInventory">If true, applies inventory parts.</param>
         /// <returns>True if processed, false otherwise</returns>
-        public bool ProcessVessel_Parts(List<Part> parts, bool applyInventory)
+        public bool ProcessVessel_Parts(List<Part> parts)
         {
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID);
@@ -93,10 +92,10 @@ namespace ScrapYard
             }
 
             //have ID, can now apply inventory
-            if (applyInventory)
-            {
-                ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(parts);
-            }
+            //if (applyInventory)
+            //{
+            //    ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(parts);
+            //}
 
             //Mark as a build
             ScrapYard.Instance.PartTracker.AddBuild(parts);
@@ -112,9 +111,8 @@ namespace ScrapYard
         /// Removes inventory parts, refunds funds, marks it as tracked
         /// </summary>
         /// <param name="parts">The vessel as a List of Parts</param>
-        /// <param name="applyInventory">If true, applies inventory parts.</param>
         /// <returns>True if processed, false otherwise</returns>
-        public bool ProcessVessel_Nodes(List<ConfigNode> partNodes, bool applyInventory)
+        public bool ProcessVessel_Nodes(List<ConfigNode> partNodes)
         {
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(
@@ -132,10 +130,10 @@ namespace ScrapYard
             }
 
             //have ID, can now apply inventory
-            if (applyInventory)
-            {
-                ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(partNodes);
-            }
+            //if (applyInventory)
+            //{
+            //    ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(partNodes);
+            //}
 
             //Mark as a build
             ScrapYard.Instance.PartTracker.AddBuild(partNodes);

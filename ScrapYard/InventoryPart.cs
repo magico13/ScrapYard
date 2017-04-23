@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ScrapYard.Utilities;
+using ScrapYard.Modules;
 
 namespace ScrapYard
 {
@@ -23,12 +24,17 @@ namespace ScrapYard
 
         public string Name { get { return _name; } }
         public float DryCost { get { return _dryCost; } }
-        public ConfigNode TrackerModule { get { return trackerModule; } }
+        public TrackerModuleWrapper TrackerModule { get; private set; }
+        public Guid? ID
+        {
+            get
+            {
+                return TrackerModule?.ID;
+            }
+        }
 
 
         private List<ConfigNode> savedModules = new List<ConfigNode>();
-        private ConfigNode trackerModule = null;
-
         private int _hash = 0;
 
         /// <summary>
@@ -57,13 +63,15 @@ namespace ScrapYard
                     foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
                     {
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
+                        {
                             savedModules.Add(module.snapshot.moduleValues);
+                        }
                     }
 
                     //check for the part tracker and add it
-                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    if (module?.moduleName?.Equals("ModuleSYPartTracker") == true)
                     {
-                        trackerModule = module.snapshot.moduleValues;
+                        TrackerModule = new TrackerModuleWrapper(module.snapshot?.moduleValues);
                     }
                 }
             }
@@ -93,7 +101,7 @@ namespace ScrapYard
                     //check for the part tracker and add it
                     if (module.moduleName.Equals("ModuleSYPartTracker"))
                     {
-                        trackerModule = module.moduleValues;
+                        TrackerModule = new TrackerModuleWrapper(module.moduleValues);
                     }
                 }
             }
@@ -127,7 +135,7 @@ namespace ScrapYard
                     //check for the part tracker and add it
                     if (module.GetValue("name").Equals("ModuleSYPartTracker"))
                     {
-                        trackerModule = module;
+                        TrackerModule = new TrackerModuleWrapper(module);
                     }
                 }
             }
@@ -183,11 +191,11 @@ namespace ScrapYard
             }
 
             //Tracker comparison, the times used must match
-            if (trackerModule == null || comparedPart.trackerModule == null)
+            if (TrackerModule == null || comparedPart.TrackerModule == null)
             {
                 return false;
             }
-            if (trackerModule.GetValue("TimesRecovered") != comparedPart.trackerModule.GetValue("TimesRecovered"))
+            if (TrackerModule.TimesRecovered != comparedPart.TrackerModule.TimesRecovered)
             {
                 return false;
             }
@@ -197,12 +205,12 @@ namespace ScrapYard
             }
 
             //Strict comparison, the ids must be the same
-            if (trackerModule.GetValue("ID") != comparedPart.trackerModule.GetValue("ID"))
+            if (ID != comparedPart.ID)
             {
                 return false;
             }
 
-            //Every must match, they are the same
+            //Everything must match, they are the same
             return true;
         }
 
@@ -246,9 +254,9 @@ namespace ScrapYard
                 {
                     returnNode.AddNode(module);
                 }
-                if (trackerModule != null)
+                if (TrackerModule?.HasModule == true)
                 {
-                    returnNode.AddNode(trackerModule);
+                    returnNode.AddNode(TrackerModule.TrackerNode);
                 }
                 return returnNode;
             }
@@ -264,7 +272,7 @@ namespace ScrapYard
                     {
                         if (module.GetValue("name").Equals("ModuleSYPartTracker"))
                         {
-                            trackerModule = module;
+                            TrackerModule = new TrackerModuleWrapper(module);
                         }
                         else
                         {
