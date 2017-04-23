@@ -62,6 +62,7 @@
     <Compile Include="UI\InventoryApplyVM.cs" />
     <Compile Include="UI\WindowBase.cs" />
     <Compile Include="Utilities\ConfigNodeUtils.cs" />
+    <Compile Include="Utilities\InventoryManagement.cs" />
     <Compile Include="Utilities\Logging.cs" />
     <Compile Include="Utilities\Utils.cs" />
     <Compile Include="VesselTracker.cs" />

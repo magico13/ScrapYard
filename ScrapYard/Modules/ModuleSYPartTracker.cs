@@ -12,7 +12,7 @@ namespace ScrapYard.Modules
     public class ModuleSYPartTracker : PartModule
     {
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
-        public string ID;
+        public string ID = Guid.NewGuid().ToString();
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
         public int TimesRecovered = 0;
 
@@ -22,14 +22,21 @@ namespace ScrapYard.Modules
             base.OnInitialize();
             if (string.IsNullOrEmpty(ID))
             {
-                ID = Guid.NewGuid().ToString();
+                ID = NewID();
+                TimesRecovered = 0;
             }
         }
 
         public override void OnCopy(PartModule fromModule)
         {
             base.OnCopy(fromModule);
-            ID = Guid.NewGuid().ToString();
+            ID = NewID();
+            TimesRecovered = 0;
+        }
+
+        protected string NewID()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

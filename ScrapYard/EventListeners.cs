@@ -91,7 +91,7 @@ namespace ScrapYard
             }
 
             //ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(vessel.parts);
-            ScrapYard.Instance.TheInventory.RemovePartsFromInventory(vessel.Parts);
+            InventoryManagement.RemovePartsFromInventory(vessel.Parts);
             ScrapYard.Instance.PartTracker.AddBuild(vessel.Parts);
 
             //List<InventoryPart> UniqueParts = new List<InventoryPart>(),
