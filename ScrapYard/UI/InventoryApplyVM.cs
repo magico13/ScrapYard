@@ -8,7 +8,7 @@ namespace ScrapYard.UI
 {
     public class InventoryApplyVM
     {
-        public void ApplyInventoryToVessel()
+        public void ApplyInventoryToEditorVessel()
         {
             if (EditorLogic.fetch != null && EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts.Any())
             {

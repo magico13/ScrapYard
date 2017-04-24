@@ -25,19 +25,20 @@ namespace ScrapYard
         #region Inventory Manipulation
         /// <summary>
         /// Takes a List of Parts and returns the Parts that are present in the inventory. 
-        /// Assumes the default strictness.
         /// </summary>
         /// <param name="sourceParts">Source list of parts</param>
+        /// <param name="strictness">The strictness enum value name.</param>
         /// <returns>List of Parts that are in the inventory</returns>
-        public List<Part> GetPartsInInventory_Parts(List<Part> sourceParts)
+        public List<Part> GetPartsInInventory_Parts(List<Part> sourceParts, string strictness)
         {
+            ComparisonStrength actualStrictness = (ComparisonStrength)Enum.Parse(typeof(ComparisonStrength), strictness);
             List<Part> inInventory = new List<Part>();
             PartInventory InventoryCopy = new PartInventory(true);
             InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
             foreach (Part part in sourceParts)
             {
                 InventoryPart inputPart = new InventoryPart(part);
-                if (InventoryCopy.RemovePart(inputPart) != null)
+                if (InventoryCopy.RemovePart(inputPart, actualStrictness) != null)
                 {
                     inInventory.Add(part);
                 }
@@ -51,15 +52,16 @@ namespace ScrapYard
         /// </summary>
         /// <param name="sourceParts">Source list of parts</param>
         /// <returns>List of part ConfigNodes that are in the inventory</returns>
-        public List<ConfigNode> GetPartsInInventory_ConfigNodes(List<ConfigNode> sourceParts)
+        public List<ConfigNode> GetPartsInInventory_ConfigNodes(List<ConfigNode> sourceParts, string strictness)
         {
+            ComparisonStrength actualStrictness = (ComparisonStrength)Enum.Parse(typeof(ComparisonStrength), strictness);
             List<ConfigNode> inInventory = new List<ConfigNode>();
             PartInventory InventoryCopy = new PartInventory(true);
             InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
             foreach (ConfigNode part in sourceParts)
             {
                 InventoryPart inputPart = new InventoryPart(part);
-                if (InventoryCopy.RemovePart(inputPart) != null)
+                if (InventoryCopy.RemovePart(inputPart, actualStrictness) != null)
                 {
                     inInventory.Add(part);
                 }
@@ -67,6 +69,41 @@ namespace ScrapYard
             return inInventory;
         }
 
+        /// <summary>
+        /// Adds a list of parts to the Inventory
+        /// </summary>
+        /// <param name="parts">The list of parts to add</param>
+        /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
+        public void AddPartsToInventory_Parts(List<Part> parts, bool incrementRecovery)
+        {
+            foreach (Part part in parts)
+            {
+                InventoryPart iPart = new InventoryPart(part);
+                if (incrementRecovery && iPart.TrackerModule.HasModule)
+                {
+                    iPart.TrackerModule.TimesRecovered++;
+                }
+                ScrapYard.Instance.TheInventory.AddPart(iPart);
+            }
+        }
+
+        /// <summary>
+        /// Adds a list of parts to the Inventory
+        /// </summary>
+        /// <param name="parts">The list of parts to add</param>
+        /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
+        public void AddPartsToInventory_Nodes(List<ConfigNode> parts, bool incrementRecovery)
+        {
+            foreach (ConfigNode part in parts)
+            {
+                InventoryPart iPart = new InventoryPart(part);
+                if (incrementRecovery && iPart.TrackerModule.HasModule)
+                {
+                    iPart.TrackerModule.TimesRecovered++;
+                }
+                ScrapYard.Instance.TheInventory.AddPart(iPart);
+            }
+        }
         #endregion Inventory Manipulation
 
         #region Vessel Processing
@@ -91,14 +128,8 @@ namespace ScrapYard
                 return false;
             }
 
-            //have ID, can now apply inventory
-            //if (applyInventory)
-            //{
-            //    ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(parts);
-            //}
-
             //Mark as a build
-            ScrapYard.Instance.PartTracker.AddBuild(parts);
+            //ScrapYard.Instance.PartTracker.AddBuild(parts);
 
             //Mark as processed
             ScrapYard.Instance.ProcessedTracker.TrackVessel(ID, true);
@@ -129,20 +160,54 @@ namespace ScrapYard
                 return false;
             }
 
-            //have ID, can now apply inventory
-            //if (applyInventory)
-            //{
-            //    ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(partNodes);
-            //}
-
             //Mark as a build
-            ScrapYard.Instance.PartTracker.AddBuild(partNodes);
+            //ScrapYard.Instance.PartTracker.AddBuild(partNodes);
 
             //Mark as processed
             ScrapYard.Instance.ProcessedTracker.TrackVessel(ID, true);
 
             return true;
 
+        }
+
+        /// <summary>
+        /// Records a build in the part tracker
+        /// </summary>
+        /// <param name="parts">The vessel as a list of Parts.</param>
+        public void RecordBuild_Parts(List<Part> parts)
+        {
+            ScrapYard.Instance.PartTracker.AddBuild(parts);
+        }
+
+        /// <summary>
+        /// Records a build in the part tracker
+        /// </summary>
+        /// <param name="parts">The vessel as a list of ConfigNodes.</param>
+        public void RecordBuild_Nodes(List<ConfigNode> parts)
+        {
+            ScrapYard.Instance.PartTracker.AddBuild(parts);
+        }
+
+        /// <summary>
+        /// Checks if the part is pulled from the inventory or is new
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>True if from inventory, false if new</returns>
+        public bool PartIsFromInventory_Part(Part part)
+        {
+            InventoryPart iPart = new InventoryPart(part);
+            return iPart.TrackerModule.Inventoried;
+        }
+
+        /// <summary>
+        /// Checks if the part is pulled from the inventory or is new
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <returns>True if from inventory, false if new</returns>
+        public bool PartIsFromInventory_Node(ConfigNode part)
+        {
+            InventoryPart iPart = new InventoryPart(part);
+            return iPart.TrackerModule.Inventoried;
         }
         #endregion
 

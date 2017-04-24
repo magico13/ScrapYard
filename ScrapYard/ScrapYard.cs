@@ -13,16 +13,27 @@ namespace ScrapYard
         public Settings Settings { get; } = new Settings();
         public VesselTracker ProcessedTracker { get; } = new VesselTracker();
         public PartTracker PartTracker { get; } = new PartTracker();
+
+        private void Awake()
+        {
+            Logging.DebugLog("Awake Start");
+            Instance = this;
+            ScrapYardEvents.Initialize();
+            Logging.DebugLog("Awake Complete");
+        }
+
         void Start()
         {
-            Instance = this;
-            
+            Logging.DebugLog("Start Start");
             EventListeners.Instance.RegisterListeners();
+            Logging.DebugLog("Start Complete");
         }
 
         void OnDestroy()
         {
+            Logging.DebugLog("OnDestroy Start");
             EventListeners.Instance.DeregisterListeners();
+            Logging.DebugLog("OnDestroy Complete");
         }
 
         public override void OnLoad(ConfigNode node)
@@ -34,7 +45,8 @@ namespace ScrapYard
             PartTracker.State = node.GetNode("PartTracker");
             ProcessedTracker.State = node.GetNode("VesselTracker");
             //load settings?
-            
+            Logging.DebugLog("OnLoad Complete");
+
         }
 
         public override void OnSave(ConfigNode node)
@@ -46,6 +58,7 @@ namespace ScrapYard
             node.AddNode(PartTracker.State);
             node.AddNode(ProcessedTracker.State);
             //save settings?
+            Logging.DebugLog("OnSave Complete");
         }
 
         #region GUI Code

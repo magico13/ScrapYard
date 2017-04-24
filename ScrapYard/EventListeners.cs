@@ -25,7 +25,7 @@ namespace ScrapYard
             GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
             
             //For debugging
-            Events.SYInventoryChanged.Add(InventoryChangedEventListener);
+            ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
 
             Logging.DebugLog("Event Listeners Registered!");
             //end if
@@ -40,7 +40,7 @@ namespace ScrapYard
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
             GameEvents.onGUIApplicationLauncherUnreadifying.Remove(OnGUIAppLauncherUnReadying);
 
-            Events.SYInventoryChanged.Remove(InventoryChangedEventListener);
+            ScrapYardEvents.OnSYInventoryChanged.Remove(InventoryChangedEventListener);
 
             Logging.DebugLog("Event Listeners De-Registered!");
         }

@@ -25,10 +25,11 @@ namespace ScrapYard
 
         public void AddPart(InventoryPart part)
         {
+            part.TrackerModule.Inventoried = true;
             internalInventory.Add(part);
             if (!disableEvents)
             {
-                Events.SYInventoryChanged.Fire(part, true);
+                ScrapYardEvents.OnSYInventoryChanged.Fire(part, true);
             }
         }
 
@@ -74,7 +75,7 @@ namespace ScrapYard
             {
                 if (!disableEvents)
                 {
-                    Events.SYInventoryChanged.Fire(found, false);
+                    ScrapYardEvents.OnSYInventoryChanged.Fire(found, false);
                 }
                 return found;
             }

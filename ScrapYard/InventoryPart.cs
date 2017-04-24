@@ -24,7 +24,7 @@ namespace ScrapYard
 
         public string Name { get { return _name; } }
         public float DryCost { get { return _dryCost; } }
-        public TrackerModuleWrapper TrackerModule { get; private set; }
+        public TrackerModuleWrapper TrackerModule { get; private set; } = new TrackerModuleWrapper(null);
         public Guid? ID
         {
             get
@@ -64,14 +64,18 @@ namespace ScrapYard
                     {
                         if (module.moduleName.ToUpper().Contains(trackedModuleName))
                         {
-                            savedModules.Add(module.snapshot.moduleValues);
+                            ConfigNode saved = new ConfigNode("MODULE");
+                            module.Save(saved);
+                            savedModules.Add(saved);
                         }
                     }
 
                     //check for the part tracker and add it
-                    if (module?.moduleName?.Equals("ModuleSYPartTracker") == true)
+                    if (module.moduleName.Equals("ModuleSYPartTracker"))
                     {
-                        TrackerModule = new TrackerModuleWrapper(module.snapshot?.moduleValues);
+                        ConfigNode saved = new ConfigNode("MODULE");
+                        module.Save(saved);
+                        TrackerModule = new TrackerModuleWrapper(saved);
                     }
                 }
             }

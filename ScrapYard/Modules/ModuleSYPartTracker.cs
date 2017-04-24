@@ -15,7 +15,8 @@ namespace ScrapYard.Modules
         public string ID = Guid.NewGuid().ToString();
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
         public int TimesRecovered = 0;
-
+        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        public bool Inventoried = false;
 
         public override void OnInitialize()
         {
@@ -24,6 +25,7 @@ namespace ScrapYard.Modules
             {
                 ID = NewID();
                 TimesRecovered = 0;
+                Inventoried = false;
             }
         }
 
@@ -32,6 +34,7 @@ namespace ScrapYard.Modules
             base.OnCopy(fromModule);
             ID = NewID();
             TimesRecovered = 0;
+            Inventoried = false;
         }
 
         protected string NewID()

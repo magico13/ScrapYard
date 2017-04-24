@@ -66,6 +66,8 @@ namespace ScrapYard.Utilities
                     }
                 }
             }
+
+            ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
         }
 
         /// <summary>
@@ -99,6 +101,7 @@ namespace ScrapYard.Utilities
                     }
                 }
             }
+            ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
         }
 
 
