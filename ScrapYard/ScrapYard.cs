@@ -10,7 +10,7 @@ namespace ScrapYard
     {
         public static ScrapYard Instance { get; private set; }
         public PartInventory TheInventory { get; } = new PartInventory();
-        public Settings Settings { get; } = new Settings();
+        public GlobalSettings Settings { get; } = new GlobalSettings();
         public VesselTracker ProcessedTracker { get; } = new VesselTracker();
         public PartTracker PartTracker { get; } = new PartTracker();
 
@@ -18,6 +18,8 @@ namespace ScrapYard
         {
             Logging.DebugLog("Start Start");
             Instance = this;
+            //load settings
+            Settings.LoadSettings();
             EventListeners.Instance.RegisterListeners();
             Logging.DebugLog("Start Complete");
         }
@@ -26,6 +28,8 @@ namespace ScrapYard
         {
             Logging.DebugLog("OnDestroy Start");
             EventListeners.Instance.DeregisterListeners();
+            //Save settings
+            Settings.SaveSettings();
             Logging.DebugLog("OnDestroy Complete");
         }
 
