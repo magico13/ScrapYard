@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="API\APIManager.cs" />
     <Compile Include="API\ScrapYardWrapper.cs" />
+    <Compile Include="EventInitializer.cs" />
     <Compile Include="EventListeners.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="InventoryPart.cs" />

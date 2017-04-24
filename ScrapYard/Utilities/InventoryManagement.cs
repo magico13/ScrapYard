@@ -62,6 +62,7 @@ namespace ScrapYard.Utilities
                         ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
                         tracker.ID = inInventory.ID?.ToString();
                         tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
+                        tracker.Inventoried = inInventory.TrackerModule.Inventoried;
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
                     }
                 }
@@ -95,8 +96,10 @@ namespace ScrapYard.Utilities
                     {
                         string id = inInventory.ID?.ToString();
                         int recovered = inInventory.TrackerModule.TimesRecovered;
+                        bool inventoried = inInventory.TrackerModule.Inventoried;
                         trackerNode.SetValue("ID", id);
                         trackerNode.SetValue("TimesRecovered", recovered);
+                        trackerNode.SetValue("Inventoried", inventoried);
                         Logging.DebugLog($"Copied tracker. Recovered {recovered} times with id {id}");
                     }
                 }

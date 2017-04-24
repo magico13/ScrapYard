@@ -128,8 +128,8 @@ namespace ScrapYard
                 return false;
             }
 
-            //Mark as a build
-            //ScrapYard.Instance.PartTracker.AddBuild(parts);
+            //remove parts
+            InventoryManagement.RemovePartsFromInventory(parts);
 
             //Mark as processed
             ScrapYard.Instance.ProcessedTracker.TrackVessel(ID, true);
@@ -160,8 +160,8 @@ namespace ScrapYard
                 return false;
             }
 
-            //Mark as a build
-            //ScrapYard.Instance.PartTracker.AddBuild(partNodes);
+            //remove parts
+            InventoryManagement.RemovePartsFromInventory(partNodes);
 
             //Mark as processed
             ScrapYard.Instance.ProcessedTracker.TrackVessel(ID, true);

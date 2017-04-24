@@ -14,17 +14,10 @@ namespace ScrapYard
         public VesselTracker ProcessedTracker { get; } = new VesselTracker();
         public PartTracker PartTracker { get; } = new PartTracker();
 
-        private void Awake()
-        {
-            Logging.DebugLog("Awake Start");
-            Instance = this;
-            ScrapYardEvents.Initialize();
-            Logging.DebugLog("Awake Complete");
-        }
-
         void Start()
         {
             Logging.DebugLog("Start Start");
+            Instance = this;
             EventListeners.Instance.RegisterListeners();
             Logging.DebugLog("Start Complete");
         }

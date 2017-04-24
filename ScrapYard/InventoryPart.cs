@@ -203,6 +203,10 @@ namespace ScrapYard
             {
                 return false;
             }
+            if (TrackerModule.Inventoried != comparedPart.TrackerModule.Inventoried)
+            {
+                return false;
+            }
             if (strictness == ComparisonStrength.TRACKER)
             {
                 return true;
