@@ -29,6 +29,8 @@ namespace ScrapYard
             tracker.TryGetValue(id, out originalState);
             tracker[id] = partsProcessed;
 
+            Logging.DebugLog($"Tracking vessel '{id}'. Original state: {originalState} New state: {partsProcessed}");
+
             return originalState;
         }
 
@@ -87,6 +89,7 @@ namespace ScrapYard
                 return false;
             }
 
+            Logging.DebugLog($"Removing tracking of vessel '{vesselID}'.");
             return tracker.Remove(vesselID.GetValueOrDefault());
         }
 
