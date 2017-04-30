@@ -47,6 +47,25 @@ namespace ScrapYard
 
         private void InventoryChangedEventListener(InventoryPart p, bool added)
         {
+            //if removed then check if we should remove a corresponding part from the EditorLogic vessel
+            if (!added)
+            {
+                if (EditorLogic.fetch?.ship?.Parts?.Count > 0)
+                {
+                    //see if this part is on it, if so, overwrite it with a new one
+                    foreach (Part part in EditorLogic.fetch.ship.Parts)
+                    {
+                        InventoryPart shipPart = new InventoryPart(part);
+                        if (p.ID == shipPart.ID)
+                        {
+                            ModuleSYPartTracker module = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
+                            module.SetToFresh();
+                            break; //There can only be one part with this ID
+                        }
+                    }
+                }
+            }
+
             Logging.DebugLog($"InventoryChangedEvent - part: {p.Name} - added: {added}");
         }
 
@@ -55,20 +74,8 @@ namespace ScrapYard
             Logging.DebugLog("Recovered");
             foreach (ProtoPartSnapshot pps in vessel.protoPartSnapshots)
             {
-                ProtoPartModuleSnapshot tracker;
-                if ((tracker = pps.modules.Find(m => m.moduleName == "ModuleSYPartTracker")) != null)
-                {
-                    long timesRecovered = 0;
-                    long.TryParse(tracker.moduleValues.GetValue("TimesRecovered"), out timesRecovered);
-                    tracker.moduleValues.SetValue("TimesRecovered", timesRecovered + 1);
-                }
-                //else
-                //{
-                //    //add the module, no idea if this works at all
-                //    //pps.modules.Add(new ProtoPartModuleSnapshot(new ModuleSYPartTracker() { TimesRecovered = 1 }));
-                //}
-
                 InventoryPart recoveredPart = new InventoryPart(pps);
+                recoveredPart.TrackerModule.TimesRecovered++;
                 ScrapYard.Instance.TheInventory.AddPart(recoveredPart);
                 if (ScrapYard.Instance.Settings.OverrideFunds)
                 {
@@ -90,49 +97,8 @@ namespace ScrapYard
                 return;
             }
 
-            //ScrapYard.Instance.TheInventory.ApplyInventoryToVessel(vessel.parts);
             InventoryManagement.RemovePartsFromInventory(vessel.Parts);
             ScrapYard.Instance.PartTracker.AddBuild(vessel.Parts);
-
-            //List<InventoryPart> UniqueParts = new List<InventoryPart>(),
-            //List< InventoryPart > UsedParts = new List<InventoryPart>();
-
-            //foreach (Part part in vessel.parts)
-            //{
-            //    InventoryPart inventoryPart = new InventoryPart(part);
-            //    UsedParts.Add(inventoryPart);
-            ////    if (UniqueParts.Find(p => p.IdenticalTo(inventoryPart)) == null)
-            ////        UniqueParts.Add(inventoryPart);
-            //}
-
-            ////Increment the tracker
-            ////Logging.DebugLog("ScrapYard", "Incrementing the tracker.");
-            ///*foreach (InventoryPart part in UniqueParts)
-            //{
-            //    ScrapYard.Instance.TheInventory.IncrementUsageCounter(part);
-            //}*/
-
-            ////Remove all possible inventory parts
-            ////Logging.DebugLog("ScrapYard", "Removing parts from inventory.");
-            ////Logging.DebugLog("ScrapYard", ScrapYard.instance.TheInventory.GetPartByIndex(0).Quantity);
-            //List<InventoryPart> inInventory, notInInventory;
-            //ScrapYard.Instance.TheInventory.SplitParts(UsedParts, out inInventory, out notInInventory);
-
-            //foreach (InventoryPart part in inInventory)
-            //{
-            //    //Remove part
-            //    //part.SetQuantity(-1);
-            //    //Logging.DebugLog("ScrapYard", ScrapYard.instance.TheInventory.GetPartByIndex(0).Quantity);
-            //    ScrapYard.Instance.TheInventory.RemovePart(part);
-
-            //    //Refund its cost
-            //    if (ScrapYard.Instance.Settings.OverrideFunds)
-            //    {
-            //        Funding.Instance.AddFunds(part.DryCost, TransactionReasons.VesselRollout);
-            //    }
-            //}
-
-            //ScrapYard.Instance.ProcessedTracker.TrackVessel(Utilities.Utils.StringToGuid(vessel.Parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID), true);
         }
 
         public void OnGUIAppLauncherReady()
