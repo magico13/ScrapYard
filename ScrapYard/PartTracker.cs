@@ -13,6 +13,16 @@ namespace ScrapYard
         private Dictionary<InventoryPart, int> _useTracker = new Dictionary<InventoryPart, int>();
         #endregion Fields
 
+        #region Properties
+        public bool TrackerEnabled
+        {
+            get
+            {
+                return ScrapYard.Instance.Settings.EnabledForSave && ScrapYard.Instance.Settings.CurrentSaveSettings.UseTracker;
+            }
+        }
+        #endregion Properties
+
         #region Public Methods
 
         #region Add
@@ -22,6 +32,10 @@ namespace ScrapYard
         /// <param name="parts">The vessel as a list of parts</param>
         public void AddBuild(List<Part> parts)
         {
+            if (!TrackerEnabled)
+            {
+                return;
+            }
             Logging.DebugLog("Adding build (parts)");
             List<InventoryPart> uniqueParts = new List<InventoryPart>();
             foreach (Part part in parts) //add a use for each part and get the unique parts for the build tracker
@@ -47,6 +61,10 @@ namespace ScrapYard
         /// <param name="parts">The vessel as a list of part ConfigNodes</param>
         public void AddBuild(List<ConfigNode> partNodes)
         {
+            if (!TrackerEnabled)
+            {
+                return;
+            }
             Logging.DebugLog("Adding build (nodes)");
             List<InventoryPart> uniqueParts = new List<InventoryPart>();
             foreach (ConfigNode partNode in partNodes) //add a use for each part and get the unique parts for the build tracker
@@ -75,6 +93,10 @@ namespace ScrapYard
         /// <returns>Number of builds</returns>
         public int GetBuildsForPart(Part part)
         {
+            if (!TrackerEnabled)
+            {
+                return 0;
+            }
             InventoryPart ip = new InventoryPart(part);
             return getBuilds(ip);
         }
@@ -86,6 +108,10 @@ namespace ScrapYard
         /// <returns>Number of builds</returns>
         public int GetBuildsForPart(ConfigNode part)
         {
+            if (!TrackerEnabled)
+            {
+                return 0;
+            }
             InventoryPart ip = new InventoryPart(part);
             return getBuilds(ip);
         }
@@ -97,6 +123,10 @@ namespace ScrapYard
         /// <returns>Number of uses</returns>
         public int GetUsesForPart(Part part)
         {
+            if (!TrackerEnabled)
+            {
+                return 0;
+            }
             InventoryPart ip = new InventoryPart(part);
             return getUses(ip);
         }
@@ -108,6 +138,10 @@ namespace ScrapYard
         /// <returns>Number of uses</returns>
         public int GetUsesForPart(ConfigNode part)
         {
+            if (!TrackerEnabled)
+            {
+                return 0;
+            }
             InventoryPart ip = new InventoryPart(part);
             return getUses(ip);
         }

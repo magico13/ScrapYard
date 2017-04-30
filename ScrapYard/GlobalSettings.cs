@@ -36,7 +36,27 @@ namespace ScrapYard
             }
         }
         
+        /// <summary>
+        /// Settings for the current save
+        /// </summary>
+        public SaveSpecificSettings CurrentSaveSettings
+        {
+            get
+            {
+                return HighLogic.CurrentGame?.Parameters.CustomParams<SaveSpecificSettings>();
+            }
+        }
 
+        /// <summary>
+        /// Returns whether ScrapYard is enabled for the save
+        /// </summary>
+        public bool EnabledForSave
+        {
+            get
+            {
+                return CurrentSaveSettings?.ModEnabled ?? false;
+            }
+        }
 
         public GlobalSettings()
         {

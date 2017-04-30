@@ -31,6 +31,10 @@ namespace ScrapYard
         /// <returns>List of Parts that are in the inventory</returns>
         public List<Part> GetPartsInInventory_Parts(List<Part> sourceParts, string strictness)
         {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return new List<Part>();
+            }
             ComparisonStrength actualStrictness = (ComparisonStrength)Enum.Parse(typeof(ComparisonStrength), strictness);
             List<Part> inInventory = new List<Part>();
             PartInventory InventoryCopy = new PartInventory(true);
@@ -54,6 +58,10 @@ namespace ScrapYard
         /// <returns>List of part ConfigNodes that are in the inventory</returns>
         public List<ConfigNode> GetPartsInInventory_ConfigNodes(List<ConfigNode> sourceParts, string strictness)
         {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return new List<ConfigNode>();
+            }
             ComparisonStrength actualStrictness = (ComparisonStrength)Enum.Parse(typeof(ComparisonStrength), strictness);
             List<ConfigNode> inInventory = new List<ConfigNode>();
             PartInventory InventoryCopy = new PartInventory(true);
@@ -76,6 +84,10 @@ namespace ScrapYard
         /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
         public void AddPartsToInventory_Parts(List<Part> parts, bool incrementRecovery)
         {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return;
+            }
             foreach (Part part in parts)
             {
                 InventoryPart iPart = new InventoryPart(part);
@@ -94,6 +106,10 @@ namespace ScrapYard
         /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
         public void AddPartsToInventory_Nodes(List<ConfigNode> parts, bool incrementRecovery)
         {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return;
+            }
             foreach (ConfigNode part in parts)
             {
                 InventoryPart iPart = new InventoryPart(part);
@@ -114,6 +130,10 @@ namespace ScrapYard
         /// <returns>True if processed, false otherwise</returns>
         public bool ProcessVessel_Parts(List<Part> parts)
         {
+            if (!ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                return true;
+            }
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID);
             if (!guid.HasValue)
@@ -145,6 +165,10 @@ namespace ScrapYard
         /// <returns>True if processed, false otherwise</returns>
         public bool ProcessVessel_Nodes(List<ConfigNode> partNodes)
         {
+            if (!ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                return true;
+            }
             //try to get the ID out of the list
             Guid? guid = Utils.StringToGuid(
                 partNodes[0].GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name").Equals("ModuleSYPartTracker", StringComparison.OrdinalIgnoreCase))?.GetValue("ID"));

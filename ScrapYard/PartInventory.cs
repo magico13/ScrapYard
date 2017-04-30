@@ -13,6 +13,17 @@ namespace ScrapYard
         private bool disableEvents = false;
         private HashSet<InventoryPart> internalInventory = new HashSet<InventoryPart>();
 
+
+        #region Properties
+        public bool InventoryEnabled
+        {
+            get
+            {
+                return ScrapYard.Instance.Settings.EnabledForSave && ScrapYard.Instance.Settings.CurrentSaveSettings.UseInventory;
+            }
+        }
+        #endregion Properties
+
         public PartInventory() { }
         /// <summary>
         /// Creates a new PartInventory that doesn't trigger events when the inventory changes
@@ -25,6 +36,10 @@ namespace ScrapYard
 
         public void AddPart(InventoryPart part)
         {
+            if (!InventoryEnabled)
+            {
+                return;
+            }
             part.TrackerModule.Inventoried = true;
             internalInventory.Add(part);
             if (!disableEvents)
@@ -51,25 +66,21 @@ namespace ScrapYard
             AddPart(convertedPart);
         }
 
-       /* public int IncrementUsageCounter(InventoryPart part)
-        {
-            InventoryPart existingPart = FindPart(part);
-            if (existingPart == null)
-            {
-                InternalInventory.Add(part);
-                existingPart = part;
-            }
-            existingPart.AddUsage();
-            return existingPart.Used;
-        }*/
-
         public InventoryPart FindPart(InventoryPart part, ComparisonStrength strength = ComparisonStrength.MODULES)
         {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
             return internalInventory.FirstOrDefault(ip => ip.IsSameAs(part, strength));
         }
 
         public InventoryPart RemovePart(InventoryPart part, ComparisonStrength strength = ComparisonStrength.MODULES)
         {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
             InventoryPart found = FindPart(part, strength);
             if (found != null && internalInventory.Remove(found))
             {

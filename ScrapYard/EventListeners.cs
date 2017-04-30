@@ -15,21 +15,20 @@ namespace ScrapYard
 
         public ApplicationLauncherButton Button { get; set; }
 
-        //private static MissionRecoveryDialog LastRecoveryUI = null;
-
         public void RegisterListeners()
         {
-            GameEvents.onVesselRecovered.Add(VesselRecovered);
-            GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-            GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
-            
-            //For debugging
-            ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
+            if (ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                GameEvents.onVesselRecovered.Add(VesselRecovered);
+                GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
 
-            Logging.DebugLog("Event Listeners Registered!");
-            //end if
+                ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
+
+                Logging.DebugLog("Event Listeners Registered!");
             }
+        }
 
         public void DeregisterListeners()
         {
@@ -71,6 +70,10 @@ namespace ScrapYard
 
         public void VesselRecovered(ProtoVessel vessel, bool someBool)
         {
+            if (!ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                return;
+            }
             Logging.DebugLog("Recovered");
             foreach (ProtoPartSnapshot pps in vessel.protoPartSnapshots)
             {
@@ -86,6 +89,10 @@ namespace ScrapYard
 
         public void VesselRolloutEvent(ShipConstruct vessel)
         {
+            if (!ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                return;
+            }
             Logging.DebugLog("Vessel Rollout!");
 
             //If vessel not processed, then take parts
@@ -103,6 +110,10 @@ namespace ScrapYard
 
         public void OnGUIAppLauncherReady()
         {
+            if (!ScrapYard.Instance.Settings.EnabledForSave)
+            {
+                return;
+            }
             bool vis;
             if (ApplicationLauncher.Ready && (Button == null || !ApplicationLauncher.Instance.Contains(Button, out vis))) //Add Stock button
             {
@@ -120,7 +131,10 @@ namespace ScrapYard
 
         public void OnGUIAppLauncherUnReadying(GameScenes scene)
         {
-            ApplicationLauncher.Instance.RemoveModApplication(Button);
+            if (Button != null)
+            {
+                ApplicationLauncher.Instance.RemoveModApplication(Button);
+            }
         }
     }
 }
