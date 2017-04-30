@@ -13,13 +13,31 @@ namespace ScrapYard
         private static Type SYType;
         private static object _instance;
 
+        /// <summary>
+        /// The strictness of comparing two parts for equivalency
+        /// </summary>
         public enum ComparisonStrength
         {
-            NAME, //says they're equal if names match
-            COSTS, //says Name and dry costs are the same
-            MODULES, //as above, plus tracked modules (except MdouleSYPartTracker) match
-            TRACKER, //as above, plus the number of times used must match
-            STRICT //as above, plus the ids match
+            /// <summary>
+            /// Equivalent if their names match
+            /// </summary>
+            NAME,
+            /// <summary>
+            /// EqualEquivalent if name and dry cost match
+            /// </summary>
+            COSTS,
+            /// <summary>
+            /// Equaivalent if name, dry cost, and Modules (except ModuleSYPartTracker) match
+            /// </summary>
+            MODULES,
+            /// <summary>
+            /// Equivalent if name, dry cost, Modules, and TimesRecovered match
+            /// </summary>
+            TRACKER,
+            /// <summary>
+            /// Equivalent if name, dry cost, Modules, TimesRecovered and IDs match
+            /// </summary>
+            STRICT
         }
 
         /// <summary>

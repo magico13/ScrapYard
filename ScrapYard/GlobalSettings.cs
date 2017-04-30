@@ -12,9 +12,6 @@ namespace ScrapYard
         private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
 
         [Persistent]
-        public bool OverrideFunds = false;
-
-        [Persistent]
         private string _trackedModules = "TWEAKSCALE, PROCEDURAL";
         private string[] _trackedArray = null;
         public string[] TrackedModules

@@ -114,11 +114,6 @@ namespace ScrapYard
                         loading.State = inventoryPartNode;
                         internalInventory.Add(loading);
                     }
-                    Logging.DebugLog("Printing PartInventory:");
-                    foreach (InventoryPart part in internalInventory)
-                    {
-                        Logging.DebugLog(part.Name);
-                    }
                 }
                 catch (Exception ex)
                 {

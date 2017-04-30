@@ -7,13 +7,31 @@ using ScrapYard.Modules;
 
 namespace ScrapYard
 {
+    /// <summary>
+    /// The strictness of comparing two parts for equivalency
+    /// </summary>
     public enum ComparisonStrength
     {
-        NAME, //says they're equal if names match
-        COSTS, //says Name and dry costs are the same
-        MODULES, //as above, plus tracked modules (except MdouleSYPartTracker) match
-        TRACKER, //as above, plus the number of times used must match
-        STRICT //as above, plus the ids match
+        /// <summary>
+        /// Equivalent if their names match
+        /// </summary>
+        NAME,
+        /// <summary>
+        /// EqualEquivalent if name and dry cost match
+        /// </summary>
+        COSTS,
+        /// <summary>
+        /// Equaivalent if name, dry cost, and Modules (except ModuleSYPartTracker) match
+        /// </summary>
+        MODULES,
+        /// <summary>
+        /// Equivalent if name, dry cost, Modules, and TimesRecovered match
+        /// </summary>
+        TRACKER,
+        /// <summary>
+        /// Equivalent if name, dry cost, Modules, TimesRecovered and IDs match
+        /// </summary>
+        STRICT
     }
     public class InventoryPart
     {
@@ -288,7 +306,7 @@ namespace ScrapYard
                         }
                     }
 
-                    Logging.DebugLog($"Name: {Name} DryCost: {DryCost}");
+                    //Logging.DebugLog($"Name: {Name} DryCost: {DryCost}");
                 }
                 catch (Exception ex)
                 {
@@ -298,7 +316,7 @@ namespace ScrapYard
         }
 
         public override int GetHashCode()
-        { //TODO: Cache hash
+        {
             if (_hash == 0)
             {
                 foreach (char s in Name ?? string.Empty)

@@ -77,9 +77,9 @@ namespace ScrapYard
                 InventoryPart recoveredPart = new InventoryPart(pps);
                 recoveredPart.TrackerModule.TimesRecovered++;
                 ScrapYard.Instance.TheInventory.AddPart(recoveredPart);
-                if (ScrapYard.Instance.Settings.OverrideFunds)
+                if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
                 {
-                    Funding.Instance.AddFunds(-1 * recoveredPart.DryCost, TransactionReasons.VesselRecovery);
+                    Funding.Instance?.AddFunds(-1 * recoveredPart.DryCost, TransactionReasons.VesselRecovery);
                 }
             }
         }
