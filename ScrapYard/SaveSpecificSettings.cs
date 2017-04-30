@@ -56,7 +56,7 @@ namespace ScrapYard
         [GameParameters.CustomParameterUI("Enable Part Tracker", toolTip = "Uncheck this to disable the part tracker entirely.")]
         public bool UseTracker = true;
 
-        [GameParameters.CustomParameterUI("Override Funds", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.",
+        [GameParameters.CustomParameterUI("Override Funds (WIP)", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.\nStill under development.",
             gameMode = GameParameters.GameMode.CAREER)]
         public bool OverrideFunds = false;
         
