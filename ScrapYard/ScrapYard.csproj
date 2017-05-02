@@ -35,6 +35,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="MagiCore">
+      <HintPath>..\..\MagiCore\MagiCore\obj\Release\MagiCore.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -51,8 +54,10 @@
     <Compile Include="EventListeners.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="InventoryPart.cs" />
+    <Compile Include="ModuleTemplates\ModuleConfigParser.cs" />
     <Compile Include="Modules\ModuleSYPartTracker.cs" />
     <Compile Include="Modules\TrackerModuleWrapper.cs" />
+    <Compile Include="ModuleTemplates\ModuleTemplate.cs" />
     <Compile Include="PartInventory.cs" />
     <Compile Include="PartTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
