@@ -10,32 +10,13 @@ namespace ScrapYard
     {
         private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
         private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+        private static string templatePath = scrapYardPath + "/PluginData/ModuleTemplates.cfg";
 
-        [Persistent]
-        private string _trackedModules = "TWEAKSCALE, PROCEDURAL";
-        private string[] _trackedArray = null;
-        public string[] TrackedModules
-        {
-            get
-            {
-                if (_trackedArray == null)
-                { 
-                    string[] arr = _trackedModules.Split(',');
-                    for (int i = 0; i < arr.Length; i++)
-                    {
-                        arr[i] = arr[i].Trim();
-                    }
-                    _trackedArray = arr;
-                }
-                return _trackedArray;
-            }
-            set
-            {
-                _trackedArray = value;
-                _trackedModules = string.Join(", ", value);
-            }
-        }
-        
+        public ModuleTemplateList ModuleTemplates { get; private set; } = new ModuleTemplateList();
+
+        public ModuleTemplateList ForbiddenTemplates { get; private set; } = new ModuleTemplateList();
+
+
         /// <summary>
         /// Settings for the current save
         /// </summary>
@@ -68,18 +49,39 @@ namespace ScrapYard
             //TODO: Module Manager?
 
             //load the setting file, a confignode
-            if (File.Exists(settingsPath))
+            //if (File.Exists(settingsPath))
+            //{
+            //    ConfigNode settingsNode = ConfigNode.Load(settingsPath);
+            //    ConfigNode.LoadObjectFromConfig(this, settingsNode);
+            //}
+
+            ModuleTemplates.Clear();
+            ForbiddenTemplates.Clear();
+
+            if (File.Exists(templatePath))
             {
-                ConfigNode settingsNode = ConfigNode.Load(settingsPath);
-                ConfigNode.LoadObjectFromConfig(this, settingsNode);
+                ConfigNode settingsNode = ConfigNode.Load(templatePath);
+                foreach (ConfigNode templateNode in settingsNode.GetNodes())
+                {
+                    ModuleTemplate template = new ModuleTemplate(templateNode);
+                    if (!template.IsForbiddenType)
+                    {
+                        ModuleTemplates.Add(template);
+                    }
+                    else
+                    {
+                        ForbiddenTemplates.Add(template);
+                    }
+                }
+                Logging.DebugLog($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
             }
         }
 
         public void SaveSettings()
         {
             Directory.CreateDirectory(scrapYardPath + "/PluginData");
-            ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
-            settingsNode.Save(settingsPath);
+            //ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
+            //settingsNode.Save(settingsPath);
         }
     }
 }

@@ -42,6 +42,7 @@ namespace ScrapYard
 
         public string Name { get { return _name; } }
         public float DryCost { get { return _dryCost; } }
+        public bool DoNotStore { get; set; } = false;
         public TrackerModuleWrapper TrackerModule { get; private set; } = new TrackerModuleWrapper(null);
         public Guid? ID
         {
@@ -78,23 +79,9 @@ namespace ScrapYard
             {
                 foreach (PartModule module in originPart.Modules)
                 {
-                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
-                    {
-                        if (module.moduleName.ToUpper().Contains(trackedModuleName))
-                        {
-                            ConfigNode saved = new ConfigNode("MODULE");
-                            module.Save(saved);
-                            savedModules.Add(saved);
-                        }
-                    }
-
-                    //check for the part tracker and add it
-                    if (module.moduleName.Equals("ModuleSYPartTracker"))
-                    {
-                        ConfigNode saved = new ConfigNode("MODULE");
-                        module.Save(saved);
-                        TrackerModule = new TrackerModuleWrapper(saved);
-                    }
+                    ConfigNode saved = new ConfigNode("MODULE");
+                    module.Save(saved);
+                    storeModuleNode(saved);
                 }
             }
         }
@@ -114,17 +101,7 @@ namespace ScrapYard
             {
                 foreach (ProtoPartModuleSnapshot module in originPartSnapshot.modules)
                 {
-                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
-                    {
-                        if (module.moduleName.ToUpper().Contains(trackedModuleName))
-                            savedModules.Add(module.moduleValues);
-                    }
-
-                    //check for the part tracker and add it
-                    if (module.moduleName.Equals("ModuleSYPartTracker"))
-                    {
-                        TrackerModule = new TrackerModuleWrapper(module.moduleValues);
-                    }
+                    storeModuleNode(module.moduleValues);
                 }
             }
         }
@@ -136,11 +113,10 @@ namespace ScrapYard
         public InventoryPart(ConfigNode originPartConfigNode)
         {
             _name = ConfigNodeUtils.PartNameFromNode(originPartConfigNode);
-            float fuelCost;
             AvailablePart availablePartForNode = ConfigNodeUtils.AvailablePartFromNode(originPartConfigNode);
             if (availablePartForNode != null)
             {
-                float dryMass, fuelMass;
+                float dryMass, fuelMass, fuelCost;
                 ShipConstruction.GetPartCostsAndMass(originPartConfigNode, availablePartForNode, out _dryCost, out fuelCost, out dryMass, out fuelMass);
             }
 
@@ -148,17 +124,7 @@ namespace ScrapYard
             {
                 foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
                 {
-                    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
-                    {
-                        if (module.GetValue("name").ToUpper().Contains(trackedModuleName))
-                            savedModules.Add(module);
-                    }
-
-                    //check for the part tracker and add it
-                    if (module.GetValue("name").Equals("ModuleSYPartTracker"))
-                    {
-                        TrackerModule = new TrackerModuleWrapper(module);
-                    }
+                    storeModuleNode(module);
                 }
             }
         }
@@ -240,28 +206,46 @@ namespace ScrapYard
             return true;
         }
 
+        /// <summary>
+        /// Converts the InventoryPart into a Part using the stored modules
+        /// </summary>
+        /// <returns></returns>
         public Part ToPart()
         {
             //Part retPart = new Part();
             AvailablePart aPart = Utils.AvailablePartFromName(Name);
             Part retPart = aPart.partPrefab;
 
+
             //set the modules to the ones we've saved
-            foreach (PartModule mod in retPart.Modules)
+            if (retPart.Modules?.Count > 0)
             {
-                foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
+                foreach (ConfigNode saved in savedModules)
                 {
-                    if (mod.moduleName.ToUpper().Contains(trackedModuleName))
+                    //look for this module on the partInfo and replace it
+                    string moduleName = saved.GetValue("name");
+                    if (retPart.Modules.Contains(moduleName))
                     {
-                        //replace the module with the version we've saved
-                        ConfigNode savedModule = savedModules.FirstOrDefault(c => c.GetValue("name").ToUpper().Contains(trackedModuleName));
-                        if (savedModule != null)
-                        {
-                            mod.Load(savedModule);
-                        }
+                        PartModule correspondingModule = retPart.Modules[moduleName];
+                        correspondingModule.Load(saved);
                     }
                 }
             }
+            //foreach (PartModule mod in retPart.Modules)
+            //{
+            //    foreach (string trackedModuleName in ScrapYard.Instance.Settings.TrackedModules)
+            //    {
+            //        if (mod.moduleName.ToUpper().Contains(trackedModuleName))
+            //        {
+            //            //replace the module with the version we've saved
+            //            ConfigNode savedModule = savedModules.FirstOrDefault(c => c.GetValue("name").ToUpper().Contains(trackedModuleName));
+            //            if (savedModule != null)
+            //            {
+            //                mod.Load(savedModule);
+            //            }
+            //        }
+            //    }
+            //}
 
             return retPart;
         }
@@ -331,6 +315,31 @@ namespace ScrapYard
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj);
+        }
+
+        private bool storeModuleNode(ConfigNode moduleNode)
+        {
+            if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(moduleNode))
+            {
+                savedModules.Add(moduleNode);
+                return true;
+            }
+
+            //check if this is one of the forbidden modules, and if so then set DoNotStore
+            if (ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(moduleNode))
+            {
+                DoNotStore = true;
+                return false; //we're not storing this, so we still return false
+            }
+
+            //check for the part tracker and add it
+            if (moduleNode.GetValue("name").Equals("ModuleSYPartTracker"))
+            {
+                TrackerModule = new TrackerModuleWrapper(moduleNode);
+                return true;
+            }
+
+            return false;
         }
     }
 }

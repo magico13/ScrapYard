@@ -54,10 +54,10 @@
     <Compile Include="EventListeners.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="InventoryPart.cs" />
-    <Compile Include="ModuleTemplates\ModuleConfigParser.cs" />
     <Compile Include="Modules\ModuleSYPartTracker.cs" />
     <Compile Include="Modules\TrackerModuleWrapper.cs" />
     <Compile Include="ModuleTemplates\ModuleTemplate.cs" />
+    <Compile Include="ModuleTemplates\ModuleTemplateList.cs" />
     <Compile Include="PartInventory.cs" />
     <Compile Include="PartTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

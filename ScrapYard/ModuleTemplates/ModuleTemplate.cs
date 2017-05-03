@@ -10,12 +10,14 @@ namespace ScrapYard
     {
         public string NameRegex { get; set; }
         public string[] Requirements { get; set; }
+        public bool IsForbiddenType { get; set; }
 
 
         public ModuleTemplate(ConfigNode source)
         {
             NameRegex = source.GetValue("name");
             Requirements = source.GetValues("requirement");
+            IsForbiddenType = string.Equals(source.name, "FORBIDDEN_TEMPLATE", StringComparison.Ordinal);
         }
 
 
@@ -57,7 +59,14 @@ namespace ScrapYard
             int i = 0;
             for (; i<fieldSplit.Length-1; i++)
             {
-                currentNode = currentNode.GetNode(fieldSplit[i]);
+                if (currentNode.HasNode(fieldSplit[i]))
+                {
+                    currentNode = currentNode.GetNode(fieldSplit[i]);
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
 
             string final = fieldSplit[i];
@@ -75,7 +84,11 @@ namespace ScrapYard
                 return currentNode.CountValues.ToString();
             }
 
-            return currentNode.GetValue(final);
+            if (currentNode.HasValue(final))
+            {
+                return currentNode.GetValue(final);
+            }
+            return string.Empty;
         }
 
         private bool processRequirement(ConfigNode sourceNode, string requirement)
@@ -92,14 +105,14 @@ namespace ScrapYard
 
             double result = MagiCore.MathParsing.ParseMath("SY_REQUIREMENT_PROCESSING", requirement, variables);
 
-            return (result != 0);
+            return (result > 0);
         }
 
         private List<string> variablesUsed(string requirementString)
         {
             List<string> used = new List<string>();
             //find everything within square brackets
-            MatchCollection matches = Regex.Matches(requirementString, "\\[.+?\\]");
+            MatchCollection matches = Regex.Matches(requirementString, @"\[.+?\]");
             foreach (Match match in matches)
             {
                 used.Add(match.Value.Trim('[', ']'));

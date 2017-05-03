@@ -36,7 +36,7 @@ namespace ScrapYard
 
         public void AddPart(InventoryPart part)
         {
-            if (!InventoryEnabled)
+            if (!InventoryEnabled || part.DoNotStore) //if not using the inventory, or the part shouldn't be stored, then do not add it
             {
                 return;
             }
