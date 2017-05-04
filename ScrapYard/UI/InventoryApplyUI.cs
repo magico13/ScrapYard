@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KSP.UI.Screens;
+using UnityEngine;
 
 namespace ScrapYard.UI
 {
@@ -33,7 +34,7 @@ namespace ScrapYard.UI
 
             //set the position to the bottom of the screen, near the button
             //SetSize(EventListeners.Instance.Button.GetAnchorUL().x, EventListeners.Instance.Button.GetAnchorUL().y - 20, 75, 20);
-            SetSize(Mouse.screenPos.x - (75/2), Mouse.screenPos.y-100, 75, 15);
+            SetSize(Mouse.screenPos.x - (75/2), Screen.height - 100, 75, 50);
             //Activate the button
             EventListeners.Instance.Button.SetTrue(false);
         }
