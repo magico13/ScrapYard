@@ -23,14 +23,14 @@ namespace ScrapYard.Modules
             base.OnInitialize();
             if (string.IsNullOrEmpty(ID))
             {
-                SetToFresh();
+                MakeFresh();
             }
         }
 
         public override void OnCopy(PartModule fromModule)
         {
             base.OnCopy(fromModule);
-            SetToFresh();
+            MakeFresh();
         }
 
         protected string NewID()
@@ -38,7 +38,7 @@ namespace ScrapYard.Modules
             return Guid.NewGuid().ToString();
         }
 
-        public void SetToFresh()
+        public void MakeFresh()
         {
             ID = NewID();
             TimesRecovered = 0;

@@ -33,6 +33,16 @@ namespace ScrapYard.Modules
         }
 
         /// <summary>
+        /// Makes the tracker reset to a fresh one.
+        /// </summary>
+        public void MakeFresh()
+        {
+            ID = Guid.NewGuid();
+            TimesRecovered = 0;
+            Inventoried = false;
+        }
+
+        /// <summary>
         /// True if the wrapper has an actual module applied
         /// </summary>
         public bool HasModule { get { return TrackerNode != null; } }

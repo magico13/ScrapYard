@@ -23,6 +23,7 @@ namespace ScrapYard
                 GameEvents.OnVesselRollout.Add(VesselRolloutEvent);
                 GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
+                GameEvents.onEditorShipModified.Add(OnEditorShipModified);
 
                 ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
 
@@ -38,13 +39,14 @@ namespace ScrapYard
             GameEvents.onVesselRecovered.Remove(VesselRecovered);
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
             GameEvents.onGUIApplicationLauncherUnreadifying.Remove(OnGUIAppLauncherUnReadying);
+            GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
 
             ScrapYardEvents.OnSYInventoryChanged.Remove(InventoryChangedEventListener);
 
             Logging.DebugLog("Event Listeners De-Registered!");
         }
 
-        private void InventoryChangedEventListener(InventoryPart p, bool added)
+        public void InventoryChangedEventListener(InventoryPart p, bool added)
         {
             //if removed then check if we should remove a corresponding part from the EditorLogic vessel
             if (!added)
@@ -58,7 +60,7 @@ namespace ScrapYard
                         if (p.ID == shipPart.ID)
                         {
                             ModuleSYPartTracker module = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                            module.SetToFresh();
+                            module.MakeFresh();
                             break; //There can only be one part with this ID
                         }
                     }
@@ -135,6 +137,11 @@ namespace ScrapYard
             {
                 ApplicationLauncher.Instance.RemoveModApplication(Button);
             }
+        }
+
+        public void OnEditorShipModified(ShipConstruct ship)
+        {
+            ScrapYard.Instance.EditorVerificationRequired = true;
         }
     }
 }

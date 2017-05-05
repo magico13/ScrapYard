@@ -14,10 +14,15 @@ namespace ScrapYard
         public VesselTracker ProcessedTracker { get; } = new VesselTracker();
         public PartTracker PartTracker { get; } = new PartTracker();
 
+
+        public bool EditorVerificationRequired { get; set; }
         void Start()
         {
             Logging.DebugLog("Start Start");
             Instance = this;
+
+            InvokeRepeating("VerifyEditor", 1, 1);
+
             //load settings
             Settings.LoadSettings();
             EventListeners.Instance.RegisterListeners();
@@ -66,5 +71,13 @@ namespace ScrapYard
             ApplyInventoryUI.OnGUIHandler();
         }
         #endregion GUI Code
+
+        private void VerifyEditor()
+        {
+            if (EditorVerificationRequired)
+            {
+                Utilities.InventoryManagement.VerifyEditorShip();
+            }
+        }
     }
 }

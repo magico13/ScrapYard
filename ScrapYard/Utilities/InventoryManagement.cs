@@ -117,15 +117,31 @@ namespace ScrapYard.Utilities
             foreach (Part part in input)
             {
                 InventoryPart iPart = new InventoryPart(part);
-                InventoryPart inInventory = ScrapYard.Instance.TheInventory.RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
-
-                if (inInventory != null)
+                if (iPart.TrackerModule.Inventoried)
                 {
-                    Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
-                    //add funds back if active
-                    if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                    InventoryPart inInventory = ScrapYard.Instance.TheInventory.RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
+
+                    if (inInventory != null)
                     {
-                        Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                        Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
+                        //add funds back if active
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                        {
+                            Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                        }
+                    }
+                    else
+                    {
+                        //we couldn't find the appropriate part in the inventory, should we "make it fresh"? Or do we allow this...
+                        //I mean, we kind of should allow it. Maybe. Maybe not though.
+                        //we do need to verify they havent changed a part after applying it. may as well do it here
+                        //but then kct edits need to add all parts back to the inventory. thats fair
+                        //basically we say that you cant bring your own inventory parts and must buy ours for 4x the cost :P
+
+                        //reset their tracker status
+                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                        iPart.TrackerModule.MakeFresh();
+                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
             }
@@ -141,17 +157,52 @@ namespace ScrapYard.Utilities
             {
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(partNode);
-                //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = ScrapYard.Instance.TheInventory.RemovePart(iPart, ComparisonStrength.STRICT);
-
-                //if one was found...
-                if (inInventory != null)
+                if (iPart.TrackerModule.Inventoried)
                 {
-                    Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
-                    //add funds back if active
-                    if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                    //find a corresponding one in the inventory and remove it
+                    InventoryPart inInventory = ScrapYard.Instance.TheInventory.RemovePart(iPart, ComparisonStrength.STRICT);
+
+                    //if one was found...
+                    if (inInventory != null)
                     {
-                        Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                        Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
+                        //add funds back if active
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                        {
+                            Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
+                        }
+                    }
+                    else
+                    {
+                        //reset their tracker status
+                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                        iPart.TrackerModule.MakeFresh();
+                        ConfigNode tracker = partNode.GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name") == "ModuleSYPartTracker");
+                        tracker.SetValue("ID", Guid.NewGuid().ToString());
+                        tracker.SetValue("TimeRecovered", 0);
+                        tracker.SetValue("Inventoried", false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the inventory parts on the ship in the editor are valid
+        /// </summary>
+        public static void VerifyEditorShip()
+        {
+            foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
+            {
+                InventoryPart iPart = new InventoryPart(part);
+                if (iPart.TrackerModule.Inventoried)
+                {
+                    InventoryPart inInventory = ScrapYard.Instance.TheInventory.FindPart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
+                    if (inInventory == null)
+                    {
+                        //reset their tracker status
+                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                        iPart.TrackerModule.MakeFresh();
+                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
             }
