@@ -9,7 +9,7 @@ namespace ScrapYard
     public class GlobalSettings
     {
         private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
-        private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+        //private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
         private static string templatePath = scrapYardPath + "/PluginData/ModuleTemplates.cfg";
 
         public ModuleTemplateList ModuleTemplates { get; private set; } = new ModuleTemplateList();
