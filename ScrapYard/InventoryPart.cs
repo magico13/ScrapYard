@@ -259,28 +259,54 @@ namespace ScrapYard
             {
                 ConfigNode returnNode = ConfigNode.CreateConfigFromObject(this);
 
+                returnNode.AddValue("_id", ID);
+                returnNode.AddValue("_timesRecovered", TrackerModule.TimesRecovered);
+                returnNode.AddValue("_inventoried", TrackerModule.Inventoried);
+
                 //Add module nodes
                 foreach (ConfigNode module in savedModules)
                 {
                     returnNode.AddNode(module);
                 }
-                if (TrackerModule?.HasModule == true)
-                {
-                    returnNode.AddNode(TrackerModule.TrackerNode);
-                }
+                //if (TrackerModule?.HasModule == true) //uncomment if we decide to store the whole module again
+                //{
+                //    returnNode.AddNode(TrackerModule.TrackerNode);
+                //}
                 return returnNode;
             }
             set
             {
                 try
                 {
+                    if (value == null)
+                    {
+                        return;
+                    }
                     //  ConfigNode cnUnwrapped = node.GetNode(this.GetType().Name);
                     //plug it in to the object
                     ConfigNode.LoadObjectFromConfig(this, value);
+
+                    //try to get tracker stuff
+                    int timesRecovered = 0;
+                    bool inventoried = false;
+                    string idStr = null;
+
+                    if (value.TryGetValue("_id", ref idStr) |
+                        value.TryGetValue("_timesRecovered", ref timesRecovered) |
+                        value.TryGetValue("_inventoried", ref inventoried)) // the single | makes all of them happen, we need at least one to succeed
+                    {
+                        Guid? idGuid = Utilities.Utils.StringToGuid(idStr);
+                        if (idGuid.HasValue)
+                        {
+                            TrackerModule = new TrackerModuleWrapper(idGuid.Value, timesRecovered, inventoried);
+                        }
+                    }
+
+
                     savedModules = new List<ConfigNode>();
                     foreach (ConfigNode module in value.GetNodes("MODULE"))
                     {
-                        if (module.GetValue("name").Equals("ModuleSYPartTracker"))
+                        if (module.GetValue("name").Equals("ModuleSYPartTracker")) //we still need to load it for a little while longer
                         {
                             TrackerModule = new TrackerModuleWrapper(module);
                         }
@@ -289,8 +315,6 @@ namespace ScrapYard
                             savedModules.Add(module);
                         }
                     }
-
-                    //Logging.DebugLog($"Name: {Name} DryCost: {DryCost}");
                 }
                 catch (Exception ex)
                 {

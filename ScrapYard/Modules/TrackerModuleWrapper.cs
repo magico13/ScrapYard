@@ -20,6 +20,19 @@ namespace ScrapYard.Modules
         }
 
         /// <summary>
+        /// Creates a new wrapper for the ModuleSYPartTracker, without the actual backing ConfigNode
+        /// </summary>
+        /// <param name="id">The ID</param>
+        /// <param name="recovered">The number of times recovered</param>
+        /// <param name="inventoried">Whether the part is from the inventory</param>
+        public TrackerModuleWrapper(Guid id, int recovered, bool inventoried)
+        {
+            _id = id;
+            _timesRecovered = recovered;
+            _inventoried = inventoried;
+        }
+
+        /// <summary>
         /// True if the wrapper has an actual module applied
         /// </summary>
         public bool HasModule { get { return TrackerNode != null; } }
@@ -41,6 +54,15 @@ namespace ScrapYard.Modules
                     }
                 }
                 return _id;
+            }
+            set
+            {
+                //set the ID in the actual node
+                if (HasModule && value.HasValue)
+                {
+                    TrackerNode.SetValue("ID", value.Value.ToString());
+                }
+                 _id = value;
             }
         }
 
@@ -68,8 +90,8 @@ namespace ScrapYard.Modules
                 if (HasModule)
                 {
                     TrackerNode.SetValue("TimesRecovered", value);
-                    _timesRecovered = null; //force a recalculation next time
                 }
+                _timesRecovered = value;
             }
         }
 
@@ -96,8 +118,8 @@ namespace ScrapYard.Modules
                 if (HasModule)
                 {
                     TrackerNode.SetValue("Inventoried", value);
-                    _inventoried = null;
                 }
+                _inventoried = value;
             }
         }
     }
