@@ -12,7 +12,7 @@
     {
         "USERNAME":"magico13",
         "REPOSITORY":"ScrapYard",
-        "ALLOW_PRE_RELEASE":true,
+        "ALLOW_PRE_RELEASE":true
     },
     "KSP_VERSION_MIN":
 	{

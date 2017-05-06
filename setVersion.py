@@ -12,10 +12,10 @@ VersionFile = "./GameData/ScrapYard/ScrapYard.version"
 version = sys.argv[1] #"1.2.3.4"  or "major.minor.patch.build"
 versionSplit = version.split('.')
 
-major = versionSplit[0]
-minor = versionSplit[1]
-patch = versionSplit[2]
-build = versionSplit[3]
+major = int(versionSplit[0])
+minor = int(versionSplit[1])
+patch = int(versionSplit[2])
+build = int(versionSplit[3])
 
 
 #update the VersionInfo.cs file
@@ -38,6 +38,6 @@ fileJSON["VERSION"]["PATCH"] = patch
 fileJSON["VERSION"]["BUILD"] = build
 
 with open(VersionFile, 'w') as v:
-  json.dump(fileJSON, v)
+  json.dump(fileJSON, v, sort_keys=True, indent=4)
   
 print("Done!")
