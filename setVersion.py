@@ -21,7 +21,7 @@ build = int(versionSplit[3])
 #update the VersionInfo.cs file
 print("Setting .dll version")
 with open(VersionInfo, 'w') as v:
-  v.write('[assembly: System.Reflection.AssemblyVersion("' + version + '")] //Added by build\n')
+  #v.write('[assembly: System.Reflection.AssemblyVersion("' + version + '")] //Added by build\n')
   v.write('[assembly: System.Reflection.AssemblyFileVersion("' + version + '")] //Added by build\n')
   
 #Update the .version file
