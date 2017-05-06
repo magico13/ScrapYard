@@ -140,7 +140,6 @@ namespace ScrapYard.Utilities
 
                         //reset their tracker status
                         Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
-                        iPart.TrackerModule.MakeFresh();
                         (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
@@ -176,7 +175,6 @@ namespace ScrapYard.Utilities
                     {
                         //reset their tracker status
                         Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
-                        iPart.TrackerModule.MakeFresh();
                         ConfigNode tracker = partNode.GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name") == "ModuleSYPartTracker");
                         tracker.SetValue("ID", Guid.NewGuid().ToString());
                         tracker.SetValue("TimeRecovered", 0);
@@ -194,6 +192,10 @@ namespace ScrapYard.Utilities
             foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
             {
                 InventoryPart iPart = new InventoryPart(part);
+                if (iPart.ID == null)
+                {
+                    (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                }
                 if (iPart.TrackerModule.Inventoried)
                 {
                     InventoryPart inInventory = ScrapYard.Instance.TheInventory.FindPart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
@@ -201,8 +203,21 @@ namespace ScrapYard.Utilities
                     {
                         //reset their tracker status
                         Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
-                        iPart.TrackerModule.MakeFresh();
                         (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                    }
+                }
+                else
+                {
+                    //check that we're not sharing an ID with something in the inventory
+                    if (iPart.ID.HasValue)
+                    {
+                        InventoryPart inInventory = ScrapYard.Instance.TheInventory.FindPart(iPart.ID.Value);
+                        if (inInventory != null)
+                        {
+                            //found a part that is sharing an ID but shouldn't be
+                            Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
+                            (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                        }
                     }
                 }
             }

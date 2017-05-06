@@ -11,13 +11,17 @@ namespace ScrapYard
         public string NameRegex { get; set; }
         public string[] Requirements { get; set; }
         public bool IsForbiddenType { get; set; }
-
+        public bool StoreIfDefault { get; set; }
 
         public ModuleTemplate(ConfigNode source)
         {
             NameRegex = source.GetValue("name");
             Requirements = source.GetValues("requirement");
             IsForbiddenType = string.Equals(source.name, "FORBIDDEN_TEMPLATE", StringComparison.Ordinal);
+
+            bool store = false;
+            source.TryGetValue("storeIfDefault", ref store);
+            StoreIfDefault = store;
         }
 
 

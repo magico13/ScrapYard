@@ -81,7 +81,7 @@ namespace ScrapYard
                 {
                     ConfigNode saved = new ConfigNode("MODULE");
                     module.Save(saved);
-                    storeModuleNode(saved);
+                    storeModuleNode(_name, saved);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace ScrapYard
             {
                 foreach (ProtoPartModuleSnapshot module in originPartSnapshot.modules)
                 {
-                    storeModuleNode(module.moduleValues);
+                    storeModuleNode(_name, module.moduleValues);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace ScrapYard
             {
                 foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
                 {
-                    storeModuleNode(module);
+                    storeModuleNode(_name, module);
                 }
             }
         }
@@ -341,16 +341,17 @@ namespace ScrapYard
             return ReferenceEquals(this, obj);
         }
 
-        private bool storeModuleNode(ConfigNode moduleNode)
+        private bool storeModuleNode(string partName, ConfigNode moduleNode)
         {
-            if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(moduleNode))
+            //If it matches a template, save it
+            if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(partName, moduleNode))
             {
                 savedModules.Add(moduleNode);
                 return true;
             }
 
             //check if this is one of the forbidden modules, and if so then set DoNotStore
-            if (ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(moduleNode))
+            if (ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
             {
                 DoNotStore = true;
                 return false; //we're not storing this, so we still return false

@@ -76,6 +76,7 @@ namespace ScrapYard
         {
             if (EditorVerificationRequired)
             {
+                EditorVerificationRequired = false;
                 Utilities.InventoryManagement.VerifyEditorShip();
             }
         }

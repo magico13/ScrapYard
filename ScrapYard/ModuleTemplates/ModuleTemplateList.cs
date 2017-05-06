@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ScrapYard.Utilities;
 
 namespace ScrapYard
 {
@@ -13,13 +14,28 @@ namespace ScrapYard
         /// </summary>
         /// <param name="moduleNode">A PartModule ConfigNode</param>
         /// <returns>The matching template or null if no match</returns>
-        public ModuleTemplate FindMatchingTemplate(ConfigNode moduleNode)
+        public ModuleTemplate FindMatchingTemplate(string partName, ConfigNode moduleNode)
         {
             foreach (ModuleTemplate template in this)
             {
                 if (template.Matches(moduleNode))
                 {
-                    return template;
+                    Part prefab;
+                    string moduleName = moduleNode.GetValue("name");
+                    if (template.StoreIfDefault) //if we store them even if they're the default, we can just save it
+                    {
+                        return template;
+                    }
+                    else if ((prefab = Utils.AvailablePartFromName(partName)?.partPrefab)?.Modules.Contains(moduleName) == true)
+                    {
+                        ConfigNode defaultNode = new ConfigNode();
+                        prefab.Modules[moduleName].Save(defaultNode);
+                        if (!moduleNode.IsIdenticalTo(defaultNode)) //don't save them when they're the default values
+                        {
+                            return template;
+                        }
+                    }
+                    
                 }
             }
             return null;
@@ -30,9 +46,9 @@ namespace ScrapYard
         /// </summary>
         /// <param name="moduleNode">The PartModule ConfigNode</param>
         /// <returns>True if a match is found, false otherwise</returns>
-        public bool CheckForMatch(ConfigNode moduleNode)
+        public bool CheckForMatch(string partName, ConfigNode moduleNode)
         {
-            return (FindMatchingTemplate(moduleNode) != null);
+            return (FindMatchingTemplate(partName, moduleNode) != null);
         }
     }
 }
