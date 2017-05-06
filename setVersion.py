@@ -9,7 +9,7 @@ VersionFile = "./GameData/ScrapYard/ScrapYard.version"
 
 
 #get the various parts of the version from the passed in version
-version = sys.args[1] #"1.2.3.4"  or "major.minor.patch.build"
+version = sys.argv[1] #"1.2.3.4"  or "major.minor.patch.build"
 versionSplit = version.split('.')
 
 major = versionSplit[0]
