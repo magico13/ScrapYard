@@ -17,7 +17,7 @@ namespace ScrapYard.Utilities
         /// <param name="input"></param>
         /// <param name="inInventory"></param>
         /// <param name="notInInventory"></param>
-        public static void SplitParts(List<Part> input, out List<InventoryPart> inInventory, out List<InventoryPart> notInInventory)
+        public static void SplitParts(IEnumerable<Part> input, out IList<InventoryPart> inInventory, out IList<InventoryPart> notInInventory)
         {
             inInventory = new List<InventoryPart>();
             notInInventory = new List<InventoryPart>();
@@ -41,7 +41,7 @@ namespace ScrapYard.Utilities
         /// Applies the inventory to a vessel, specifically the part tracker. Happens in the Editor
         /// </summary>
         /// <param name="input">The vessel as a list of parts</param>
-        public static void ApplyInventoryToVessel(List<Part> input)
+        public static void ApplyInventoryToVessel(IEnumerable<Part> input)
         {
             PartInventory copy = new PartInventory(true);
             copy.State = ScrapYard.Instance.TheInventory.State;
@@ -75,7 +75,7 @@ namespace ScrapYard.Utilities
         /// Applies the inventory to a vessel, specifically the part tracker
         /// </summary>
         /// <param name="input">The vessel as a list of part ConfigNodes</param>
-        public static void ApplyInventoryToVessel(List<ConfigNode> input)
+        public static void ApplyInventoryToVessel(IEnumerable<ConfigNode> input)
         {
             PartInventory copy = new PartInventory(true);
             copy.State = ScrapYard.Instance.TheInventory.State;
@@ -112,7 +112,7 @@ namespace ScrapYard.Utilities
         /// Removes any inventory parts from the inventory (vessel rollout, KCT construction)
         /// </summary>
         /// <param name="input">The vessel as a list of parts.</param>
-        public static void RemovePartsFromInventory(List<Part> input)
+        public static void RemovePartsFromInventory(IEnumerable<Part> input)
         {
             foreach (Part part in input)
             {
@@ -150,7 +150,7 @@ namespace ScrapYard.Utilities
         /// Removes any inventory parts from the inventory (vessel rollout, KCT construction)
         /// </summary>
         /// <param name="input">The vessel as a list of part ConfigNodes.</param>
-        public static void RemovePartsFromInventory(List<ConfigNode> input)
+        public static void RemovePartsFromInventory(IEnumerable<ConfigNode> input)
         {
             foreach (ConfigNode partNode in input)
             {

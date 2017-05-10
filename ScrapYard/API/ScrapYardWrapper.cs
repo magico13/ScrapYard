@@ -64,7 +64,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="parts">The vessel as a List of Parts</param>
         /// <returns>True if processed, false otherwise</returns>
-        public static bool ProcessVessel(List<Part> parts)
+        public static bool ProcessVessel(IEnumerable<Part> parts)
         {
             if (!Available)
             {
@@ -78,7 +78,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="parts">The vessel as a List of part ConfigNodes</param>
         /// <returns>True if processed, false otherwise</returns>
-        public static bool ProcessVessel(List<ConfigNode> parts)
+        public static bool ProcessVessel(IEnumerable<ConfigNode> parts)
         {
             if (!Available)
             {
@@ -92,7 +92,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="parts">The list of parts to add</param>
         /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
-        public static void AddPartsToInventory(List<Part> parts, bool incrementRecovery)
+        public static void AddPartsToInventory(IEnumerable<Part> parts, bool incrementRecovery)
         {
             if (Available)
             {
@@ -105,7 +105,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="parts">The list of parts to add</param>
         /// <param name="incrementRecovery">If true, increments the number of recoveries in the tracker</param>
-        public static void AddPartsToInventory(List<ConfigNode> parts, bool incrementRecovery)
+        public static void AddPartsToInventory(IEnumerable<ConfigNode> parts, bool incrementRecovery)
         {
             if (Available)
             {
@@ -117,7 +117,7 @@ namespace ScrapYard
         /// Records a build in the part tracker
         /// </summary>
         /// <param name="parts">The vessel as a list of Parts.</param>
-        public static void RecordBuild(List<Part> parts)
+        public static void RecordBuild(IEnumerable<Part> parts)
         {
             if (Available)
             {
@@ -129,7 +129,7 @@ namespace ScrapYard
         /// Records a build in the part tracker
         /// </summary>
         /// <param name="parts">The vessel as a list of ConfigNodes.</param>
-        public static void RecordBuild(List<ConfigNode> parts)
+        public static void RecordBuild(IEnumerable<ConfigNode> parts)
         {
             if (Available)
             {
@@ -143,13 +143,13 @@ namespace ScrapYard
         /// <param name="sourceParts">Source list of parts</param>
         /// <param name="strictness">How strict of a comparison to use. Defaults to MODULES</param>
         /// <returns>List of Parts that are in the inventory</returns>
-        public static List<Part> GetPartsInInventory(List<Part> sourceParts, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        public static IList<Part> GetPartsInInventory(IEnumerable<Part> sourceParts, ComparisonStrength strictness = ComparisonStrength.MODULES)
         {
             if (!Available)
             {
                 return null;
             }
-            return (List<Part>)invokeMethod("GetPartsInInventory_Parts", sourceParts, strictness.ToString());
+            return (IList<Part>)invokeMethod("GetPartsInInventory_Parts", sourceParts, strictness.ToString());
             //Why do a ToString on an enum instead of casting to int? Because if the internal enum changes then the intended strictness is kept.
         }
 
@@ -159,14 +159,104 @@ namespace ScrapYard
         /// <param name="sourceParts">Source list of parts</param>
         /// <param name="strictness">How strict of a comparison to use. Defaults to MODULES</param>
         /// <returns>List of part ConfigNodes that are in the inventory</returns>
-        public static List<ConfigNode> GetPartsInInventory(List<ConfigNode> sourceParts, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        public static IList<ConfigNode> GetPartsInInventory(IEnumerable<ConfigNode> sourceParts, ComparisonStrength strictness = ComparisonStrength.MODULES)
         {
             if (!Available)
             {
                 return null;
             }
-            return (List<ConfigNode>)invokeMethod("GetPartsInInventory_ConfigNodes", sourceParts, strictness.ToString());
+            return (IList<ConfigNode>)invokeMethod("GetPartsInInventory_ConfigNodes", sourceParts, strictness.ToString());
             //Why do a ToString on an enum instead of casting to int? Because if the internal enum changes then the intended strictness is kept.
+        }
+
+        /// <summary>
+        /// Adds a part to the Inventory
+        /// </summary>
+        /// <param name="part">The part to add</param>
+        /// <param name="incrementRecovery">If true, increments the counter for how many times the part was recovered</param>
+        /// <returns>True if added, false otherwise</returns>
+        public static bool AddPartToInventory(Part part, bool incrementRecovery)
+        {
+            if (!Available)
+            {
+                return false;
+            }
+            return (bool)invokeMethod("AddPartToInventory_Part", part, incrementRecovery);
+        }
+
+        /// <summary>
+        /// Adds a part to the Inventory
+        /// </summary>
+        /// <param name="part">The part to add</param>
+        /// <param name="incrementRecovery">If true, increments the counter for how many times the part was recovered</param>
+        /// <returns>True if added, false otherwise</returns>
+        public static bool AddPartToInventory(ConfigNode part, bool incrementRecovery)
+        {
+            if (!Available)
+            {
+                return false;
+            }
+            return (bool)invokeMethod("AddPartToInventory_Node", part, incrementRecovery);
+        }
+
+        /// <summary>
+        /// Removes a part from the Inventory using the given strictness for finding the part
+        /// </summary>
+        /// <param name="part">The part to remove</param>
+        /// <param name="strictness">The strictenss to use when searching for the part. Defaults to MODULES</param>
+        /// <returns>True if removed, false otherwise.</returns>
+        public static bool RemovePartFromInventory(Part part, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        {
+            if (!Available)
+            {
+                return false;
+            }
+            return (bool)invokeMethod("RemovePartFromInventory_Part", part, strictness.ToString());
+        }
+
+        /// <summary>
+        /// Removes a part from the Inventory using the given strictness for finding the part
+        /// </summary>
+        /// <param name="part">The part to remove</param>
+        /// <param name="strictness">The strictenss to use when searching for the part. Defaults to MODULES</param>
+        /// <returns>True if removed, false otherwise.</returns>
+        public static bool RemovePartFromInventory(ConfigNode part, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        {
+            if (!Available)
+            {
+                return false;
+            }
+            return (bool)invokeMethod("RemovePartFromInventory_Node", part, strictness.ToString());
+        }
+
+        /// <summary>
+        /// Finds a part in the inventory for the given part
+        /// </summary>
+        /// <param name="part">The part to search for</param>
+        /// <param name="strictness">The strictness to use when searching for the part. Defaults to MODULES.</param>
+        /// <returns>A ConfigNode representing the InventoryPart, or null if none found.</returns>
+        public static ConfigNode FindInventoryPart(Part part, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        {
+            if (!Available)
+            {
+                return null;
+            }
+            return invokeMethod("FindInventoryPart_Part", part, strictness.ToString()) as ConfigNode;
+        }
+
+        /// <summary>
+        /// Finds a part in the inventory for the given part
+        /// </summary>
+        /// <param name="part">The part to search for</param>
+        /// <param name="strictness">The strictness to use when searching for the part. Defaults to MODULES.</param>
+        /// <returns>A ConfigNode representing the InventoryPart, or null if none found.</returns>
+        public static ConfigNode FindInventoryPart(ConfigNode part, ComparisonStrength strictness = ComparisonStrength.MODULES)
+        {
+            if (!Available)
+            {
+                return null;
+            }
+            return invokeMethod("FindInventoryPart_Node", part, strictness.ToString()) as ConfigNode;
         }
 
         /// <summary>

@@ -45,11 +45,11 @@ namespace ScrapYard
         /// Adds a part to the inventory using an InventoryPart
         /// </summary>
         /// <param name="part">The Inventory Part to add</param>
-        public void AddPart(InventoryPart part)
+        public InventoryPart AddPart(InventoryPart part)
         {
             if (!InventoryEnabled || part.DoNotStore) //if not using the inventory, or the part shouldn't be stored, then do not add it
             {
-                return;
+                return null;
             }
             part.TrackerModule.Inventoried = true;
             internalInventory.Add(part);
@@ -57,36 +57,37 @@ namespace ScrapYard
             {
                 ScrapYardEvents.OnSYInventoryChanged.Fire(part, true);
             }
+            return part;
         }
 
         /// <summary>
         /// Adds a part to the inventory using a Part
         /// </summary>
         /// <param name="part">The Part to add</param>
-        public void AddPart(Part part)
+        public InventoryPart AddPart(Part part)
         {
             InventoryPart convertedPart = new InventoryPart(part);
-            AddPart(convertedPart);
+            return AddPart(convertedPart);
         }
 
         /// <summary>
         /// Adds a part to the inventory using a ProtoPartSnapshot
         /// </summary>
         /// <param name="protoPartSnapshot">The ProtoPartSnapshot to add</param>
-        public void AddPart(ProtoPartSnapshot protoPartSnapshot)
+        public InventoryPart AddPart(ProtoPartSnapshot protoPartSnapshot)
         {
             InventoryPart convertedPart = new InventoryPart(protoPartSnapshot);
-            AddPart(convertedPart);
+            return AddPart(convertedPart);
         }
 
         /// <summary>
         /// Adds a part to the inventory using a ConfigNode of a Part
         /// </summary>
         /// <param name="partNode">The ConfigNode to add</param>
-        public void AddPart(ConfigNode partNode)
+        public InventoryPart AddPart(ConfigNode partNode)
         {
             InventoryPart convertedPart = new InventoryPart(partNode);
-            AddPart(convertedPart);
+            return AddPart(convertedPart);
         }
 
         /// <summary>

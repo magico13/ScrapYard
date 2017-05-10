@@ -74,18 +74,11 @@ namespace ScrapYard
             }
 
             string final = fieldSplit[i];
-            
-            if (string.Equals(final, "COUNT", StringComparison.Ordinal))
+
+            string specialValue = getSpecialFieldValue(currentNode, final);
+            if (!string.IsNullOrEmpty(specialValue))
             {
-                return (currentNode.CountNodes + currentNode.CountValues).ToString();
-            }
-            else if (string.Equals(final, "NODECOUNT", StringComparison.Ordinal))
-            {
-                return currentNode.CountNodes.ToString();
-            }
-            else if (string.Equals(final, "VALUECOUNT", StringComparison.Ordinal))
-            {
-                return currentNode.CountValues.ToString();
+                return specialValue;
             }
 
             if (currentNode.HasValue(final))
@@ -123,6 +116,24 @@ namespace ScrapYard
             }
 
             return used;
+        }
+
+        private string getSpecialFieldValue(ConfigNode node, string field)
+        {
+            if (string.Equals(field, "COUNT", StringComparison.Ordinal))
+            { //Get the number of nodes and values
+                return (node.CountNodes + node.CountValues).ToString();
+            }
+            else if (string.Equals(field, "NODECOUNT", StringComparison.Ordinal))
+            { //Get the number of nodes
+                return node.CountNodes.ToString();
+            }
+            else if (string.Equals(field, "VALUECOUNT", StringComparison.Ordinal))
+            { //Get the number of values
+                return node.CountValues.ToString();
+            }
+
+            return null;
         }
     }
 }

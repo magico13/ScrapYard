@@ -68,6 +68,10 @@ namespace ScrapYard
         public InventoryPart(Part originPart)
         {
             _name = originPart.partInfo.name;
+            if (ScrapYard.Instance.Settings.PartBlacklist.Contains(Name))
+            {
+                DoNotStore = true;
+            }
             _dryCost = originPart.GetModuleCosts(originPart.partInfo.cost) + originPart.partInfo.cost;
             foreach (PartResource resource in originPart.Resources)
             {
@@ -93,6 +97,10 @@ namespace ScrapYard
         public InventoryPart(ProtoPartSnapshot originPartSnapshot)
         {
             _name = originPartSnapshot.partInfo.name;
+            if (ScrapYard.Instance.Settings.PartBlacklist.Contains(Name))
+            {
+                DoNotStore = true;
+            }
             float fuelCost;
             ShipConstruction.GetPartCosts(originPartSnapshot, originPartSnapshot.partInfo, out _dryCost, out fuelCost);
 
@@ -112,19 +120,31 @@ namespace ScrapYard
         /// <param name="originPartConfigNode">The <see cref="ConfigNode"/> to use as the basis of the <see cref="InventoryPart"/>.</param>
         public InventoryPart(ConfigNode originPartConfigNode)
         {
-            _name = ConfigNodeUtils.PartNameFromNode(originPartConfigNode);
-            AvailablePart availablePartForNode = ConfigNodeUtils.AvailablePartFromNode(originPartConfigNode);
-            if (availablePartForNode != null)
+            //if the ConfigNode given is already an InventoryPart, just load it instead
+            if (originPartConfigNode.name == typeof(InventoryPart).FullName)
             {
-                float dryMass, fuelMass, fuelCost;
-                ShipConstruction.GetPartCostsAndMass(originPartConfigNode, availablePartForNode, out _dryCost, out fuelCost, out dryMass, out fuelMass);
+                State = originPartConfigNode;
             }
-
-            if (originPartConfigNode.HasNode("MODULE"))
+            else
             {
-                foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
+                _name = ConfigNodeUtils.PartNameFromNode(originPartConfigNode);
+                if (ScrapYard.Instance.Settings.PartBlacklist.Contains(Name))
                 {
-                    storeModuleNode(_name, module);
+                    DoNotStore = true;
+                }
+                AvailablePart availablePartForNode = ConfigNodeUtils.AvailablePartFromNode(originPartConfigNode);
+                if (availablePartForNode != null)
+                {
+                    float dryMass, fuelMass, fuelCost;
+                    ShipConstruction.GetPartCostsAndMass(originPartConfigNode, availablePartForNode, out _dryCost, out fuelCost, out dryMass, out fuelMass);
+                }
+
+                if (originPartConfigNode.HasNode("MODULE"))
+                {
+                    foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
+                    {
+                        storeModuleNode(_name, module);
+                    }
                 }
             }
         }
@@ -156,6 +176,14 @@ namespace ScrapYard
                 return true;
             }
 
+            if (strictness == ComparisonStrength.STRICT) //Strict comparison, the ids must be the same
+            { //Compare IDs now so we can avoid the full module comparison if they don't have the same ID
+                if (comparedPart.ID != ID)
+                {
+                    return false;
+                }
+            }
+
             //Test to ensure the number of saved modules are identical
             if (savedModules.Count == comparedPart.savedModules.Count)
             {
@@ -179,10 +207,6 @@ namespace ScrapYard
             }
 
             //Tracker comparison, the times used must match
-            if (TrackerModule == null || comparedPart.TrackerModule == null)
-            {
-                return false;
-            }
             if (TrackerModule.TimesRecovered != comparedPart.TrackerModule.TimesRecovered)
             {
                 return false;
@@ -194,12 +218,6 @@ namespace ScrapYard
             if (strictness == ComparisonStrength.TRACKER)
             {
                 return true;
-            }
-
-            //Strict comparison, the ids must be the same
-            if (ID != comparedPart.ID)
-            {
-                return false;
             }
 
             //Everything must match, they are the same
@@ -343,28 +361,29 @@ namespace ScrapYard
 
         private bool storeModuleNode(string partName, ConfigNode moduleNode)
         {
+            bool saved = false;
             //If it matches a template, save it
             if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(partName, moduleNode))
             {
                 savedModules.Add(moduleNode);
-                return true;
+                saved = true;
             }
 
             //check if this is one of the forbidden modules, and if so then set DoNotStore
-            if (ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
+            //If we already have DoNotStore set, there's no reason to check again
+            if (!DoNotStore && ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
             {
                 DoNotStore = true;
-                return false; //we're not storing this, so we still return false
             }
 
             //check for the part tracker and add it
             if (moduleNode.GetValue("name").Equals("ModuleSYPartTracker"))
             {
                 TrackerModule = new TrackerModuleWrapper(moduleNode);
-                return true;
+                saved = true;
             }
 
-            return false;
+            return saved;
         }
     }
 }

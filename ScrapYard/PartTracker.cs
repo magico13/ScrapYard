@@ -30,7 +30,7 @@ namespace ScrapYard
         /// Takes a list of parts and registers it as a build
         /// </summary>
         /// <param name="parts">The vessel as a list of parts</param>
-        public void AddBuild(List<Part> parts)
+        public void AddBuild(IEnumerable<Part> parts)
         {
             if (!TrackerEnabled)
             {
@@ -59,7 +59,7 @@ namespace ScrapYard
         /// Takes a list of part ConfigNodes and registers it as a build
         /// </summary>
         /// <param name="parts">The vessel as a list of part ConfigNodes</param>
-        public void AddBuild(List<ConfigNode> partNodes)
+        public void AddBuild(IEnumerable<ConfigNode> partNodes)
         {
             if (!TrackerEnabled)
             {
