@@ -10,8 +10,6 @@ namespace ScrapYard
     {
         private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
         //private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
-        private static string blacklistPath = scrapYardPath + "/SYPartBlacklist.cfg";
-        private static string templatePath = scrapYardPath + "/SYModuleTemplates.cfg";
 
         public ModuleTemplateList ModuleTemplates { get; private set; } = new ModuleTemplateList();
 
