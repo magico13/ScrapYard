@@ -9,8 +9,9 @@ namespace ScrapYard
     public class GlobalSettings
     {
         private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
-        private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
-        private static string templatePath = scrapYardPath + "/PluginData/ModuleTemplates.cfg";
+        //private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+        private static string blacklistPath = scrapYardPath + "/SYPartBlacklist.cfg";
+        private static string templatePath = scrapYardPath + "/SYModuleTemplates.cfg";
 
         public ModuleTemplateList ModuleTemplates { get; private set; } = new ModuleTemplateList();
 
@@ -55,54 +56,42 @@ namespace ScrapYard
 
         public void LoadSettings()
         {
-            //TODO: Module Manager?
-
             //load the setting file, a confignode
-            if (File.Exists(settingsPath))
+            //if (File.Exists(settingsPath))
+            //{
+            //    ConfigNode settingsNode = ConfigNode.Load(settingsPath);
+            //    ConfigNode.LoadObjectFromConfig(this, settingsNode);
+            //}
+
+            _partBlacklist.Clear();
+            foreach (ConfigNode blacklistNode in GameDatabase.Instance.GetConfigNodes("SY_PART_BLACKLIST"))
             {
-                ConfigNode settingsNode = ConfigNode.Load(settingsPath);
-                ConfigNode.LoadObjectFromConfig(this, settingsNode);
-                if (settingsNode.HasNode("Blacklist"))
-                {
-                    _partBlacklist.Clear();
-                    _partBlacklist.AddRange(settingsNode.GetNode("Blacklist").GetValues("name"));
-                }
+                _partBlacklist.AddRange(blacklistNode.GetValues("name"));
             }
+            Logging.DebugLog($"Blacklisted {PartBlacklist.Count()} parts.");
 
             ModuleTemplates.Clear();
             ForbiddenTemplates.Clear();
 
-            if (File.Exists(templatePath))
+            foreach (ConfigNode moduleTemplate in GameDatabase.Instance.GetConfigNodes("SY_MODULE_TEMPLATE"))
             {
-                ConfigNode settingsNode = ConfigNode.Load(templatePath);
-                foreach (ConfigNode templateNode in settingsNode.GetNodes())
-                {
-                    ModuleTemplate template = new ModuleTemplate(templateNode);
-                    if (!template.IsForbiddenType)
-                    {
-                        ModuleTemplates.Add(template);
-                    }
-                    else
-                    {
-                        ForbiddenTemplates.Add(template);
-                    }
-                }
-                Logging.DebugLog($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
+                ModuleTemplate template = new ModuleTemplate(moduleTemplate);
+                ModuleTemplates.Add(template);
             }
+
+            foreach (ConfigNode moduleTemplate in GameDatabase.Instance.GetConfigNodes("SY_FORBIDDEN_TEMPLATE"))
+            {
+                ModuleTemplate template = new ModuleTemplate(moduleTemplate);
+                ForbiddenTemplates.Add(template);
+            }
+            Logging.DebugLog($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
         }
 
         public void SaveSettings()
         {
-            Directory.CreateDirectory(scrapYardPath + "/PluginData");
-            ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
-            //add blacklist
-            ConfigNode blacklist = new ConfigNode("Blacklist");
-            foreach (string listed in PartBlacklist)
-            {
-                blacklist.AddValue("name", listed);
-            }
-            settingsNode.AddNode(blacklist);
-            settingsNode.Save(settingsPath);
+            //Directory.CreateDirectory(scrapYardPath + "/PluginData");
+            //ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
+            //settingsNode.Save(settingsPath);
         }
     }
 }
