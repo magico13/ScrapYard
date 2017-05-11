@@ -20,6 +20,11 @@ namespace ScrapYard
             {
                 if (template.Matches(moduleNode))
                 {
+                    if (template.IsForbiddenType)
+                    {
+                        return template;
+                    }
+
                     Part prefab = null;
                     string moduleName = moduleNode.GetValue("name");
                     if (template.StoreIfDefault) //if we store them even if they're the default, we can just save it

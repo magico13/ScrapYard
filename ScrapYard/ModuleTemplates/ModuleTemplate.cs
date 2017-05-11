@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ScrapYard
@@ -17,7 +15,7 @@ namespace ScrapYard
         {
             NameRegex = source.GetValue("name");
             Requirements = source.GetValues("requirement");
-            IsForbiddenType = string.Equals(source.name, "FORBIDDEN_TEMPLATE", StringComparison.Ordinal);
+            IsForbiddenType = string.Equals(source.name, "SY_FORBIDDEN_TEMPLATE", StringComparison.Ordinal);
 
             bool store = false;
             source.TryGetValue("storeIfDefault", ref store);

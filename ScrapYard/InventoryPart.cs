@@ -78,7 +78,7 @@ namespace ScrapYard
                 _dryCost -= (float)(resource.maxAmount * PartResourceLibrary.Instance.GetDefinition(resource.resourceName).unitCost);
             }
 
-            //Save modules (once we know which modules we want to save)
+            //Save modules
             if (originPart.Modules != null)
             {
                 foreach (PartModule module in originPart.Modules)
@@ -373,6 +373,7 @@ namespace ScrapYard
             //If we already have DoNotStore set, there's no reason to check again
             if (!DoNotStore && ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
             {
+                Logging.DebugLog("Matched forbidden template with module "+moduleNode.GetValue("name"));
                 DoNotStore = true;
             }
 
