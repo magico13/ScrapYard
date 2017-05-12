@@ -58,18 +58,20 @@ namespace ScrapYard
             {
                 InventoryPart converted = new InventoryPart(part);
                 InventoryPart found = addUse(converted);
-                TrackType thisType = found.TrackerModule.Inventoried ? TrackType.INVENTORIED : TrackType.NEW;
+                InventoryPart found_bak = found;
+                TrackType thisType = converted.TrackerModule.Inventoried ? TrackType.INVENTORIED : TrackType.NEW;
 
-                if (uniqueParts.Keys.FirstOrDefault(ip => ip.IsSameAs(converted, _strictness)) != null)
-                { //not previously in dictionary, so add
-                    uniqueParts.Add(found, thisType);
-                }
-                else
-                {
+                if ((found = uniqueParts.Keys.FirstOrDefault(ip => ip.IsSameAs(converted, _strictness))) != null)
+                { 
                     if (uniqueParts[found] != TrackType.TOTAL && uniqueParts[found] != thisType)
                     {
                         uniqueParts[found] = TrackType.TOTAL;
                     }
+                }
+                else
+                { //not previously in dictionary, so add
+                    found = found_bak;
+                    uniqueParts.Add(found, thisType);
                 }
             }
 
@@ -96,18 +98,20 @@ namespace ScrapYard
             {
                 InventoryPart converted = new InventoryPart(partNode);
                 InventoryPart found = addUse(converted);
-                TrackType thisType = found.TrackerModule.Inventoried ? TrackType.INVENTORIED : TrackType.NEW;
+                InventoryPart found_bak = found;
+                TrackType thisType = converted.TrackerModule.Inventoried ? TrackType.INVENTORIED : TrackType.NEW;
 
-                if (uniqueParts.Keys.FirstOrDefault(ip => ip.IsSameAs(converted, _strictness)) != null)
-                { //not previously in dictionary, so add
-                    uniqueParts.Add(found, thisType);
-                }
-                else
+                if ((found = uniqueParts.Keys.FirstOrDefault(ip => ip.IsSameAs(converted, _strictness))) != null)
                 {
                     if (uniqueParts[found] != TrackType.TOTAL && uniqueParts[found] != thisType)
                     {
                         uniqueParts[found] = TrackType.TOTAL;
                     }
+                }
+                else
+                { //not previously in dictionary, so add
+                    found = found_bak;
+                    uniqueParts.Add(found, thisType);
                 }
             }
 
