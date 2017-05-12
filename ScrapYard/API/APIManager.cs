@@ -7,6 +7,11 @@ using System.Text;
 
 namespace ScrapYard
 {
+    /// <summary>
+    /// This is the remote-side of the API, where all calls through the wrapper funnel through.
+    /// It can also be referenced directly, and it is recommended that you interact with ScrapYard through these methods exclusively.
+    /// This may be required later on, with everything else being made internal (probably not, but it'd be better design)
+    /// </summary>
     public sealed class APIManager
     {
         private static APIManager _instance = new APIManager();
@@ -327,6 +332,96 @@ namespace ScrapYard
         {
             ScrapYard.Instance.PartTracker.AddBuild(parts);
         }
+        #endregion Vessel Processing
+
+        #region Part Tracker
+        /// <summary>
+        /// Gets the number of builds for a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <param name="type">The type of build counter to check</param>
+        /// <returns>Number of builds for the part</returns>
+        public int GetBuildCount_Part(Part part, string type)
+        {
+            return ScrapYard.Instance.PartTracker.GetBuildsForPart(part, parseTrackType(type));
+        }
+
+        /// <summary>
+        /// Gets the number of builds for a part
+        /// </summary>
+        /// <param name="partNode">The ConfigNode of the part to check</param>
+        /// <param name="type">The type of build counter to check</param>
+        /// <returns>Number of builds for the part</returns>
+        public int GetBuildCount_Node(ConfigNode partNode, string type)
+        {
+            return ScrapYard.Instance.PartTracker.GetBuildsForPart(partNode, parseTrackType(type));
+        }
+
+        /// <summary>
+        /// Gets the number of uses of a part
+        /// </summary>
+        /// <param name="part">The part to check</param>
+        /// <param name="type">The type of use counter to check</param>
+        /// <returns>Number of uses of the part</returns>
+        public int GetUseCount_Part(Part part, string type)
+        {
+            return ScrapYard.Instance.PartTracker.GetUsesForPart(part, parseTrackType(type));
+        }
+
+        /// <summary>
+        /// Gets the number of uses of a part
+        /// </summary>
+        /// <param name="partNode">The ConfigNode of the part to check</param>
+        /// <param name="type">The type of use counter to check</param>
+        /// <returns>Number of uses of the part</returns>
+        public int GetUseCount_Node(ConfigNode partNode, string type)
+        {
+            return ScrapYard.Instance.PartTracker.GetUsesForPart(partNode, parseTrackType(type));
+        }
+
+        /// <summary>
+        /// Gets the unique ID for the current part.
+        /// It is recommended to cache this.
+        /// </summary>
+        /// <param name="part">The part to get the ID of</param>
+        /// <returns>The part's ID (a Guid) as a string or null if it can't be gotten</returns>
+        public string GetPartID_Part(Part part)
+        {
+            return new InventoryPart(part).ID?.ToString();
+        }
+
+        /// <summary>
+        /// Gets the unique ID for the current part.
+        /// It is recommended to cache this.
+        /// </summary>
+        /// <param name="part">The part to get the ID of</param>
+        /// <returns>The part's ID (a Guid) as a string or null if it can't be gotten</returns>
+        public string GetPartID_Node(ConfigNode part)
+        {
+            return new InventoryPart(part).ID?.ToString();
+        }
+
+        /// <summary>
+        /// Gets the number of times a part has been recovered. 
+        /// It is recommended to cache this.
+        /// </summary>
+        /// <param name="part">The part to get the TimesRecovered count of.</param>
+        /// <returns>The number of times the part has been recovered.</returns>
+        public int GetTimesUsed_Part(Part part)
+        {
+            return new InventoryPart(part).TrackerModule.TimesRecovered;
+        }
+
+        /// <summary>
+        /// Gets the number of times a part has been recovered.
+        /// It is recommended to cache this.
+        /// </summary>
+        /// <param name="part">The part to get the TimesRecovered count of.</param>
+        /// <returns>The number of times the part has been recovered.</returns>
+        public int GetTimesUsed_Node(ConfigNode part)
+        {
+            return new InventoryPart(part).TrackerModule.TimesRecovered;
+        }
 
         /// <summary>
         /// Checks if the part is pulled from the inventory or is new
@@ -349,48 +444,6 @@ namespace ScrapYard
             InventoryPart iPart = new InventoryPart(part);
             return iPart.TrackerModule.Inventoried;
         }
-        #endregion Vessel Processing
-
-        #region Part Tracker
-        /// <summary>
-        /// Gets the number of builds for a part
-        /// </summary>
-        /// <param name="part">The part to check</param>
-        /// <returns>Number of builds for the part</returns>
-        public int GetBuildCount_Part(Part part)
-        {
-            return ScrapYard.Instance.PartTracker.GetBuildsForPart(part);
-        }
-
-        /// <summary>
-        /// Gets the number of builds for a part
-        /// </summary>
-        /// <param name="partNode">The ConfigNode of the part to check</param>
-        /// <returns>Number of builds for the part</returns>
-        public int GetBuildCount_Node(ConfigNode partNode)
-        {
-            return ScrapYard.Instance.PartTracker.GetBuildsForPart(partNode);
-        }
-
-        /// <summary>
-        /// Gets the number of uses of a part
-        /// </summary>
-        /// <param name="part">The part to check</param>
-        /// <returns>Number of uses of the part</returns>
-        public int GetUseCount_Part(Part part)
-        {
-            return ScrapYard.Instance.PartTracker.GetUsesForPart(part);
-        }
-
-        /// <summary>
-        /// Gets the number of uses of a part
-        /// </summary>
-        /// <param name="partNode">The ConfigNode of the part to check</param>
-        /// <returns>Number of uses of the part</returns>
-        public int GetUseCount_Node(ConfigNode partNode)
-        {
-            return ScrapYard.Instance.PartTracker.GetUsesForPart(partNode);
-        }
         #endregion Part Tracker
 
 
@@ -404,6 +457,19 @@ namespace ScrapYard
             catch
             {
                 return ComparisonStrength.MODULES;
+            }
+        }
+
+        private PartTracker.TrackType parseTrackType(string type)
+        {
+            try
+            {
+                PartTracker.TrackType actualStrictness = (PartTracker.TrackType)Enum.Parse(typeof(PartTracker.TrackType), type);
+                return actualStrictness;
+            }
+            catch
+            {
+                return PartTracker.TrackType.TOTAL;
             }
         }
     }

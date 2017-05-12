@@ -286,10 +286,6 @@ namespace ScrapYard
                 {
                     returnNode.AddNode(module);
                 }
-                //if (TrackerModule?.HasModule == true) //uncomment if we decide to store the whole module again
-                //{
-                //    returnNode.AddNode(TrackerModule.TrackerNode);
-                //}
                 return returnNode;
             }
             set
@@ -324,7 +320,7 @@ namespace ScrapYard
                     savedModules = new List<ConfigNode>();
                     foreach (ConfigNode module in value.GetNodes("MODULE"))
                     {
-                        if (module.GetValue("name").Equals("ModuleSYPartTracker")) //we still need to load it for a little while longer
+                        if (module.GetValue("name").Equals("ModuleSYPartTracker")) //Deprecated, but not a bad idea to keep
                         {
                             TrackerModule = new TrackerModuleWrapper(module);
                         }
