@@ -80,6 +80,8 @@ namespace ScrapYard
             {
                 addBuild(partPair.Key, partPair.Value);
             }
+
+            ScrapYardEvents.OnSYTrackerUpdated.Fire(uniqueParts.Keys);
         }
 
         /// <summary>
@@ -120,6 +122,7 @@ namespace ScrapYard
             {
                 addBuild(partPair.Key, partPair.Value);
             }
+            ScrapYardEvents.OnSYTrackerUpdated.Fire(uniqueParts.Keys);
         }
         #endregion Add
 

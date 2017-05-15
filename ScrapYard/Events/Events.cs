@@ -9,6 +9,7 @@ namespace ScrapYard
     {
         public static EventData<InventoryPart, bool> OnSYInventoryChanged;// = new EventData<InventoryPart, bool>("OnSYInventoryChanged");
         public static EventVoid OnSYInventoryAppliedToVessel;// = new EventVoid("OnSYInventoryAppliedToVessel");
+        public static EventData<IEnumerable<InventoryPart>> OnSYTrackerUpdated;
         private static bool initialized;
 
 
@@ -19,6 +20,7 @@ namespace ScrapYard
                 Logging.DebugLog("Initializing Events.");
                 OnSYInventoryChanged = new EventData<InventoryPart, bool>("OnSYInventoryChanged");
                 OnSYInventoryAppliedToVessel = new EventVoid("OnSYInventoryAppliedToVessel");
+                OnSYTrackerUpdated = new EventData<IEnumerable<InventoryPart>>("OnSYTrackerUpdated");
 
                 initialized = true;
                 Logging.DebugLog("Events Initialized.");
