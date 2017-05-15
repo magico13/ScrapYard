@@ -120,8 +120,8 @@ namespace ScrapYard
             if (ApplicationLauncher.Ready && (Button == null || !ApplicationLauncher.Instance.Contains(Button, out vis))) //Add Stock button
             {
                 Button = ApplicationLauncher.Instance.AddModApplication(
-                    () => { ScrapYard.Instance.ApplyInventoryUI.Show(); },
-                    () => { ScrapYard.Instance.ApplyInventoryUI.Close(); },
+                    () => { handleButtonClick(true); },
+                    () => { handleButtonClick(false); },
                     null,
                     null,
                     null,
@@ -142,6 +142,64 @@ namespace ScrapYard
         public void OnEditorShipModified(ShipConstruct ship)
         {
             ScrapYard.Instance.EditorVerificationRequired = true;
+        }
+
+
+
+        //TODO: Move this stuff somewhere better
+        private void handleButtonClick(bool enable)
+        {
+            if (enable)
+            {
+                if (EditorLogic.SelectedPart == null)
+                {
+                    ScrapYard.Instance.ApplyInventoryUI.Show();
+                }
+                else
+                {
+                    List<Part> selectedParts = new List<Part>(EditorLogic.SelectedPart.children);
+                    selectedParts.Add(EditorLogic.SelectedPart);
+                    List<Part> inventoriedParts = new List<Part>();
+                    double cost = 0;
+                    uint count = 0;
+                    foreach (Part p in selectedParts)
+                    {
+                        InventoryPart iP = new InventoryPart(p);
+                        if (iP.TrackerModule.Inventoried)
+                        {
+                            cost += iP.DryCost;
+                            count++;
+                            inventoriedParts.Add(p);
+                        }
+                    }
+                    string descriptor = (ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds ? "Sell" : "Discard");
+                    if (count > 0)
+                    {
+                        string message = $"Are you sure you'd like to {descriptor.ToLower()} the selected {count} parts for {cost} funds?";
+                        if (!ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds)
+                        {
+                            message = $"Are you sure you'd like to {descriptor.ToLower()} the selected {count} parts?";
+                        }
+
+                        MultiOptionDialog diag = new MultiOptionDialog(message,
+                            descriptor + "Parts", HighLogic.UISkin,
+                            new DialogGUIButton("Yes", () => InventoryManagement.RemovePartsFromInventory(inventoriedParts)),
+                            new DialogGUIButton("No", () => { }));
+                        PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
+                    }
+                    else
+                    {
+                        //let them know they can sell parts here
+                        PopupDialog.SpawnPopupDialog(new Vector2(), new Vector2(), descriptor + " Parts Here",
+                            "You can " + descriptor.ToLower() + " parts by dropping parts from the inventory here.", "Ok", false, HighLogic.UISkin);
+                    }
+                    Button?.SetFalse(false);
+                }
+            }
+            else
+            {
+                ScrapYard.Instance.ApplyInventoryUI.Close();
+            }
         }
     }
 }
