@@ -38,7 +38,7 @@ namespace ScrapYard.Utilities
         }
 
         /// <summary>
-        /// Applies the inventory to a vessel, specifically the part tracker. Happens in the Editor
+        /// Applies the inventory to a vessel, specifically the part tracker module. Happens in the Editor
         /// </summary>
         /// <param name="input">The vessel as a list of parts</param>
         public static void ApplyInventoryToVessel(IEnumerable<Part> input)
@@ -69,10 +69,11 @@ namespace ScrapYard.Utilities
             }
 
             ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
+            GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
         }
 
         /// <summary>
-        /// Applies the inventory to a vessel, specifically the part tracker
+        /// Applies the inventory to a vessel, specifically the part tracker module. Happens in the Editor
         /// </summary>
         /// <param name="input">The vessel as a list of part ConfigNodes</param>
         public static void ApplyInventoryToVessel(IEnumerable<ConfigNode> input)
@@ -105,6 +106,7 @@ namespace ScrapYard.Utilities
                 }
             }
             ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
+            GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
         }
 
 
@@ -183,45 +185,5 @@ namespace ScrapYard.Utilities
                 }
             }
         }
-
-        /// <summary>
-        /// Verifies that the inventory parts on the ship in the editor are valid
-        /// </summary>
-        public static void VerifyEditorShip()
-        {
-            foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
-            {
-                InventoryPart iPart = new InventoryPart(part);
-                if (iPart.ID == null)
-                {
-                    (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                }
-                if (iPart.TrackerModule.Inventoried)
-                {
-                    InventoryPart inInventory = ScrapYard.Instance.TheInventory.FindPart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
-                    if (inInventory == null)
-                    {
-                        //reset their tracker status
-                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
-                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                    }
-                }
-                else
-                {
-                    //check that we're not sharing an ID with something in the inventory
-                    if (iPart.ID.HasValue)
-                    {
-                        InventoryPart inInventory = ScrapYard.Instance.TheInventory.FindPart(iPart.ID.Value);
-                        if (inInventory != null)
-                        {
-                            //found a part that is sharing an ID but shouldn't be
-                            Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
-                            (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                        }
-                    }
-                }
-            }
-        }
-
     }
 }

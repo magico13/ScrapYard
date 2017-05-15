@@ -15,7 +15,7 @@ namespace ScrapYard
             }
         }
 
-        public override bool HasPresets //we should integrate KCT into this...
+        public override bool HasPresets
         {
             get
             {
@@ -56,8 +56,7 @@ namespace ScrapYard
         [GameParameters.CustomParameterUI("Enable Part Tracker", toolTip = "Uncheck this to disable the part tracker entirely.")]
         public bool UseTracker = true;
 
-        [GameParameters.CustomParameterUI("Override Funds (WIP)", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.\nStill under development.",
-            gameMode = GameParameters.GameMode.CAREER)]
+        [GameParameters.CustomParameterUI("Override Funds (WIP)", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.\nStill under development.")]
         public bool OverrideFunds = false;
         
 

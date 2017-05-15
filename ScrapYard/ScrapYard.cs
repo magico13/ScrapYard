@@ -21,7 +21,7 @@ namespace ScrapYard
             Logging.DebugLog("Start Start");
             Instance = this;
 
-            InvokeRepeating("VerifyEditor", 1, 1);
+            InvokeRepeating("VerifyEditor", 0.5f, 0.5f);
 
             //load settings
             Settings.LoadSettings();
@@ -77,7 +77,8 @@ namespace ScrapYard
             if (EditorVerificationRequired)
             {
                 EditorVerificationRequired = false;
-                Utilities.InventoryManagement.VerifyEditorShip();
+                Utilities.EditorHandling.VerifyEditorShip();
+                Utilities.EditorHandling.UpdateEditorCost();
             }
         }
     }

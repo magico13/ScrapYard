@@ -142,6 +142,7 @@ namespace ScrapYard
         public void OnEditorShipModified(ShipConstruct ship)
         {
             ScrapYard.Instance.EditorVerificationRequired = true;
+            EditorHandling.UpdateCostUI();
         }
 
 
