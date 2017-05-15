@@ -127,7 +127,7 @@ namespace ScrapYard.Utilities
                     {
                         Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
                         //add funds back if active
-                        if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                        if (ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds)
                         {
                             Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
                         }
@@ -168,7 +168,7 @@ namespace ScrapYard.Utilities
                     {
                         Logging.DebugLog($"Removed a part in inventory for {inInventory.Name} id: {inInventory.ID}");
                         //add funds back if active
-                        if (HighLogic.CurrentGame.Parameters.CustomParams<SaveSpecificSettings>().OverrideFunds)
+                        if (ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds)
                         {
                             Funding.Instance?.AddFunds(inInventory.DryCost, TransactionReasons.VesselRollout);
                         }
