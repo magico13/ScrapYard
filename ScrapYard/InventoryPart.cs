@@ -267,6 +267,42 @@ namespace ScrapYard
 
             return retPart;
         }
+        
+        /// <summary>
+        /// Fully applies stored modules to the provided part
+        /// </summary>
+        /// <param name="part">The Part to apply onto</param>
+        /// <returns>True if part is the right type</returns>
+        public bool FullyApplyToPart(Part part)
+        {
+            if (part?.partInfo.name != Name)
+            {
+                return false;
+            }
+
+            if (part.Modules?.Count > 0)
+            {
+                foreach (ConfigNode saved in savedModules)
+                {
+                    //look for this module on the partInfo and replace it
+                    string moduleName = saved.GetValue("name");
+                    if (part.Modules.Contains(moduleName))
+                    {
+                        PartModule correspondingModule = part.Modules[moduleName];
+                        correspondingModule.Load(saved);
+                    }
+                }
+                if (part.Modules.Contains("ModuleSYPartTracker"))
+                {
+                    ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
+                    tracker.ID = TrackerModule.ID.ToString();
+                    tracker.TimesRecovered = TrackerModule.TimesRecovered;
+                    tracker.Inventoried = TrackerModule.Inventoried;
+                }
+            }
+            return true;
+        }
+
 
         /// <summary>
         /// Gets the ConfigNode version of the InventoryPart, or sets the state of the InventoryPart from a ConfigNode

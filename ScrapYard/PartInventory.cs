@@ -120,6 +120,51 @@ namespace ScrapYard
         }
 
         /// <summary>
+        /// Finds all parts in the inventory for the given InventoryPart and the provided strictness
+        /// </summary>
+        /// <param name="part">The source part to find a match for</param>
+        /// <param name="strength">The strictness of the comparison. Defaults to MODULES.</param>
+        /// <returns>An IEnumerable of InventoryParts that match</returns>
+        public IEnumerable<InventoryPart> FindParts(InventoryPart part, ComparisonStrength strength = ComparisonStrength.MODULES)
+        {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
+
+            List<InventoryPart> foundParts = new List<InventoryPart>();
+            PartInventory copy = new PartInventory(true);
+            copy.State = this.State;
+            InventoryPart found = null;
+            do
+            {
+                found = copy.RemovePart(part, strength);
+                if (found != null)
+                {
+                    foundParts.Add(found);
+                }
+            } while (found != null);
+
+            return foundParts;
+        }
+
+        /// <summary>
+        /// Returns an IEnumerable with all parts in the Inventory
+        /// </summary>
+        /// <returns>All inventory parts in an IEnumerable</returns>
+        public IEnumerable<InventoryPart> GetAllParts()
+        {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
+
+            InventoryPart[] toReturn = new InventoryPart[internalInventory.Count];
+            internalInventory.CopyTo(toReturn);
+            return toReturn;
+        }
+
+        /// <summary>
         /// Removes a part from the inventory given an InventoryPart to compare and the strictness of comparison
         /// </summary>
         /// <param name="part">The source part to find a match for</param>
@@ -159,7 +204,10 @@ namespace ScrapYard
                     returnNode.AddNode(toAdd);
                 }
                 watcher.Stop();
-                Logging.DebugLog($"Saved Part Inventory of size {internalInventory.Count} in {watcher.ElapsedMilliseconds}ms");
+                if (!disableEvents)
+                {
+                    Logging.DebugLog($"Saved Part Inventory of size {internalInventory.Count} in {watcher.ElapsedMilliseconds}ms");
+                }
                 return returnNode;
             }
             internal set
@@ -185,7 +233,10 @@ namespace ScrapYard
                     Logging.LogException(ex);
                 }
                 watcher.Stop();
-                Logging.DebugLog($"Loaded Part Inventory of size {internalInventory.Count} in {watcher.ElapsedMilliseconds}ms");
+                if (!disableEvents)
+                {
+                    Logging.DebugLog($"Loaded Part Inventory of size {internalInventory.Count} in {watcher.ElapsedMilliseconds}ms");
+                }
             }
         }
     }

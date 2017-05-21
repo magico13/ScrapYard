@@ -32,6 +32,8 @@ namespace ScrapYard.UI
         public bool CenterWindow { get; set; }
         public bool Draggable { get; set; } = true; //True by default
 
+        public GUISkin Skin { get; set; }
+
         /// <summary>
         /// Makes the window not visible
         /// </summary>

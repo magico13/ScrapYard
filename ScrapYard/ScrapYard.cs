@@ -65,10 +65,12 @@ namespace ScrapYard
 
         #region GUI Code
         public UI.InventoryApplyUI ApplyInventoryUI { get; } = new UI.InventoryApplyUI();
+        public UI.InstanceSelectorUI InstanceSelectorUI { get; } = new UI.InstanceSelectorUI();
 
         private void OnGUI()
         {
             ApplyInventoryUI.OnGUIHandler();
+            InstanceSelectorUI.OnGUIHandler();
         }
         #endregion GUI Code
 

@@ -24,6 +24,8 @@ namespace ScrapYard
                 GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
                 GameEvents.onEditorShipModified.Add(OnEditorShipModified);
+                GameEvents.onEditorPartDeleted.Add(OnEditorPartDeleted);
+                GameEvents.onEditorPodDeleted.Add(shipOrPartModified);
 
                 ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
 
@@ -40,6 +42,8 @@ namespace ScrapYard
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
             GameEvents.onGUIApplicationLauncherUnreadifying.Remove(OnGUIAppLauncherUnReadying);
             GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
+            GameEvents.onEditorPartDeleted.Remove(OnEditorPartDeleted);
+            GameEvents.onEditorPodDeleted.Remove(shipOrPartModified);
 
             ScrapYardEvents.OnSYInventoryChanged.Remove(InventoryChangedEventListener);
 
@@ -141,10 +145,20 @@ namespace ScrapYard
 
         public void OnEditorShipModified(ShipConstruct ship)
         {
+            shipOrPartModified();   
+        }
+
+        public void OnEditorPartDeleted(Part part)
+        {
+            shipOrPartModified();
+        }
+
+
+        private void shipOrPartModified()
+        {
             ScrapYard.Instance.EditorVerificationRequired = true;
             EditorHandling.UpdateCostUI();
         }
-
 
 
         //TODO: Move this stuff somewhere better
