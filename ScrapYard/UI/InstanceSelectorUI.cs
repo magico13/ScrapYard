@@ -16,10 +16,10 @@ namespace ScrapYard.UI
         {
             SetSize(500, 100, 300, Screen.height-100);
 
-            if (HighLogic.LoadedSceneIsEditor)
-            {
-                Show();
-            }
+            //if (HighLogic.LoadedSceneIsEditor)
+            //{
+            //    Show();
+            //}
         }
 
         public override void Draw(int windowID)

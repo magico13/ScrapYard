@@ -150,10 +150,11 @@ namespace ScrapYard
         }
 
         /// <summary>
-        /// Checks to see if the passed InventoryPart is identical to this one, excluding Quantity and Used by default
+        /// Checks to see if the passed InventoryPart is identical to this one, for a given strictness of "identical"
         /// </summary>
-        /// <param name="comparedPart"></param>
-        /// <returns></returns>
+        /// <param name="comparedPart">The part to compare to</param>
+        /// <param name="strictness">The strength of the comparison (just name? modules? everything?)</param>
+        /// <returns>True if mathing, false otherwise</returns>
         public bool IsSameAs(InventoryPart comparedPart, ComparisonStrength strictness)
         {
             //Test that the name is the same
@@ -166,8 +167,8 @@ namespace ScrapYard
                 return true;
             }
 
-            //Verify the costs are the same
-            if (DryCost != comparedPart.DryCost)
+            //Verify the costs are within 1 funds
+            if (Math.Abs(DryCost - comparedPart.DryCost) > 1.0)
             {
                 return false;
             }
