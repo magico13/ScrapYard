@@ -42,8 +42,7 @@ namespace ScrapYard
             }
             ComparisonStrength actualStrictness = parseStrictnessString(strictness);
             List<Part> inInventory = new List<Part>();
-            PartInventory InventoryCopy = new PartInventory(true);
-            InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory InventoryCopy = ScrapYard.Instance.TheInventory.Copy();
             foreach (Part part in sourceParts)
             {
                 InventoryPart inputPart = new InventoryPart(part);
@@ -69,8 +68,7 @@ namespace ScrapYard
             }
             ComparisonStrength actualStrictness = parseStrictnessString(strictness);
             List<ConfigNode> inInventory = new List<ConfigNode>();
-            PartInventory InventoryCopy = new PartInventory(true);
-            InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory InventoryCopy = ScrapYard.Instance.TheInventory.Copy();
             foreach (ConfigNode part in sourceParts)
             {
                 InventoryPart inputPart = new InventoryPart(part);

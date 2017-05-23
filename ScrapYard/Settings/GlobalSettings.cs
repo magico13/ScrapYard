@@ -8,8 +8,18 @@ namespace ScrapYard
 {
     public class GlobalSettings
     {
-        //private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
-        //private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+        private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
+        private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+
+
+        [Persistent]
+        private bool _autoApplyInventory = false;
+        public bool AutoApplyInventory
+        {
+            get { return _autoApplyInventory; }
+            set { _autoApplyInventory = value; }
+        }
+
 
         public ModuleTemplateList ModuleTemplates { get; private set; } = new ModuleTemplateList();
 
@@ -55,11 +65,24 @@ namespace ScrapYard
         public void LoadSettings()
         {
             //load the setting file, a confignode
-            //if (File.Exists(settingsPath))
-            //{
-            //    ConfigNode settingsNode = ConfigNode.Load(settingsPath);
-            //    ConfigNode.LoadObjectFromConfig(this, settingsNode);
-            //}
+            if (File.Exists(settingsPath))
+            {
+                ConfigNode settingsNode = ConfigNode.Load(settingsPath);
+                ConfigNode.LoadObjectFromConfig(this, settingsNode);
+
+                foreach (ConfigNode posNode in settingsNode.GetNodes("POSITION"))
+                {
+                    string name = posNode.GetValue("name");
+                    if (name == ScrapYard.Instance.ApplyInventoryUI.Title)
+                    {
+                        ScrapYard.Instance.ApplyInventoryUI.LoadPosition(posNode);
+                    }
+                    else if (name == ScrapYard.Instance.InstanceSelectorUI.Title)
+                    {
+                        ScrapYard.Instance.InstanceSelectorUI.LoadPosition(posNode);
+                    }
+                }
+            }
 
             _partBlacklist.Clear();
             foreach (ConfigNode blacklistNode in GameDatabase.Instance.GetConfigNodes("SY_PART_BLACKLIST"))
@@ -87,9 +110,12 @@ namespace ScrapYard
 
         public void SaveSettings()
         {
-            //Directory.CreateDirectory(scrapYardPath + "/PluginData");
-            //ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
-            //settingsNode.Save(settingsPath);
+            Directory.CreateDirectory(scrapYardPath + "/PluginData");
+            ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
+
+            settingsNode.AddNode(ScrapYard.Instance.ApplyInventoryUI.SavePosition(false));
+            settingsNode.AddNode(ScrapYard.Instance.InstanceSelectorUI.SavePosition(true));
+            settingsNode.Save(settingsPath);
         }
     }
 }

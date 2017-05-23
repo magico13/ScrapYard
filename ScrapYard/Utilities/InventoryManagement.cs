@@ -21,8 +21,7 @@ namespace ScrapYard.Utilities
         {
             inInventory = new List<InventoryPart>();
             notInInventory = new List<InventoryPart>();
-            PartInventory InventoryCopy = new PartInventory(true);
-            InventoryCopy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory InventoryCopy = ScrapYard.Instance.TheInventory.Copy();
             foreach (Part part in input)
             {
                 InventoryPart inputPart = new InventoryPart(part);
@@ -43,14 +42,18 @@ namespace ScrapYard.Utilities
         /// <param name="input">The vessel as a list of parts</param>
         public static void ApplyInventoryToVessel(IEnumerable<Part> input)
         {
-            PartInventory copy = new PartInventory(true);
-            copy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory copy = ScrapYard.Instance.TheInventory.Copy();
             foreach (Part part in input)
             {
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(part);
                 //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
+                
+                InventoryPart inInventory = copy.RemovePart(iPart.ID.GetValueOrDefault());
+                if (inInventory == null)
+                {
+                    inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
+                }
 
                 //if one was found...
                 if (inInventory != null)
@@ -78,14 +81,17 @@ namespace ScrapYard.Utilities
         /// <param name="input">The vessel as a list of part ConfigNodes</param>
         public static void ApplyInventoryToVessel(IEnumerable<ConfigNode> input)
         {
-            PartInventory copy = new PartInventory(true);
-            copy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory copy = ScrapYard.Instance.TheInventory.Copy();
             foreach (ConfigNode partNode in input)
             {
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(partNode);
                 //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
+                InventoryPart inInventory = copy.RemovePart(iPart.ID.GetValueOrDefault());
+                if (inInventory == null)
+                {
+                    inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
+                }
 
                 //if one was found...
                 if (inInventory != null)

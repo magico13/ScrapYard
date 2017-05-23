@@ -133,8 +133,7 @@ namespace ScrapYard
             }
 
             List<InventoryPart> foundParts = new List<InventoryPart>();
-            PartInventory copy = new PartInventory(true);
-            copy.State = this.State;
+            PartInventory copy = Copy();
             InventoryPart found = null;
             do
             {
@@ -186,6 +185,55 @@ namespace ScrapYard
                 return found;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Removes a part with the given ID
+        /// </summary>
+        /// <param name="id">The ID of the part to remove</param>
+        /// <returns>The removed InventoryPart, or null if none found</returns>
+        public InventoryPart RemovePart(Guid id)
+        {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
+            InventoryPart found = FindPart(id);
+            if (found != null && internalInventory.Remove(found))
+            {
+                if (!disableEvents)
+                {
+                    ScrapYardEvents.OnSYInventoryChanged.Fire(found, false);
+                }
+                return found;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Copies the PartInventory to a new PartInventory
+        /// </summary>
+        /// <param name="disableEventsOnCopy">If true, the copy will not fire events</param>
+        /// <returns>A copy of the PartInventory</returns>
+        public PartInventory Copy(bool disableEventsOnCopy = true)
+        {
+            PartInventory ret = null;
+            bool originalDisable = disableEvents;
+            try
+            {
+                disableEvents = true;
+                ret = new PartInventory(disableEventsOnCopy);
+                ret.State = State;
+            }
+            catch (Exception ex)
+            {
+                Logging.LogException(ex);
+            }
+            finally
+            {
+                disableEvents = originalDisable;
+            }
+            return ret;
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ namespace ScrapYard.UI
     {
         internal InventoryApplyVM _viewModel;
 
-        public InventoryApplyUI() : base(3741, "ScrapYard", false, false)
+        public InventoryApplyUI() : base(3741, "ScrapYard", true, false)
         {
             _viewModel = new InventoryApplyVM();
         }
@@ -16,6 +16,8 @@ namespace ScrapYard.UI
         public override void Draw(int windowID)
         {
             GUILayout.BeginVertical();
+            _viewModel.AutoApplyInventory = GUILayout.Toggle(_viewModel.AutoApplyInventory, "Auto-Apply");
+
             if (GUILayout.Button("Apply Inventory"))
             {
                 _viewModel.ApplyInventoryToEditorVessel();
@@ -34,7 +36,7 @@ namespace ScrapYard.UI
 
             //set the position to the bottom of the screen, near the button
             //SetSize(EventListeners.Instance.Button.GetAnchorUL().x, EventListeners.Instance.Button.GetAnchorUL().y - 20, 75, 20);
-            SetSize(Mouse.screenPos.x - (75/2), Screen.height - 100, 75, 50);
+            SetSize(Mouse.screenPos.x - (75/2), Screen.height - 125, 75, 50);
             //Activate the button
             EventListeners.Instance.Button.SetTrue(false);
         }

@@ -122,5 +122,49 @@ namespace ScrapYard.UI
 
             WindowRect = new Rect(newX, newY, WindowRect.width, WindowRect.height);
         }
+
+        /// <summary>
+        /// Saves the position and visibility to a ConfigNode
+        /// </summary>
+        /// <returns>A ConfigNode with the position and visibility data</returns>
+        public ConfigNode SavePosition(bool saveVisibility = true)
+        {
+            ConfigNode posNode = new ConfigNode("POSITION");
+            posNode.AddValue("name", Title);
+            posNode.AddValue("x", WindowRect.x);
+            posNode.AddValue("y", WindowRect.y);
+            posNode.AddValue("width", WindowRect.width);
+            posNode.AddValue("height", WindowRect.height);
+            if (saveVisibility)
+            {
+                posNode.AddValue("visible", IsVisible);
+            }
+            return posNode;
+        }
+
+        /// <summary>
+        /// Loads the position and visibility info from a confignode
+        /// </summary>
+        /// <param name="posNode">The position node</param>
+        public void LoadPosition(ConfigNode posNode)
+        {
+            if (posNode == null || posNode.GetValue("name") != Title)
+            {
+                return;
+            }
+            float x, y, width, height;
+            float.TryParse(posNode.GetValue("x"), out x);
+            float.TryParse(posNode.GetValue("y"), out y);
+            float.TryParse(posNode.GetValue("width"), out width);
+            float.TryParse(posNode.GetValue("height"), out height);
+
+            SetSize(x, y, width, height);
+            bool vis;
+            bool.TryParse(posNode.GetValue("visible"), out vis);
+            if (vis)
+            {
+                Show();
+            }
+        }
     }
 }

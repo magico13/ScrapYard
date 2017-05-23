@@ -79,6 +79,11 @@ namespace ScrapYard
             if (EditorVerificationRequired)
             {
                 EditorVerificationRequired = false;
+
+                if (Settings.AutoApplyInventory && EditorLogic.fetch?.ship?.Count > 0)
+                {
+                    Utilities.InventoryManagement.ApplyInventoryToVessel(EditorLogic.fetch.ship.parts);
+                }
                 Utilities.EditorHandling.VerifyEditorShip();
                 Utilities.EditorHandling.UpdateEditorCost();
             }

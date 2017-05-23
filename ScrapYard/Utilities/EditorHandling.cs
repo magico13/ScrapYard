@@ -18,8 +18,7 @@ namespace ScrapYard.Utilities
         public static void VerifyEditorShip()
         {
             //make a copy of the inventory
-            PartInventory copy = new PartInventory(true);
-            copy.State = ScrapYard.Instance.TheInventory.State;
+            PartInventory copy = ScrapYard.Instance.TheInventory.Copy();
 
             foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
             {
