@@ -47,6 +47,14 @@ namespace ScrapYard
             }
         }
 
+        public override string DisplaySection
+        {
+            get
+            {
+                return Title;
+            }
+        }
+
         [GameParameters.CustomParameterUI("Mod Enabled", toolTip = "Uncheck this to disable ScrapYard for this save.")]
         public bool ModEnabled = true;
 

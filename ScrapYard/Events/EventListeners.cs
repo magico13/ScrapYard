@@ -195,8 +195,7 @@ namespace ScrapYard
                         {
                             message = $"Are you sure you'd like to {descriptor.ToLower()} the selected {count} parts?";
                         }
-
-                        MultiOptionDialog diag = new MultiOptionDialog(message,
+                        MultiOptionDialog diag = new MultiOptionDialog("discardMsg", message,
                             descriptor + "Parts", HighLogic.UISkin,
                             new DialogGUIButton("Yes", () => InventoryManagement.RemovePartsFromInventory(inventoriedParts)),
                             new DialogGUIButton("No", () => { }));
@@ -205,7 +204,7 @@ namespace ScrapYard
                     else
                     {
                         //let them know they can sell parts here
-                        PopupDialog.SpawnPopupDialog(new Vector2(), new Vector2(), descriptor + " Parts Here",
+                        PopupDialog.SpawnPopupDialog(new Vector2(), new Vector2(), "dropPartsMsg", descriptor + " Parts Here",
                             "You can " + descriptor.ToLower() + " parts by dropping parts from the inventory here.", "Ok", false, HighLogic.UISkin);
                     }
                     Button?.SetFalse(false);
