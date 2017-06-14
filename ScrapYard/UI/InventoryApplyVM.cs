@@ -1,4 +1,5 @@
-﻿using ScrapYard.Utilities;
+﻿using ScrapYard.Modules;
+using ScrapYard.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,11 @@ namespace ScrapYard.UI
             }
             set
             {
-                ScrapYard.Instance.Settings.AutoApplyInventory = value;
+                if (value != AutoApplyInventory)
+                {
+                    ScrapYard.Instance.EditorVerificationRequired = true;
+                    ScrapYard.Instance.Settings.AutoApplyInventory = value;
+                }
             }
         }
 
@@ -25,6 +30,20 @@ namespace ScrapYard.UI
             if (EditorLogic.fetch != null && EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts.Any())
             {
                 InventoryManagement.ApplyInventoryToVessel(EditorLogic.fetch.ship.Parts);
+            }
+        }
+
+        public void MakeFresh()
+        {
+            if (EditorLogic.fetch != null && EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts.Any())
+            {
+                foreach (Part part in EditorLogic.fetch.ship)
+                {
+                    if (part.Modules.Contains("ModuleSYPartTracker"))
+                    {
+                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                    }
+                }
             }
         }
     }

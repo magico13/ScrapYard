@@ -21,11 +21,15 @@ namespace ScrapYard
             Logging.DebugLog("Start Start");
             Instance = this;
 
-            InvokeRepeating("VerifyEditor", 0.5f, 0.5f);
+            InvokeRepeating("VerifyEditor", 1f, 1f);
 
             //load settings
             Settings.LoadSettings();
             EventListeners.Instance.RegisterListeners();
+            if (HighLogic.LoadedSceneIsEditor)
+            {
+                EditorVerificationRequired = true;
+            }
             Logging.DebugLog("Start Complete");
         }
 
@@ -78,14 +82,23 @@ namespace ScrapYard
         {
             if (EditorVerificationRequired)
             {
-                EditorVerificationRequired = false;
-
-                if (Settings.AutoApplyInventory && EditorLogic.fetch?.ship?.Count > 0)
+                try
                 {
-                    Utilities.InventoryManagement.ApplyInventoryToVessel(EditorLogic.fetch.ship.parts);
+                    if (Settings.AutoApplyInventory && EditorLogic.fetch?.ship?.Count > 0)
+                    {
+                        Utilities.InventoryManagement.ApplyInventoryToVessel(EditorLogic.fetch.ship.parts);
+                    }
+                    Utilities.EditorHandling.VerifyEditorShip();
+                    Utilities.EditorHandling.UpdateEditorCost();
                 }
-                Utilities.EditorHandling.VerifyEditorShip();
-                Utilities.EditorHandling.UpdateEditorCost();
+                catch
+                {
+                    throw;
+                }
+                finally
+                {
+                    EditorVerificationRequired = false;
+                }
             }
         }
     }
