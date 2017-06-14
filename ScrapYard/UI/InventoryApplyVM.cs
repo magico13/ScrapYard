@@ -44,6 +44,7 @@ namespace ScrapYard.UI
                         (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
+                ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
             }
         }
     }
