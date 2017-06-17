@@ -30,6 +30,8 @@ namespace ScrapYard
             {
                 EditorVerificationRequired = true;
             }
+
+            ScrapYardEvents.OnSYReady.Fire();
             Logging.DebugLog("Start Complete");
         }
 

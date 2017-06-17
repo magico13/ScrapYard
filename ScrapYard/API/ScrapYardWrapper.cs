@@ -302,6 +302,21 @@ namespace ScrapYard
             }
         }
 
+        /// <summary>
+        /// Sets whether a vessel is tracked or not
+        /// </summary>
+        /// <param name="id">The ID of the vessel</param>
+        /// <param name="newStatus">The status to set</param>
+        /// <returns>The previous status</returns>
+        public static bool SetProcessedStatus(string id, bool newStatus)
+        {
+            if (Available)
+            {
+                return (bool)invokeMethod("SetProcessedStatus_ID", id, newStatus);
+            }
+            return false;
+        }
+
         #endregion Vessel Processing
 
 

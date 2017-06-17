@@ -350,6 +350,17 @@ namespace ScrapYard
         {
             ScrapYard.Instance.PartTracker.AddBuild(parts);
         }
+
+        /// <summary>
+        /// Sets whether a vessel is tracked or not
+        /// </summary>
+        /// <param name="id">The ID of the vessel</param>
+        /// <param name="newStatus">The status to set</param>
+        /// <returns>The previous status</returns>
+        public bool SetProcessedStatus_ID(string id, bool newStatus)
+        {
+            return ScrapYard.Instance.ProcessedTracker.TrackVessel(Utils.StringToGuid(id), newStatus);
+        }
         #endregion Vessel Processing
 
         #region Part Tracker
