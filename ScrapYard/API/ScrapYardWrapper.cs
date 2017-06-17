@@ -230,6 +230,20 @@ namespace ScrapYard
             return invokeMethod("FindInventoryPart_Node", part, strictness.ToString()) as ConfigNode;
         }
 
+
+        /// <summary>
+        /// Finds a part in the inventory for the given id
+        /// </summary>
+        /// <param name="id">The id of the part to search for.</param>
+        /// <returns>A ConfigNode representing the InventoryPart, or null if none found.</returns>
+        public static ConfigNode FindInventoryPart(string id)
+        {
+            if (!Available)
+            {
+                return null;
+            }
+            return invokeMethod("FindInventoryPart_ID", id) as ConfigNode;
+        }
         #endregion Inventory Manipulation
 
 

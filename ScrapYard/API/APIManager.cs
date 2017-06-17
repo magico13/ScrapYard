@@ -239,6 +239,26 @@ namespace ScrapYard
 
             return ScrapYard.Instance.TheInventory.FindPart(new InventoryPart(sourcePart), actualStrictness)?.State;
         }
+
+        /// <summary>
+        /// Finds an InventoryPart for a given ID
+        /// </summary>
+        /// <param name="id">The id of the part to search for.</param>
+        /// <returns>The ConfigNode for the InventoryPart, or null if not found</returns>
+        public ConfigNode FindInventoryPart_ID(string id)
+        {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return null;
+            }
+
+            Guid? guid = Utilities.Utils.StringToGuid(id);
+            if (!guid.HasValue)
+            {
+                return null;
+            }
+            return ScrapYard.Instance.TheInventory.FindPart(guid.Value)?.State;
+        }
         #endregion Inventory Manipulation
 
         #region Vessel Processing
