@@ -53,6 +53,10 @@ namespace ScrapYard.Modules
                         _id = Utils.StringToGuid(id);
                     }
                 }
+                if (_id == null)
+                {
+                    _id = Guid.NewGuid();
+                }
                 return _id;
             }
             set
