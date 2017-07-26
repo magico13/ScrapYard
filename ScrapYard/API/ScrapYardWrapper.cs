@@ -244,6 +244,19 @@ namespace ScrapYard
             }
             return invokeMethod("FindInventoryPart_ID", id) as ConfigNode;
         }
+
+        /// <summary>
+        /// Gets all parts in the inventory as a list of ConfigNodes
+        /// </summary>
+        /// <returns>The list of all inventory parts</returns>
+        public static IList<ConfigNode> GetAllInventoryParts()
+        {
+            if (!Available)
+            {
+                return null;
+            }
+            return invokeMethod("GetAllInventoryParts") as IList<ConfigNode>;
+        }
         #endregion Inventory Manipulation
 
 
@@ -465,6 +478,81 @@ namespace ScrapYard
             return (bool)invokeMethod("PartIsFromInventory_Node", part);
         }
         #endregion Part Tracker
+
+        #region Settings
+        /// <summary>
+        /// The list of part names that are blacklisted
+        /// </summary>
+        public static IEnumerable<string> PartBlacklist
+        {
+            get
+            {
+                return Available ? invokeMethod("GetSetting_PartBlacklist") as IEnumerable<string> : null;
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to automatically apply the inventory while building ships in the editor
+        /// </summary>
+        public static bool AutoApplyInventory
+        {
+            get
+            {
+                return Available ? (bool)invokeMethod("GetSetting_AutoApplyInventory") : false;
+            }
+            set
+            {
+                if (Available)
+                {
+                    invokeMethod("SetSetting_AutoApplyInventory", value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether the mod is enabled for this save
+        /// </summary>
+        public static bool ModEnabled
+        {
+            get
+            {
+                return Available ? (bool)invokeMethod("GetSetting_ModEnabled") : false;
+            }
+        }
+
+        /// <summary>
+        /// Whether the inventory is in use for this save
+        /// </summary>
+        public static bool UseInventory
+        {
+            get
+            {
+                return Available ? (bool)invokeMethod("GetSetting_UseInventory") : false;
+            }
+        }
+
+        /// <summary>
+        /// Whether the part use tracker is enabled for this save
+        /// </summary>
+        public static bool UseTracker
+        {
+            get
+            {
+                return Available ? (bool)invokeMethod("GetSetting_UseTracker") : false;
+            }
+        }
+
+        /// <summary>
+        /// Whether the Override Funds option is in use for this save
+        /// </summary>
+        public static bool OverrideFunds
+        {
+            get
+            {
+                return Available ? (bool)invokeMethod("GetSetting_OverrideFunds") : false;
+            }
+        }
+        #endregion Settings
 
         #endregion Public Methods
 

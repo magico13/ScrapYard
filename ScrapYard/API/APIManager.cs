@@ -2,6 +2,7 @@
 using ScrapYard.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -259,6 +260,32 @@ namespace ScrapYard
             }
             return ScrapYard.Instance.TheInventory.FindPart(guid.Value)?.State;
         }
+
+        /// <summary>
+        /// Gets all parts in the inventory as a list of ConfigNodes
+        /// </summary>
+        /// <returns>The list of all inventory parts</returns>
+        public IList<ConfigNode> GetAllInventoryParts()
+        {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return null;
+            }
+
+            try
+            {
+                IEnumerable<ConfigNode> nodes = ScrapYard.Instance.TheInventory.GetAllParts()?.Select(p => p.State);
+                if (nodes != null)
+                {
+                    return new List<ConfigNode>(nodes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.LogException(ex);
+            }
+            return null;
+        }
         #endregion Inventory Manipulation
 
         #region Vessel Processing
@@ -475,6 +502,75 @@ namespace ScrapYard
         }
         #endregion Part Tracker
 
+        #region Settings
+        //Global settings
+
+        /// <summary>
+        /// Gets the list of blacklisted parts. This is readonly.
+        /// </summary>
+        /// <returns>A Read Only list of the blacklisted parts</returns>
+        public IEnumerable<string> GetSetting_PartBlacklist()
+        {
+            return new ReadOnlyCollection<string>(ScrapYard.Instance.Settings.PartBlacklist.ToList());
+        }
+
+        /// <summary>
+        /// Gets the value of the AutoApplyInventory setting
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public bool GetSetting_AutoApplyInventory()
+        {
+            return ScrapYard.Instance.Settings.AutoApplyInventory;
+        }
+
+        /// <summary>
+        /// Sets the value of the AutoApplyInventory setting
+        /// </summary>
+        /// <param name="value">The value to set</param>
+        public void SetSetting_AutoApplyInventory(bool value)
+        {
+            ScrapYard.Instance.Settings.AutoApplyInventory = value;
+        }
+
+
+        //Save specific settings
+        /// <summary>
+        /// Gets the value of the ModEnabled save-specific setting for the current save
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public bool GetSetting_ModEnabled()
+        {
+            return ScrapYard.Instance.Settings.EnabledForSave;
+        }
+
+        /// <summary>
+        /// Gets the value of the UseInventory save-specific setting for the current save
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public bool GetSetting_UseInventory()
+        {
+            return ScrapYard.Instance.Settings.CurrentSaveSettings.UseInventory;
+        }
+
+        /// <summary>
+        /// Gets the value of the UseTracker save-specific setting for the current save
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public bool GetSetting_UseTracker()
+        {
+            return ScrapYard.Instance.Settings.CurrentSaveSettings.UseTracker;
+        }
+
+        /// <summary>
+        /// Gets the value of the OverrideFunds save-specific setting for the current save
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public bool GetSetting_OverrideFunds()
+        {
+            return ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds;
+        }
+
+        #endregion Settings
 
         private ComparisonStrength parseStrictnessString(string strictness)
         {
