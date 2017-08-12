@@ -10,12 +10,15 @@ namespace ScrapYard.UI
     {
         private InventoryPart _backingPart;
         private PartInventory _backingInventory;
-        private string _sellOrDiscard = "Discard";
+        private Part _toApply;
         private bool _selling;
+        
+        private string _sellOrDiscard = "Discard";
+        private string _selectOrApply = "Select";
 
         public event EventHandler Updated;
 
-        public PartInstance(PartInventory inventory, InventoryPart iPart, bool selling)
+        public PartInstance(PartInventory inventory, InventoryPart iPart, bool selling, Part toApply)
         {
             _backingPart = iPart;
             _backingInventory = inventory;
@@ -24,6 +27,11 @@ namespace ScrapYard.UI
             {
                 _sellOrDiscard = "Sell";
             }
+            if (toApply != null)
+            {
+                _selectOrApply = "Apply";
+            }
+            _toApply = toApply;
         }
 
         public void Draw()
@@ -43,9 +51,9 @@ namespace ScrapYard.UI
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Select"))
+            if (GUILayout.Button(_selectOrApply))
             {
-                selectPart();
+                selectPart(_toApply);
             }
 
             GUILayout.EndVertical();
@@ -53,25 +61,40 @@ namespace ScrapYard.UI
 
         private void sellPart()
         {
-            InventoryPart removed = _backingInventory.RemovePart(_backingPart, ComparisonStrength.STRICT);
-            if (removed != null)
-            {
-                Logging.DebugLog($"Sold/Discarded {removed.Name}:{removed.ID}");
-                if (_selling)
-                {
-                    Funding.Instance?.AddFunds(removed.DryCost, TransactionReasons.Vessels);
-                }
-                Updated?.Invoke(this, EventArgs.Empty);
-            }
+            //confirm with user
+            MultiOptionDialog diag = new MultiOptionDialog("confirmDiscard",
+                $"Are you sure you want to {_sellOrDiscard.ToLower()} the part for {_backingPart.DryCost} funds?",
+                _sellOrDiscard + " Part",
+                HighLogic.UISkin,
+                new DialogGUIButton(_sellOrDiscard, () => {
+                    InventoryPart removed = _backingInventory.RemovePart(_backingPart, ComparisonStrength.STRICT);
+                    if (removed != null)
+                    {
+                        Logging.DebugLog($"Sold/Discarded {removed.Name}:{removed.ID}");
+                        if (_selling)
+                        {
+                            Funding.Instance?.AddFunds(removed.DryCost, TransactionReasons.Vessels);
+                        }
+                        Updated?.Invoke(this, EventArgs.Empty);
+                    }
+                }),
+                new DialogGUIButton("Cancel", () => { }));
+            PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
         }
 
-        private void selectPart()
+        private void selectPart(Part selectedPart)
         {
-            EditorLogic.fetch.SpawnPart(Utilities.Utils.AvailablePartFromName(_backingPart.Name));
-            if (!_backingPart.FullyApplyToPart(EditorLogic.SelectedPart) && EditorLogic.fetch.ship.Count == 1)
+            //If a part is already selected, apply to it. Otherwise spawn a new one and apply to that.
+            if (selectedPart == null)
             {
-                _backingPart.FullyApplyToPart(EditorLogic.fetch.ship[0]);
+                EditorLogic.fetch.SpawnPart(Utilities.Utils.AvailablePartFromName(_backingPart.Name));
+                selectedPart = EditorLogic.SelectedPart;
+                if (selectedPart == null && EditorLogic.fetch?.ship?.Count == 1)
+                {
+                    selectedPart = EditorLogic.fetch.ship[0];
+                }
             }
+            _backingPart.FullyApplyToPart(selectedPart);
             Updated?.Invoke(this, EventArgs.Empty);
         }
     }

@@ -47,5 +47,17 @@ namespace ScrapYard.UI
                 ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
             }
         }
+
+        public void ToggleSelectorUI()
+        {
+            if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            {
+                ScrapYard.Instance.InstanceSelectorUI.Close();
+            }
+            else
+            {
+                ScrapYard.Instance.InstanceSelectorUI.Show();
+            }
+        }
     }
 }

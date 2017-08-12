@@ -10,6 +10,8 @@ namespace ScrapYard.UI
         public InventoryApplyUI() : base(3741, "ScrapYard", true, false)
         {
             _viewModel = new InventoryApplyVM();
+            //set the position to the bottom of the screen, near the button
+            SetSize(Mouse.screenPos.x - (75 / 2), Screen.height - 175, 75, 100);
         }
 
 
@@ -32,6 +34,12 @@ namespace ScrapYard.UI
                 Close();
             }
 
+            if (GUILayout.Button("Toggle Selector"))
+            {
+                _viewModel.ToggleSelectorUI();
+                Close();
+            }
+
             GUILayout.EndVertical();
             base.Draw(windowID);
         }
@@ -40,10 +48,7 @@ namespace ScrapYard.UI
         public override void Show()
         {
             base.Show();
-
-            //set the position to the bottom of the screen, near the button
-            //SetSize(EventListeners.Instance.Button.GetAnchorUL().x, EventListeners.Instance.Button.GetAnchorUL().y - 20, 75, 20);
-            SetSize(Mouse.screenPos.x - (75/2), Screen.height - 150, 75, 75);
+            
             //Activate the button
             EventListeners.Instance.Button.SetTrue(false);
         }

@@ -1,6 +1,7 @@
 ﻿using KSP.UI.Screens;
 using KSP.UI.Screens.SpaceCenter.MissionSummaryDialog;
 using ScrapYard.Modules;
+using ScrapYard.UI;
 using ScrapYard.Utilities;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,8 @@ namespace ScrapYard
                 GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherUnreadifying.Add(OnGUIAppLauncherUnReadying);
                 GameEvents.onEditorShipModified.Add(OnEditorShipModified);
-                GameEvents.onEditorPartDeleted.Add(OnEditorPartDeleted);
                 GameEvents.onEditorPodDeleted.Add(shipOrPartModified);
+                GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
 
                 ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
 
@@ -42,8 +43,8 @@ namespace ScrapYard
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
             GameEvents.onGUIApplicationLauncherUnreadifying.Remove(OnGUIAppLauncherUnReadying);
             GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
-            GameEvents.onEditorPartDeleted.Remove(OnEditorPartDeleted);
             GameEvents.onEditorPodDeleted.Remove(shipOrPartModified);
+            GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
 
             ScrapYardEvents.OnSYInventoryChanged.Remove(InventoryChangedEventListener);
 
@@ -148,11 +149,23 @@ namespace ScrapYard
             shipOrPartModified();   
         }
 
-        public void OnEditorPartDeleted(Part part)
+        public void OnEditorPartEvent(ConstructionEventType type, Part part)
         {
+            if (type == ConstructionEventType.PartDropped || 
+                type == ConstructionEventType.PartAttached || 
+                type == ConstructionEventType.PartCreated)
+            {
+                if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+                {
+                    ScrapYard.Instance.InstanceSelectorUI.Show(part, null);
+                }
+            }
+            //if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            //{
+            //    ScrapYard.Instance.InstanceSelectorUI.Show(part, null);
+            //}
             shipOrPartModified();
         }
-
 
         private void shipOrPartModified()
         {

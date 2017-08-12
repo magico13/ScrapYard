@@ -24,6 +24,11 @@ namespace ScrapYard.UI
 
         public override void Draw(int windowID)
         {
+            if (!HighLogic.LoadedSceneIsEditor)
+            {
+                Close();
+                return;
+            }
             GUILayout.BeginVertical();
             scrollPos = GUILayout.BeginScrollView(scrollPos);
 
@@ -33,6 +38,22 @@ namespace ScrapYard.UI
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
+            if (InstanceVM.ApplyPart != null)
+            {
+                if (GUILayout.Button("Use New Part"))
+                {
+                    InstanceVM.RefreshApplyPart();
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Select New Part"))
+                {
+                    //spawn a new part
+                    InstanceVM.SpawnNewPart();
+                }
+            }
+
             foreach (PartInstance instance in InstanceVM.Parts)
             {
                 instance.Draw();
@@ -41,7 +62,16 @@ namespace ScrapYard.UI
 
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
-            base.Draw(windowID);
+            base.Draw(windowID);    
+        }
+
+        public void Show(Part basePart, Part applyTo)
+        {
+            base.Show();
+            InstanceVM = new InstanceSelectorVM(ScrapYard.Instance.TheInventory,
+                basePart,
+                applyTo,
+                ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds);
         }
 
         public override void Show()

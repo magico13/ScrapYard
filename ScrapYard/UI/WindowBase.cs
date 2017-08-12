@@ -1,9 +1,23 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace ScrapYard.UI
 {
     public class WindowBase
     { 
+        //[Flags]
+        //public enum UIScenes
+        //{
+        //    All = 0,
+        //    MainMenu = 1,
+        //    SpaceCenter = 2,
+        //    Editor = 4,
+        //    Flight = 8,
+        //    TrackStation = 16,
+        //    MapMode = 32
+
+        //} 
+
         public WindowBase(int id, string title)
         {
             ID = id;
@@ -18,6 +32,7 @@ namespace ScrapYard.UI
             CenterWindow = centered;
         }
 
+        //public UIScenes VisibleScenes { get; set; } = UIScenes.All;
 
         public int ID { get; private set; } = 8234;
         private Rect _windowRect = new Rect((Screen.width - 300) / 2, (Screen.height / 4), 300, 1);
@@ -33,6 +48,8 @@ namespace ScrapYard.UI
         public bool Draggable { get; set; } = true; //True by default
 
         public GUISkin Skin { get; set; }
+
+
 
         /// <summary>
         /// Makes the window not visible

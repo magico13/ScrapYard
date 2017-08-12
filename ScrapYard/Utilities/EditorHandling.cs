@@ -117,6 +117,11 @@ namespace ScrapYard.Utilities
         {
             List<InventoryPart> retList = new List<InventoryPart>(sourceList);
 
+            if (!HighLogic.LoadedSceneIsEditor)
+            {
+                return retList;
+            }
+
             foreach (Part part in EditorLogic.fetch.ship)
             {
                 InventoryPart iPart = new InventoryPart(part);
@@ -140,6 +145,19 @@ namespace ScrapYard.Utilities
                 }
             }
             return retList;
+        }
+
+        public static void UpdateSelectionUI()
+        {
+            //either apply to the selected part, the part told to be updated by the UI, or spawn a new part if neither case met
+            if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            {
+                if (EditorLogic.SelectedPart != null &&
+                    ScrapYard.Instance.InstanceSelectorUI.InstanceVM.SelectedPartName != EditorLogic.SelectedPart.partName)
+                {
+                    ScrapYard.Instance.InstanceSelectorUI.Show(EditorLogic.SelectedPart, EditorLogic.SelectedPart);
+                }
+            }
         }
     }
 }

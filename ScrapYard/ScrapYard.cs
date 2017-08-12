@@ -92,6 +92,7 @@ namespace ScrapYard
                     }
                     Utilities.EditorHandling.VerifyEditorShip();
                     Utilities.EditorHandling.UpdateEditorCost();
+                    Utilities.EditorHandling.UpdateSelectionUI();
                 }
                 catch
                 {

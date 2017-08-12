@@ -18,6 +18,20 @@ namespace ScrapYard.Modules
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
         public bool Inventoried = false;
 
+        [KSPEvent(guiActiveEditor = true, guiName = "Select From Inventory")]
+        public void OpenInventory()
+        {
+            ScrapYard.Instance.InstanceSelectorUI.Show(part, part);
+        }
+
+        public override void OnStart(StartState state)
+        {
+            base.OnStart(state);
+            if (state == StartState.Editor && string.IsNullOrEmpty(ID))
+            {
+                ID = NewID();
+            }
+        }
         public override void OnInitialize()
         {
             base.OnInitialize();
