@@ -116,6 +116,26 @@ namespace ScrapYard.UI
             }
         }
 
+        public void OnMouseOver()
+        {
+            //set a lock
+            //EditorLogic.fetch?.Lock(true, true, true, "ScrapYard_EditorLock");   
+        }
+
+        public void OnMouseExit()
+        {
+            //remove a lock
+            //EditorLogic.fetch?.Unlock("ScrapYard_EditorLock");
+        }
+
+        public void PutPartInEditorHand(Part p)
+        {
+            System.Reflection.MethodInfo picker = typeof(EditorLogic).GetMethod("pickPart", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
+            object result = picker?.Invoke(EditorLogic.fetch, new object[] { LayerUtil.DefaultEquivalent | 4 | 2097152, false, false });
+            Logging.DebugLog(result);
+        }
+
         private void Instance_Updated(object sender, EventArgs e)
         {
             UpdatePartList();   

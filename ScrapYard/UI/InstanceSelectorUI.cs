@@ -20,6 +20,10 @@ namespace ScrapYard.UI
             //{
             //    Show();
             //}
+            //OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
+            //OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
+            //OnShow.Add(() => { GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced); });
+            //OnClose.Add(() => { GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced); });
         }
 
         public override void Draw(int windowID)
@@ -80,9 +84,17 @@ namespace ScrapYard.UI
             InstanceVM = new InstanceSelectorVM();
         }
 
-        public override void Close()
+
+        /// <summary>
+        /// Used to put the part back in the editor's hand, since no locks will stop placement
+        /// </summary>
+        /// <param name="p"></param>
+        private void OnEditorPartPlaced(Part p)
         {
-            base.Close();
+            if (MouseIsOver)
+            {
+                InstanceVM.PutPartInEditorHand(p);
+            }
         }
     }
 }

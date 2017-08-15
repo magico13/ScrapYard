@@ -5,19 +5,6 @@ namespace ScrapYard.UI
 {
     public class WindowBase
     { 
-        //[Flags]
-        //public enum UIScenes
-        //{
-        //    All = 0,
-        //    MainMenu = 1,
-        //    SpaceCenter = 2,
-        //    Editor = 4,
-        //    Flight = 8,
-        //    TrackStation = 16,
-        //    MapMode = 32
-
-        //} 
-
         public WindowBase(int id, string title)
         {
             ID = id;
@@ -35,7 +22,7 @@ namespace ScrapYard.UI
         //public UIScenes VisibleScenes { get; set; } = UIScenes.All;
 
         public int ID { get; private set; } = 8234;
-        private Rect _windowRect = new Rect((Screen.width - 300) / 2, (Screen.height / 4), 300, 1);
+        protected Rect _windowRect = new Rect((Screen.width - 300) / 2, (Screen.height / 4), 300, 1);
         public Rect WindowRect
         {
             get { return _windowRect; }
@@ -43,13 +30,68 @@ namespace ScrapYard.UI
         }
 
         public string Title { get; set; } = string.Empty;
-        public bool IsVisible { get; set; }
+        private bool _visible;
+        public bool IsVisible
+        {
+            get { return _visible; }
+            set
+            {
+                if (value != _visible)
+                {
+                    _visible = value;
+                    if (value)
+                    {
+                        OnShow.Fire();
+                    }
+                    else
+                    {
+                        OnClose.Fire();
+                    }
+                }
+            }
+        }
+
         public bool CenterWindow { get; set; }
         public bool Draggable { get; set; } = true; //True by default
 
         public GUISkin Skin { get; set; }
 
+        public EventVoid OnShow = new EventVoid("OnShow");
+        public EventVoid OnClose = new EventVoid("OnClose");
 
+        /// <summary>
+        /// Fires when the mouse enters the window
+        /// </summary>
+        public EventVoid OnMouseOver = new EventVoid("OnMouseOver");
+        /// <summary>
+        /// Fires when the mouse leaves the window
+        /// </summary>
+        public EventVoid OnMouseExit = new EventVoid("OnMouseExit");
+
+        protected bool _mouseOver;
+        /// <summary>
+        /// Returns true if the mouse is over the window.
+        /// Setting this will fire OnMouseOver and OnMouseExit events.
+        /// </summary>
+        public bool MouseIsOver
+        {
+            get { return _mouseOver; }
+            protected set
+            {
+                if (value != _mouseOver)
+                {
+                    _mouseOver = value;
+                    if (value)
+                    {
+                        OnMouseOver?.Fire();
+                    }
+                    else
+                    {
+                        OnMouseExit?.Fire();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Makes the window not visible
@@ -94,6 +136,8 @@ namespace ScrapYard.UI
                     centerWindow();
                 }
             }
+            //trigger mouse events if hovering on/off
+            MouseIsOver = checkMouseOver();
         }
 
         /// <summary>
@@ -182,6 +226,22 @@ namespace ScrapYard.UI
             {
                 Show();
             }
+        }
+
+        /// <summary>
+        /// Checks to see if the mouse is over the window.
+        /// Requires the window to be visible
+        /// </summary>
+        /// <returns>True if over the window, false otherwise.</returns>
+        protected bool checkMouseOver()
+        {
+            if (!IsVisible)
+            {
+                return false;
+            }
+            Vector2 mousePos = Input.mousePosition;
+            mousePos.y = Screen.height - mousePos.y;
+            return WindowRect.Contains(mousePos);
         }
     }
 }
