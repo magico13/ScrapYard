@@ -16,10 +16,6 @@ namespace ScrapYard.UI
         {
             SetSize(500, 100, 300, Screen.height-100);
 
-            //if (HighLogic.LoadedSceneIsEditor)
-            //{
-            //    Show();
-            //}
             //OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
             //OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
             //OnShow.Add(() => { GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced); });

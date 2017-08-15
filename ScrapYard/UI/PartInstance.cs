@@ -62,8 +62,14 @@ namespace ScrapYard.UI
         private void sellPart()
         {
             //confirm with user
+            string msg = "Are you sure you want to discard the part?";
+            if (_selling)
+            {
+                msg = $"Are you sure you want to sell the part for {_backingPart.DryCost} funds?";
+            }
+
             MultiOptionDialog diag = new MultiOptionDialog("confirmDiscard",
-                $"Are you sure you want to {_sellOrDiscard.ToLower()} the part for {_backingPart.DryCost} funds?",
+                msg,
                 _sellOrDiscard + " Part",
                 HighLogic.UISkin,
                 new DialogGUIButton(_sellOrDiscard, () => {
