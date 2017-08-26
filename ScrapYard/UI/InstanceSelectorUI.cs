@@ -14,7 +14,7 @@ namespace ScrapYard.UI
 
         public InstanceSelectorUI() : base(3742, "Inventory", true, false)
         {
-            SetSize(500, 100, 300, Screen.height-100);
+            SetSize(500, 100, 300, Screen.height-200);
 
             //OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
             //OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
@@ -85,12 +85,12 @@ namespace ScrapYard.UI
         /// Used to put the part back in the editor's hand, since no locks will stop placement
         /// </summary>
         /// <param name="p"></param>
-        private void OnEditorPartPlaced(Part p)
-        {
-            if (MouseIsOver)
-            {
-                InstanceVM.PutPartInEditorHand(p);
-            }
-        }
+        //private void OnEditorPartPlaced(Part p)
+        //{
+        //    if (MouseIsOver)
+        //    {
+        //        InstanceVM.PutPartInEditorHand(p);
+        //    }
+        //}
     }
 }

@@ -81,6 +81,10 @@ namespace ScrapYard
                     {
                         ScrapYard.Instance.InstanceSelectorUI.LoadPosition(posNode);
                     }
+                    else if (name == ScrapYard.Instance.InstanceModulesUI.Title)
+                    {
+                        ScrapYard.Instance.InstanceModulesUI.LoadPosition(posNode);
+                    }
                 }
             }
 
@@ -115,6 +119,7 @@ namespace ScrapYard
 
             settingsNode.AddNode(ScrapYard.Instance.ApplyInventoryUI.SavePosition(false));
             settingsNode.AddNode(ScrapYard.Instance.InstanceSelectorUI.SavePosition(true));
+            settingsNode.AddNode(ScrapYard.Instance.InstanceModulesUI.SavePosition(false));
             settingsNode.Save(settingsPath);
         }
     }

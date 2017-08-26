@@ -12,9 +12,10 @@ namespace ScrapYard.UI
         private PartInventory _backingInventory;
         private Part _toApply;
         private bool _selling;
-        
+        private InstanceModulesVM _moduleVM;
+        private InstanceModulesUI _moduleUI;
+
         private string _sellOrDiscard = "Discard";
-        private string _selectOrApply = "Select";
 
         public event EventHandler Updated;
 
@@ -27,16 +28,13 @@ namespace ScrapYard.UI
             {
                 _sellOrDiscard = "Sell";
             }
-            if (toApply != null)
-            {
-                _selectOrApply = "Apply";
-            }
             _toApply = toApply;
+            _moduleVM = new InstanceModulesVM(_backingPart);
         }
 
         public void Draw()
         {
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUI.skin.textArea);
 
             GUILayout.Label(string.Format("Times Used: {0}", _backingPart?.TrackerModule?.TimesRecovered ?? 0));
 
@@ -45,16 +43,25 @@ namespace ScrapYard.UI
             {
                 sellPart();
             }
-            if (GUILayout.Button("Modules"))
+            if (_moduleVM.GetModules().Count > 0 && GUILayout.Button("Modules"))
             {
                 //show module window
+                _moduleUI = ScrapYard.Instance.InstanceModulesUI;
+                _moduleUI.SetUp(_moduleVM);
+                _moduleUI.Show();
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button(_selectOrApply))
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Select"))
+            {
+                selectPart(null);
+            }
+            if (_toApply != null && GUILayout.Button("Apply"))
             {
                 selectPart(_toApply);
             }
+            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
         }

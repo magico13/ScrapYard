@@ -304,6 +304,14 @@ namespace ScrapYard
             return true;
         }
 
+        /// <summary>
+        /// Gets the list of saved modules on the part
+        /// </summary>
+        /// <returns>The list of saved modules</returns>
+        public IList<ConfigNode> ListModules()
+        {
+            return new List<ConfigNode>(savedModules);
+        }
 
         /// <summary>
         /// Gets the ConfigNode version of the InventoryPart, or sets the state of the InventoryPart from a ConfigNode

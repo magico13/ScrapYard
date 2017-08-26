@@ -21,7 +21,7 @@ namespace ScrapYard
             Logging.DebugLog("Start Start");
             Instance = this;
 
-            InvokeRepeating("VerifyEditor", 1f, 1f);
+            InvokeRepeating("VerifyEditor", 0.5f, 0.5f);
 
             //load settings
             Settings.LoadSettings();
@@ -72,11 +72,13 @@ namespace ScrapYard
         #region GUI Code
         public UI.InventoryApplyUI ApplyInventoryUI { get; } = new UI.InventoryApplyUI();
         public UI.InstanceSelectorUI InstanceSelectorUI { get; } = new UI.InstanceSelectorUI();
+        public UI.InstanceModulesUI InstanceModulesUI { get; } = new UI.InstanceModulesUI();
 
         private void OnGUI()
         {
             ApplyInventoryUI.OnGUIHandler();
             InstanceSelectorUI.OnGUIHandler();
+            InstanceModulesUI.OnGUIHandler();
         }
         #endregion GUI Code
 
