@@ -188,3 +188,7 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /MagiCore-1.1.2.zip
+/.vs/ScrapYard/v15/Server/sqlite3/storage.ide-wal
+/.vs/ScrapYard/v15/Server/sqlite3/storage.ide-shm
+/.vs/ScrapYard/v15/Server/sqlite3/storage.ide
+/.vs/ScrapYard/v15/Server/sqlite3/db.lock

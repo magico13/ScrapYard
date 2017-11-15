@@ -151,6 +151,13 @@ namespace ScrapYard.Utilities
                         (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
+                else
+                {
+                    //It's not in the inventory, great, but it could be saved (imagine launching a saved craft from the launchpad UI)
+                    //KCT gets around this by basically requiring new builds all the time, but that won't fly for UPFM
+                    //So we should ALWAYS make them fresh if we can't find it in the inventory, but we don't need to log that
+                    (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker)?.MakeFresh();
+                }
             }
         }
 
