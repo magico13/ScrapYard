@@ -69,8 +69,5 @@ namespace ScrapYard
 
         [GameParameters.CustomIntParameterUI("Editor Recalculation Frequency", toolTip = "The minimum number of tenths of seconds between verification of the ship in the editor.", minValue = 2, maxValue = 100, stepSize = 2)]
         public int RefreshTime = 10;
-
-        [GameParameters.CustomStringParameterUI("This is a test")]
-        public string TestString = string.Empty;
     }
 }
