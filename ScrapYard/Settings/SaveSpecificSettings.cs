@@ -66,7 +66,11 @@ namespace ScrapYard
 
         [GameParameters.CustomParameterUI("Override Funds (WIP)", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.\nStill under development.")]
         public bool OverrideFunds = false;
-        
 
+        [GameParameters.CustomIntParameterUI("Editor Recalculation Frequency", toolTip = "The minimum number of tenths of seconds between verification of the ship in the editor.", minValue = 2, maxValue = 100, stepSize = 2)]
+        public int RefreshTime = 10;
+
+        [GameParameters.CustomStringParameterUI("This is a test")]
+        public string TestString = string.Empty;
     }
 }

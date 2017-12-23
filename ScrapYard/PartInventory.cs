@@ -116,6 +116,14 @@ namespace ScrapYard
             {
                 return null;
             }
+            if (strength == ComparisonStrength.STRICT)
+            {
+                InventoryPart found = internalInventory.FirstOrDefault(ip => ip == part);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
             return internalInventory.FirstOrDefault(ip => ip.IsSameAs(part, strength));
         }
 
@@ -223,7 +231,8 @@ namespace ScrapYard
             {
                 disableEvents = true;
                 ret = new PartInventory(disableEventsOnCopy);
-                ret.State = State;
+                ret.internalInventory = new HashSet<InventoryPart>(internalInventory.Select(p => p.Copy()));
+                //ret.State = State;
             }
             catch (Exception ex)
             {

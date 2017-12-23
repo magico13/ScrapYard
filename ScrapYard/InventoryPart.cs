@@ -53,7 +53,25 @@ namespace ScrapYard
         }
 
 
-        private List<ConfigNode> savedModules = new List<ConfigNode>();
+        private List<ConfigNode> _savedModules;
+        private List<ConfigNode> savedModules
+        {
+            get
+            {
+                //lazy load the module list
+                if (_savedModules == null)
+                {
+                    _savedModules = new List<ConfigNode>();
+                    foreach(ConfigNode module in allModules)
+                    {
+                        storeModuleNode(Name, module);
+                    }
+                }
+                return _savedModules;
+            }
+            set { _savedModules = value; }
+        }
+        private List<ConfigNode> allModules = new List<ConfigNode>();
         private int _hash = 0;
 
         /// <summary>
@@ -85,7 +103,12 @@ namespace ScrapYard
                 {
                     ConfigNode saved = new ConfigNode("MODULE");
                     module.Save(saved);
-                    storeModuleNode(_name, saved);
+                    allModules.Add(saved);
+                    //storeModuleNode(_name, saved);
+                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    {
+                        TrackerModule = new TrackerModuleWrapper(saved);
+                    }
                 }
             }
         }
@@ -109,7 +132,12 @@ namespace ScrapYard
             {
                 foreach (ProtoPartModuleSnapshot module in originPartSnapshot.modules)
                 {
-                    storeModuleNode(_name, module.moduleValues);
+                    allModules.Add(module.moduleValues);
+                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    {
+                        TrackerModule = new TrackerModuleWrapper(module.moduleValues);
+                    }
+                    //storeModuleNode(_name, module.moduleValues);
                 }
             }
         }
@@ -143,7 +171,12 @@ namespace ScrapYard
                 {
                     foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
                     {
-                        storeModuleNode(_name, module);
+                        allModules.Add(module);
+                        //storeModuleNode(_name, module);
+                        if (module.GetValue("name").Equals("ModuleSYPartTracker"))
+                        {
+                            TrackerModule = new TrackerModuleWrapper(module);
+                        }
                     }
                 }
             }
@@ -320,6 +353,7 @@ namespace ScrapYard
         {
             get
             {
+                //if (_state == null) //if we can cache this correctly it would help to reduce lag
                 ConfigNode returnNode = ConfigNode.CreateConfigFromObject(this);
 
                 returnNode.AddValue("_id", ID);
@@ -377,7 +411,7 @@ namespace ScrapYard
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log("Error while loading InventoryPart from a ConfigNode. Error: \n" + ex.Message);
+                    Logging.Log($"Error while loading InventoryPart from a ConfigNode. Error: \n {ex}", Logging.LogType.ERROR);
                 }
             }
         }
@@ -386,7 +420,7 @@ namespace ScrapYard
         {
             if (_hash == 0)
             {
-                foreach (char s in Name ?? string.Empty)
+                foreach (char s in ID?.ToString() ?? string.Empty)
                 {
                     _hash += s;
                 }
@@ -397,7 +431,28 @@ namespace ScrapYard
 
         public override bool Equals(object obj)
         {
-            return ReferenceEquals(this, obj);
+            //return ReferenceEquals(this, obj);
+            InventoryPart other = obj as InventoryPart;
+            if (obj == null)
+            {
+                return false;
+            }
+            return (GetHashCode() == other.GetHashCode() && IsSameAs(other, ComparisonStrength.STRICT));
+        }
+
+        public InventoryPart Copy()
+        {
+            InventoryPart copy = new InventoryPart();
+            copy._dryCost = _dryCost;
+            copy._name = _name;
+            copy.savedModules = new List<ConfigNode>(savedModules);
+            copy.TrackerModule = new TrackerModuleWrapper(TrackerModule?.TrackerNode?.CreateCopy());
+            if (!copy.TrackerModule.HasModule && TrackerModule != null)
+            {
+                copy.TrackerModule = new TrackerModuleWrapper(TrackerModule.ID.Value, TrackerModule.TimesRecovered, TrackerModule.Inventoried);
+            }
+
+            return copy;
         }
 
         private bool storeModuleNode(string partName, ConfigNode moduleNode)
@@ -419,11 +474,12 @@ namespace ScrapYard
             }
 
             //check for the part tracker and add it
-            if (moduleNode.GetValue("name").Equals("ModuleSYPartTracker"))
-            {
-                TrackerModule = new TrackerModuleWrapper(moduleNode);
-                saved = true;
-            }
+            //done in constructor
+            //if (moduleNode.GetValue("name").Equals("ModuleSYPartTracker"))
+            //{
+            //    TrackerModule = new TrackerModuleWrapper(moduleNode);
+            //    saved = true;
+            //}
 
             return saved;
         }

@@ -18,45 +18,79 @@ namespace ScrapYard.Utilities
         public static void VerifyEditorShip()
         {
             //make a copy of the inventory
-            PartInventory copy = ScrapYard.Instance.TheInventory.Copy();
-
-            foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
+            PartInventory copy;
+            using (Logging.Timer.StartNew("Copy"))
             {
-                InventoryPart iPart = new InventoryPart(part);
-                if (iPart.ID == null)
+                copy = ScrapYard.Instance.TheInventory.Copy();
+            }
+            using (Logging.Timer.StartNew("Check Parts"))
+            {
+                long constTime = 0;
+                long removeTime = 0;
+                long findTime = 0;
+                long freshTime = 0;
+
+                //foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
+                List<InventoryPart> editorParts = EditorLogic.fetch?.ship?.Parts?.Select(p => new InventoryPart(p))?.ToList();
+                if (editorParts != null)
                 {
-                    (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                }
-                if (iPart.TrackerModule.Inventoried)
-                {
-                    InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
-                    if (inInventory == null)
+                    for (int i = 0; i < editorParts.Count; i++)
                     {
-                        //reset their tracker status
-                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
-                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                    }
-                }
-                else
-                {
-                    //check that we're not sharing an ID with something in the inventory
-                    if (iPart.ID.HasValue)
-                    {
-                        InventoryPart inInventory = copy.FindPart(iPart.ID.Value);
-                        if (inInventory != null)
+                        var constWatch = System.Diagnostics.Stopwatch.StartNew();
+                        InventoryPart iPart = editorParts[i];//new InventoryPart(part);
+                        constWatch.Stop();
+                        constTime += constWatch.ElapsedMilliseconds;
+                        var freshWatch = System.Diagnostics.Stopwatch.StartNew();
+                        if (iPart.ID == null)
                         {
-                            //found a part that is sharing an ID but shouldn't be
-                            Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
-                            (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                            (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                        }
+                        freshWatch.Stop();
+                        freshTime += freshWatch.ElapsedMilliseconds;
+                        if (iPart.TrackerModule.Inventoried)
+                        {
+                            var remWatch = System.Diagnostics.Stopwatch.StartNew();
+                            InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
+                            if (inInventory == null)
+                            {
+                                //reset their tracker status
+                                Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                                (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                            }
+                            remWatch.Stop();
+                            removeTime += remWatch.ElapsedMilliseconds;
+                        }
+                        else
+                        {
+                            //check that we're not sharing an ID with something in the inventory
+                            var findWatch = System.Diagnostics.Stopwatch.StartNew();
+                            if (iPart.ID.HasValue)
+                            {
+                                InventoryPart inInventory = copy.FindPart(iPart.ID.Value);
+                                if (inInventory != null)
+                                {
+                                    //found a part that is sharing an ID but shouldn't be
+                                    Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
+                                    (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                                }
+                            }
+                            findWatch.Stop();
+                            findTime += findWatch.ElapsedMilliseconds;
                         }
                     }
                 }
+                Logging.Log($"Constructor: {constTime}");
+                Logging.Log($"Removal: {removeTime}");
+                Logging.Log($"Finding: {findTime}");
+                Logging.Log($"Freshening: {freshTime}");
             }
-
-            //update the part list if visible
-            if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            using (Logging.Timer.StartNew("Update Part List"))
             {
-                ScrapYard.Instance.InstanceSelectorUI.InstanceVM?.UpdatePartList();
+                //update the part list if visible
+                if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+                {
+                    ScrapYard.Instance.InstanceSelectorUI.InstanceVM?.UpdatePartList();
+                }
             }
         }
 

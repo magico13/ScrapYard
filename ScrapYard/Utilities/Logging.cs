@@ -13,6 +13,33 @@ namespace ScrapYard
             EXCEPTION
         }
 
+        internal class Timer : IDisposable
+        {
+            private string _msg = string.Empty;
+            System.Diagnostics.Stopwatch _watch = null;
+            public Timer(string message)
+            {
+                _msg = message;
+                _watch = System.Diagnostics.Stopwatch.StartNew();
+            }
+
+            public void Dispose()
+            {
+                _watch.Stop();
+                Log($"{_msg}: {_watch.ElapsedMilliseconds}ms");
+            }
+
+            internal static Timer StartNew(string message)
+            {
+                return new Timer(message);
+            }
+
+            internal TimeSpan Elapsed()
+            {
+                return _watch.Elapsed;
+            }
+        }
+
         /// <summary>
         /// Logs the provided message only if built in Debug mode
         /// </summary>
@@ -47,9 +74,14 @@ namespace ScrapYard
             }
             else if (type == LogType.EXCEPTION)
             {
-                if (msg is Exception)
+                Exception ex;
+                if ((ex = msg as Exception) != null)
                 {
-                    LogException(msg as Exception);
+                    LogException(ex);
+                }
+                else
+                {
+                    Debug.LogError(msg);
                 }
             }
         }
