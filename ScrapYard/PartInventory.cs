@@ -156,6 +156,22 @@ namespace ScrapYard
         }
 
         /// <summary>
+        /// Gets a list of all parts in the inventory with the given name.
+        /// </summary>
+        /// <param name="name">The name to search for</param>
+        /// <returns>An IEnumerable of all InventoryParts with that name</returns>
+        public IEnumerable<InventoryPart> FindPartsByName(string name)
+        {
+            if (!InventoryEnabled)
+            {
+                return null;
+            }
+
+            PartInventory copy = Copy();
+            return copy.GetAllParts().Where(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Returns an IEnumerable with all parts in the Inventory
         /// </summary>
         /// <returns>All inventory parts in an IEnumerable</returns>

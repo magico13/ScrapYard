@@ -78,6 +78,7 @@
     <Compile Include="Utilities\EditorHandling.cs" />
     <Compile Include="Utilities\InventoryManagement.cs" />
     <Compile Include="Utilities\Logging.cs" />
+    <Compile Include="Utilities\PartCategoryFilter.cs" />
     <Compile Include="Utilities\Utils.cs" />
     <Compile Include="VesselTracker.cs" />
   </ItemGroup>

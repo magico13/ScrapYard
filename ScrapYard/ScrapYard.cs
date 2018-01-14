@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrapYard.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace ScrapYard
         public GlobalSettings Settings { get; } = new GlobalSettings();
         public VesselTracker ProcessedTracker { get; } = new VesselTracker();
         public PartTracker PartTracker { get; } = new PartTracker();
-
+        public PartCategoryFilter PartCategory { get; } = new PartCategoryFilter();
 
         public bool EditorVerificationRequired { get; set; }
         void Start()
@@ -28,6 +29,7 @@ namespace ScrapYard
             EventListeners.Instance.RegisterListeners();
             if (HighLogic.LoadedSceneIsEditor)
             {
+                PartCategory.CreateInventoryPartCategory();
                 EditorVerificationRequired = true;
             }
 
