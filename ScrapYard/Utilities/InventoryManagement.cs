@@ -196,6 +196,18 @@ namespace ScrapYard.Utilities
                         tracker.SetValue("Inventoried", false);
                     }
                 }
+                else
+                {
+                    //Not inventortied, so we should enforce that it's a new part (imagine a saved craft, the parts aren't in the inventory anymore
+                    //but the tracking data is still saved)
+                    ConfigNode tracker = partNode.GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name") == "ModuleSYPartTracker");
+                    if (tracker != null)
+                    {
+                        tracker.SetValue("ID", Guid.NewGuid().ToString());
+                        tracker.SetValue("TimeRecovered", 0);
+                        tracker.SetValue("Inventoried", false);
+                    }
+                }
             }
         }
     }

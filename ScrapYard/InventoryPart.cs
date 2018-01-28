@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ScrapYard.Utilities;
 using ScrapYard.Modules;
 
@@ -21,7 +20,7 @@ namespace ScrapYard
         /// </summary>
         COSTS,
         /// <summary>
-        /// Equaivalent if name, dry cost, and Modules (except ModuleSYPartTracker) match
+        /// Equivalent if name, dry cost, and Modules (except ModuleSYPartTracker) match
         /// </summary>
         MODULES,
         /// <summary>
@@ -316,16 +315,43 @@ namespace ScrapYard
 
             if (part.Modules?.Count > 0)
             {
-                foreach (ConfigNode saved in savedModules)
+                //we can't just copy saved modules over, since that won't work for going back to default
+                //instead we copy all modules over from the default part and load our saved modules instead of default (where appropriate)
+                foreach (PartModule defaultModule in part.partInfo.partPrefab.Modules)
                 {
-                    //look for this module on the partInfo and replace it
-                    string moduleName = saved.GetValue("name");
-                    if (part.Modules.Contains(moduleName))
+                    try
                     {
-                        PartModule correspondingModule = part.Modules[moduleName];
-                        correspondingModule.Load(saved);
+                        string modName = defaultModule.moduleName;
+                        if (modName == "ModuleSYPartTracker")
+                        {
+                            continue;
+                        }
+                        ConfigNode copyNode;
+                        if ((copyNode = savedModules.Find(m => m.GetValue("name") == modName)) == null)
+                        {
+                            copyNode = new ConfigNode("MODULE");
+                            defaultModule?.Save(copyNode);
+                        }
+                        if (copyNode.HasData)
+                        {
+                            if (modName == "TweakScale")
+                            {
+                                //Because of how tweakscale works, we have to change values on the module itself for the update to work
+                                EditorApplySpecialCases.TweakScale(part, defaultModule, copyNode);
+                            }
+                            else
+                            {
+                                part.Modules[modName].Load(copyNode);
+                            }
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Log($"Error while applying module '{defaultModule.moduleName}'. Error: \n {ex}", Logging.LogType.ERROR);
                     }
                 }
+
                 if (part.Modules.Contains("ModuleSYPartTracker"))
                 {
                     ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
@@ -354,18 +380,26 @@ namespace ScrapYard
             get
             {
                 //if (_state == null) //if we can cache this correctly it would help to reduce lag
-                ConfigNode returnNode = ConfigNode.CreateConfigFromObject(this);
-
-                returnNode.AddValue("_id", ID);
-                returnNode.AddValue("_timesRecovered", TrackerModule.TimesRecovered);
-                returnNode.AddValue("_inventoried", TrackerModule.Inventoried);
-
-                //Add module nodes
-                foreach (ConfigNode module in savedModules)
+                try
                 {
-                    returnNode.AddNode(module);
+                    ConfigNode returnNode = ConfigNode.CreateConfigFromObject(this);
+
+                    returnNode.AddValue("_id", ID);
+                    returnNode.AddValue("_timesRecovered", TrackerModule.TimesRecovered);
+                    returnNode.AddValue("_inventoried", TrackerModule.Inventoried);
+
+                    //Add module nodes
+                    foreach (ConfigNode module in savedModules)
+                    {
+                        returnNode.AddNode(module);
+                    }
+                    return returnNode;
                 }
-                return returnNode;
+                catch (Exception ex)
+                {
+                    Logging.Log($"Error while saving InventoryPart to a ConfigNode. Error: \n {ex}", Logging.LogType.ERROR);
+                }
+                return null;
             }
             set
             {

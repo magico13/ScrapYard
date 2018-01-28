@@ -74,6 +74,7 @@
     <Compile Include="UI\InventoryApplyVM.cs" />
     <Compile Include="UI\PartInstance.cs" />
     <Compile Include="UI\WindowBase.cs" />
+    <Compile Include="Utilities\EditorApplySpecialCases.cs" />
     <Compile Include="Utilities\ConfigNodeUtils.cs" />
     <Compile Include="Utilities\EditorHandling.cs" />
     <Compile Include="Utilities\InventoryManagement.cs" />
