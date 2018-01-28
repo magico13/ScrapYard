@@ -334,7 +334,7 @@ namespace ScrapYard
                         }
                         if (copyNode.HasData)
                         {
-                            if (modName == "TweakScale" && ScrapYard.Instance.Settings.ModuleTemplates.Exists(mt => mt.NameMatches(modName))
+                            if (modName == "TweakScale" && ScrapYard.Instance.Settings.ModuleTemplates.Exists(mt => mt.NameMatches(modName)))
                             {
                                 //Because of how tweakscale works, we have to change values on the module itself for the update to work
                                 EditorApplySpecialCases.TweakScale(part, defaultModule, copyNode);
