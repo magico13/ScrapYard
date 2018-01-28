@@ -18,11 +18,13 @@ namespace ScrapYard.Utilities
         public void CreateInventoryPartCategory()
         {
             IconLoader loader = UnityEngine.Object.FindObjectOfType<IconLoader>();
-            PartCategorizer.Category category =  PartCategorizer.AddCustomFilter("ScrapYard", "ScrapYard", loader.icons.First(), new UnityEngine.Color(0, 0, 1f));
+            Icon icon = loader.icons.FirstOrDefault(i => string.Equals(i.name, "stockIcon_structural", StringComparison.Ordinal));
+            Logging.DebugLog(icon.name);
+            PartCategorizer.Category category =  PartCategorizer.AddCustomFilter("ScrapYard", "ScrapYard", icon, new UnityEngine.Color(0.75f, 0.75f, 0.75f));
             category.displayType = EditorPartList.State.PartsList;
             category.exclusionFilter = PartCategorizer.Instance.filterGenericNothing;
 
-            PartCategorizer.AddCustomSubcategoryFilter(category, "Inventory", "Inventory", loader.icons.First(), Filter);
+            PartCategorizer.AddCustomSubcategoryFilter(category, "Inventory", "Inventory", icon, Filter);
         }
 
 
