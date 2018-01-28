@@ -334,10 +334,15 @@ namespace ScrapYard
                         }
                         if (copyNode.HasData)
                         {
-                            if (modName == "TweakScale" && ScrapYard.Instance.Settings.ModuleTemplates.Exists(mt => mt.NameMatches(modName)))
+                            if (modName == "TweakScale")
                             {
-                                //Because of how tweakscale works, we have to change values on the module itself for the update to work
-                                EditorApplySpecialCases.TweakScale(part, defaultModule, copyNode);
+                                ConfigNode current = new ConfigNode("MODULE");
+                                part.Modules[modName].Save(current);
+                                if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(Name, copyNode) || ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(Name, current))
+                                {
+                                    //Because of how tweakscale works, we have to change values on the module itself for the update to work
+                                    EditorApplySpecialCases.TweakScale(part, defaultModule, copyNode);
+                                }
                             }
                             else
                             {
