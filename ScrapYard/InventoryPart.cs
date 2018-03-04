@@ -41,7 +41,21 @@ namespace ScrapYard
 
         public string Name { get { return _name; } }
         public float DryCost { get { return _dryCost; } }
-        public bool DoNotStore { get; set; } = false;
+
+        private bool _doNotStore = false;
+        public bool DoNotStore
+        {
+            get
+            {
+                //populate the saved modules
+                if (savedModules.Any())
+                {
+                    return _doNotStore;
+                }
+                return _doNotStore;
+            }
+            set { _doNotStore = value; }
+        }
         public TrackerModuleWrapper TrackerModule { get; private set; } = new TrackerModuleWrapper(null);
         public Guid? ID
         {
@@ -500,26 +514,17 @@ namespace ScrapYard
             //If it matches a template, save it
             if (ScrapYard.Instance.Settings.ModuleTemplates.CheckForMatch(partName, moduleNode))
             {
-                savedModules.Add(moduleNode);
+                _savedModules.Add(moduleNode);
                 saved = true;
             }
 
             //check if this is one of the forbidden modules, and if so then set DoNotStore
             //If we already have DoNotStore set, there's no reason to check again
-            if (!DoNotStore && ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
+            if (!_doNotStore && ScrapYard.Instance.Settings.ForbiddenTemplates.CheckForMatch(partName, moduleNode))
             {
                 Logging.DebugLog("Matched forbidden template with module "+moduleNode.GetValue("name"));
                 DoNotStore = true;
             }
-
-            //check for the part tracker and add it
-            //done in constructor
-            //if (moduleNode.GetValue("name").Equals("ModuleSYPartTracker"))
-            //{
-            //    TrackerModule = new TrackerModuleWrapper(moduleNode);
-            //    saved = true;
-            //}
-
             return saved;
         }
     }
