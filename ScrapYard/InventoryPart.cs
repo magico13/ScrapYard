@@ -57,11 +57,15 @@ namespace ScrapYard
             set { _doNotStore = value; }
         }
         public TrackerModuleWrapper TrackerModule { get; private set; } = new TrackerModuleWrapper(null);
-        public Guid? ID
+        public uint? ID
         {
             get
             {
                 return TrackerModule?.ID;
+            }
+            set
+            {
+                TrackerModule.ID = value;
             }
         }
 
@@ -124,6 +128,8 @@ namespace ScrapYard
                     }
                 }
             }
+
+            ID = originPart.persistentId;
         }
 
         /// <summary>
@@ -153,6 +159,8 @@ namespace ScrapYard
                     //storeModuleNode(_name, module.moduleValues);
                 }
             }
+
+            ID = originPartSnapshot.persistentId;
         }
 
         /// <summary>
@@ -191,6 +199,16 @@ namespace ScrapYard
                             TrackerModule = new TrackerModuleWrapper(module);
                         }
                     }
+                }
+
+                uint id = 0;
+                if (originPartConfigNode.TryGetValue("persistentID", ref id))
+                {
+                    ID = id;
+                }
+                else
+                {
+                    Logging.Log($"Could not find a persistent ID for part {_name}", Logging.LogType.ERROR);
                 }
             }
         }
@@ -374,7 +392,7 @@ namespace ScrapYard
                 if (part.Modules.Contains("ModuleSYPartTracker"))
                 {
                     ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                    tracker.ID = TrackerModule.ID.ToString();
+                    tracker.ID = TrackerModule.ID.GetValueOrDefault();
                     tracker.TimesRecovered = TrackerModule.TimesRecovered;
                     tracker.Inventoried = TrackerModule.Inventoried;
                 }
@@ -441,10 +459,9 @@ namespace ScrapYard
                         value.TryGetValue("_timesRecovered", ref timesRecovered) |
                         value.TryGetValue("_inventoried", ref inventoried)) // the single | makes all of them happen, we need at least one to succeed
                     {
-                        Guid? idGuid = Utilities.Utils.StringToGuid(idStr);
-                        if (idGuid.HasValue)
+                        if (uint.TryParse(idStr, out uint id))
                         {
-                            TrackerModule = new TrackerModuleWrapper(idGuid.Value, timesRecovered, inventoried);
+                            TrackerModule = new TrackerModuleWrapper(id, timesRecovered, inventoried);
                         }
                     }
 
@@ -473,11 +490,7 @@ namespace ScrapYard
         {
             if (_hash == 0)
             {
-                foreach (char s in ID?.ToString() ?? string.Empty)
-                {
-                    _hash += s;
-                }
-                _hash *= 31;
+                _hash = ID.GetHashCode();
             }
             return _hash;
         }
@@ -495,11 +508,13 @@ namespace ScrapYard
 
         public InventoryPart Copy()
         {
-            InventoryPart copy = new InventoryPart();
-            copy._dryCost = _dryCost;
-            copy._name = _name;
-            copy.savedModules = new List<ConfigNode>(savedModules);
-            copy.TrackerModule = new TrackerModuleWrapper(TrackerModule?.TrackerNode?.CreateCopy());
+            InventoryPart copy = new InventoryPart
+            {
+                _dryCost = _dryCost,
+                _name = _name,
+                savedModules = new List<ConfigNode>(savedModules),
+                TrackerModule = new TrackerModuleWrapper(TrackerModule?.TrackerNode?.CreateCopy())
+            };
             if (!copy.TrackerModule.HasModule && TrackerModule != null)
             {
                 copy.TrackerModule = new TrackerModuleWrapper(TrackerModule.ID.Value, TrackerModule.TimesRecovered, TrackerModule.Inventoried);

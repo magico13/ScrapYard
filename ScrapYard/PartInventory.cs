@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using UnityEngine;
-using ScrapYard.Modules;
-using ScrapYard.Utilities;
 using System.Diagnostics;
 
 namespace ScrapYard
@@ -95,7 +91,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="id">The ID to search for</param>
         /// <returns>The stored InventoryPart or null if not found</returns>
-        public InventoryPart FindPart(Guid id)
+        public InventoryPart FindPart(uint id)
         {
             if (!InventoryEnabled)
             {
@@ -216,7 +212,7 @@ namespace ScrapYard
         /// </summary>
         /// <param name="id">The ID of the part to remove</param>
         /// <returns>The removed InventoryPart, or null if none found</returns>
-        public InventoryPart RemovePart(Guid id)
+        public InventoryPart RemovePart(uint id)
         {
             if (!InventoryEnabled)
             {
@@ -246,8 +242,10 @@ namespace ScrapYard
             try
             {
                 disableEvents = true;
-                ret = new PartInventory(disableEventsOnCopy);
-                ret.internalInventory = new HashSet<InventoryPart>(internalInventory.Select(p => p.Copy()));
+                ret = new PartInventory(disableEventsOnCopy)
+                {
+                    internalInventory = new HashSet<InventoryPart>(internalInventory.Select(p => p.Copy()))
+                };
                 //ret.State = State;
             }
             catch (Exception ex)
@@ -296,8 +294,10 @@ namespace ScrapYard
 
                     foreach (ConfigNode inventoryPartNode in value.GetNodes(typeof(InventoryPart).FullName))
                     {
-                        InventoryPart loading = new InventoryPart();
-                        loading.State = inventoryPartNode;
+                        InventoryPart loading = new InventoryPart
+                        {
+                            State = inventoryPartNode
+                        };
                         internalInventory.Add(loading);
                     }
                 }

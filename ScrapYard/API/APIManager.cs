@@ -253,12 +253,12 @@ namespace ScrapYard
                 return null;
             }
 
-            Guid? guid = Utilities.Utils.StringToGuid(id);
-            if (!guid.HasValue)
+            
+            if (uint.TryParse(id, out uint partID))
             {
-                return null;
+                return ScrapYard.Instance.TheInventory.FindPart(partID)?.State;
             }
-            return ScrapYard.Instance.TheInventory.FindPart(guid.Value)?.State;
+            return null;
         }
 
         /// <summary>
@@ -301,12 +301,11 @@ namespace ScrapYard
                 return true;
             }
             //try to get the ID out of the list
-            Guid? guid = Utils.StringToGuid(parts.FirstOrDefault()?.Modules.GetModule<ModuleSYPartTracker>()?.ID);
-            if (!guid.HasValue)
+            uint? ID = parts.FirstOrDefault()?.persistentId;
+            if (!ID.HasValue)
             {
                 return false; //for now we can't process this vessel. Sorry. Maybe later we'll be able to add the module
             }
-            Guid ID = guid.GetValueOrDefault();
 
             //check that it isn't already processed
             if (ScrapYard.Instance.ProcessedTracker.IsProcessed(ID))
@@ -336,13 +335,11 @@ namespace ScrapYard
                 return true;
             }
             //try to get the ID out of the list
-            Guid? guid = Utils.StringToGuid(
-                partNodes.FirstOrDefault()?.GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name").Equals("ModuleSYPartTracker", StringComparison.OrdinalIgnoreCase))?.GetValue("ID"));
-            if (!guid.HasValue)
+            uint ID = 0;
+            if (partNodes.FirstOrDefault()?.TryGetValue("persistentID", ref ID) != true)
             {
                 return false; //for now we can't process this vessel. Sorry. Maybe later we'll be able to add the module
             }
-            Guid ID = guid.GetValueOrDefault();
 
             //check that it isn't already processed
             if (ScrapYard.Instance.ProcessedTracker.IsProcessed(ID))
@@ -386,7 +383,11 @@ namespace ScrapYard
         /// <returns>The previous status</returns>
         public bool SetProcessedStatus_ID(string id, bool newStatus)
         {
-            return ScrapYard.Instance.ProcessedTracker.TrackVessel(Utils.StringToGuid(id), newStatus);
+            if (uint.TryParse(id, out uint vesselID))
+            {
+                return ScrapYard.Instance.ProcessedTracker.TrackVessel(vesselID, newStatus);
+            }
+            return false;
         }
         #endregion Vessel Processing
 

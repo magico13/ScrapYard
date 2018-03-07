@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ScrapYard.Utilities
 {
@@ -63,7 +62,7 @@ namespace ScrapYard.Utilities
                     if (inInventory.TrackerModule != null && part.Modules?.Contains("ModuleSYPartTracker") == true)
                     {
                         ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                        tracker.ID = inInventory.ID?.ToString();
+                        tracker.ID = inInventory.ID.GetValueOrDefault();
                         tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
                         tracker.Inventoried = inInventory.TrackerModule.Inventoried;
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");

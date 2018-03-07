@@ -25,7 +25,7 @@ namespace ScrapYard.Modules
         /// <param name="id">The ID</param>
         /// <param name="recovered">The number of times recovered</param>
         /// <param name="inventoried">Whether the part is from the inventory</param>
-        public TrackerModuleWrapper(Guid id, int recovered, bool inventoried)
+        public TrackerModuleWrapper(uint id, int recovered, bool inventoried)
         {
             _id = id;
             _timesRecovered = recovered;
@@ -37,25 +37,21 @@ namespace ScrapYard.Modules
         /// </summary>
         public bool HasModule { get { return TrackerNode != null; } }
 
-        private Guid? _id = null;
+        private uint? _id = null;
         /// <summary>
         /// The unique ID for this part
         /// </summary>
-        public Guid? ID
+        public uint? ID
         {
             get
             {
                 if (_id == null && HasModule)
                 {
-                    string id = null;
+                    uint id = 0;
                     if (TrackerNode.TryGetValue("ID", ref id))
                     {
-                        _id = Utils.StringToGuid(id);
+                        _id = id;
                     }
-                }
-                if (_id == null)
-                {
-                    _id = Guid.NewGuid();
                 }
                 return _id;
             }

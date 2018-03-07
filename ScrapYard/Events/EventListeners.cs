@@ -1,11 +1,7 @@
 ﻿using KSP.UI.Screens;
-using KSP.UI.Screens.SpaceCenter.MissionSummaryDialog;
 using ScrapYard.Modules;
-using ScrapYard.UI;
 using ScrapYard.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 namespace ScrapYard
@@ -105,8 +101,7 @@ namespace ScrapYard
             //If vessel not processed, then take parts
             //If already processed, just return
 
-            if (ScrapYard.Instance.ProcessedTracker.Remove(Utils.StringToGuid(
-                vessel.Parts[0].Modules.GetModule<ModuleSYPartTracker>()?.ID)))
+            if (ScrapYard.Instance.ProcessedTracker.Remove(vessel.Parts[0].persistentId))
             {
                 return;
             }
@@ -185,8 +180,10 @@ namespace ScrapYard
                 }
                 else
                 {
-                    List<Part> selectedParts = new List<Part>(EditorLogic.SelectedPart.children);
-                    selectedParts.Add(EditorLogic.SelectedPart);
+                    List<Part> selectedParts = new List<Part>(EditorLogic.SelectedPart.children)
+                    {
+                        EditorLogic.SelectedPart
+                    };
                     List<Part> inventoriedParts = new List<Part>();
                     double cost = 0;
                     uint count = 0;

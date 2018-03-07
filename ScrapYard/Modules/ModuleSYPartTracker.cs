@@ -12,11 +12,21 @@ namespace ScrapYard.Modules
     public class ModuleSYPartTracker : PartModule
     {
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
-        public string ID = null;
+        private uint id = 0;
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
         public int TimesRecovered = 0;
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
         public bool Inventoried = false;
+
+        public uint ID
+        {
+            get { return id; }
+            set
+            {
+                id = value;
+                part.persistentId = value;
+            }
+        }
 
         [KSPEvent(guiActiveEditor = true, guiName = "Select From Inventory")]
         public void OpenInventory()
@@ -27,18 +37,25 @@ namespace ScrapYard.Modules
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
-            if (state == StartState.Editor && string.IsNullOrEmpty(ID))
+            if (state == StartState.Editor && id == 0)
             {
-                ID = NewID();
+                id = part.persistentId;
+            }
+            else if (id != 0)
+            {
+                ID = id; //set it on the part
             }
         }
         public override void OnInitialize()
         {
             base.OnInitialize();
-            if (string.IsNullOrEmpty(ID))
+            if (id == 0)
             {
-                //MakeFresh();
-                ID = NewID();
+                id = part.persistentId;
+            }
+            else
+            {
+                ID = id; //set it on the part
             }
         }
 
@@ -48,14 +65,9 @@ namespace ScrapYard.Modules
             MakeFresh();
         }
 
-        protected string NewID()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
         public void MakeFresh()
         {
-            ID = NewID();
+            ID = part.persistentId;
             TimesRecovered = 0;
             Inventoried = false;
         }

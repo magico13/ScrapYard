@@ -1,9 +1,8 @@
 ﻿using ScrapYard.Modules;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Diagnostics;
 
 namespace ScrapYard.Utilities
 {
@@ -36,11 +35,11 @@ namespace ScrapYard.Utilities
                 {
                     for (int i = 0; i < editorParts.Count; i++)
                     {
-                        var constWatch = System.Diagnostics.Stopwatch.StartNew();
+                        Stopwatch constWatch = Stopwatch.StartNew();
                         InventoryPart iPart = editorParts[i];//new InventoryPart(part);
                         constWatch.Stop();
                         constTime += constWatch.ElapsedMilliseconds;
-                        var freshWatch = System.Diagnostics.Stopwatch.StartNew();
+                        Stopwatch freshWatch = Stopwatch.StartNew();
                         if (iPart.ID == null)
                         {
                             (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
@@ -49,7 +48,7 @@ namespace ScrapYard.Utilities
                         freshTime += freshWatch.ElapsedMilliseconds;
                         if (iPart.TrackerModule.Inventoried)
                         {
-                            var remWatch = System.Diagnostics.Stopwatch.StartNew();
+                            Stopwatch remWatch = Stopwatch.StartNew();
                             InventoryPart inInventory = copy.RemovePart(iPart, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
                             if (inInventory == null)
                             {
@@ -63,7 +62,7 @@ namespace ScrapYard.Utilities
                         else
                         {
                             //check that we're not sharing an ID with something in the inventory
-                            var findWatch = System.Diagnostics.Stopwatch.StartNew();
+                            Stopwatch findWatch = Stopwatch.StartNew();
                             if (iPart.ID.HasValue)
                             {
                                 InventoryPart inInventory = copy.FindPart(iPart.ID.Value);
