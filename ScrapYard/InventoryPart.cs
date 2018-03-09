@@ -118,13 +118,17 @@ namespace ScrapYard
             {
                 foreach (PartModule module in originPart.Modules)
                 {
-                    ConfigNode saved = new ConfigNode("MODULE");
-                    module.Save(saved);
-                    allModules.Add(saved);
-                    //storeModuleNode(_name, saved);
-                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    string name = module.moduleName;
+                    bool isTracker = name.Equals("ModuleSYPartTracker");
+                    if (isTracker || moduleNameMatchesAnything(name)) //only save if there is a potential match
                     {
-                        TrackerModule = new TrackerModuleWrapper(saved);
+                        ConfigNode saved = new ConfigNode("MODULE");
+                        module.Save(saved);
+                        allModules.Add(saved);
+                        if (isTracker)
+                        {
+                            TrackerModule = new TrackerModuleWrapper(saved);
+                        }
                     }
                 }
             }
@@ -151,12 +155,17 @@ namespace ScrapYard
             {
                 foreach (ProtoPartModuleSnapshot module in originPartSnapshot.modules)
                 {
-                    allModules.Add(module.moduleValues);
-                    if (module.moduleName.Equals("ModuleSYPartTracker"))
+                    string name = module.moduleName;
+                    bool isTracker = name.Equals("ModuleSYPartTracker");
+                    if (isTracker || moduleNameMatchesAnything(name)) //only save if there is a potential match
                     {
-                        TrackerModule = new TrackerModuleWrapper(module.moduleValues);
+                        ConfigNode saved = module.moduleValues;
+                        allModules.Add(saved);
+                        if (isTracker)
+                        {
+                            TrackerModule = new TrackerModuleWrapper(saved);
+                        }
                     }
-                    //storeModuleNode(_name, module.moduleValues);
                 }
             }
 
@@ -192,9 +201,10 @@ namespace ScrapYard
                 {
                     foreach (ConfigNode module in originPartConfigNode.GetNodes("MODULE"))
                     {
+                        string name = module.GetValue("name");
+                        bool isTracker = name.Equals("ModuleSYPartTracker");
                         allModules.Add(module);
-                        //storeModuleNode(_name, module);
-                        if (module.GetValue("name").Equals("ModuleSYPartTracker"))
+                        if (isTracker)
                         {
                             TrackerModule = new TrackerModuleWrapper(module);
                         }
@@ -541,6 +551,13 @@ namespace ScrapYard
                 DoNotStore = true;
             }
             return saved;
+        }
+
+        private bool moduleNameMatchesAnything(string moduleName)
+        {
+            return ScrapYard.Instance.Settings.ModuleTemplates.MatchByName(moduleName) 
+                || ScrapYard.Instance.Settings.ForbiddenTemplates.MatchByName(moduleName);
+
         }
     }
 }

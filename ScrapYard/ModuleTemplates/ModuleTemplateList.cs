@@ -47,6 +47,23 @@ namespace ScrapYard
         }
 
         /// <summary>
+        /// Checks if there are any modules that match by name only
+        /// </summary>
+        /// <param name="moduleName">Name of the module to check for</param>
+        /// <returns>True if there are any modules whose name requirement matches.</returns>
+        public bool MatchByName(string moduleName)
+        {
+            foreach (ModuleTemplate template in this)
+            {
+                if (template.NameMatches(moduleName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Checks if any templates match
         /// </summary>
         /// <param name="moduleNode">The PartModule ConfigNode</param>
