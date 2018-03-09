@@ -67,7 +67,7 @@ namespace ScrapYard.Modules
 
         public void MakeFresh()
         {
-            ID = part.persistentId;
+            ID = FlightGlobals.CheckPartpersistentId(0, part, false, true);
             TimesRecovered = 0;
             Inventoried = false;
         }

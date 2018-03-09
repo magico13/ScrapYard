@@ -79,7 +79,18 @@ namespace ScrapYard
                 if (_savedModules == null)
                 {
                     _savedModules = new List<ConfigNode>();
-                    foreach(ConfigNode module in allModules)
+
+                    if (_cachedModules != null)
+                    {
+                        _allModules = _cachedModules.Select(m =>
+                       {
+                           ConfigNode node = new ConfigNode("MODULE");
+                           m.Save(node);
+                           return node;
+                       }).ToList();
+                    }
+                    
+                    foreach (ConfigNode module in _allModules)
                     {
                         storeModuleNode(Name, module);
                     }
@@ -88,8 +99,10 @@ namespace ScrapYard
             }
             set { _savedModules = value; }
         }
-        private List<ConfigNode> allModules = new List<ConfigNode>();
+        private List<ConfigNode> _allModules = new List<ConfigNode>();
+        private List<PartModule> _cachedModules = null;
         private int _hash = 0;
+        
 
         /// <summary>
         /// Creates an empty InventoryPart.
@@ -116,20 +129,22 @@ namespace ScrapYard
             //Save modules
             if (originPart.Modules != null)
             {
+                _cachedModules = new List<PartModule>();
                 foreach (PartModule module in originPart.Modules)
                 {
                     string name = module.moduleName;
                     bool isTracker = name.Equals("ModuleSYPartTracker");
-                    if (isTracker || moduleNameMatchesAnything(name)) //only save if there is a potential match
+                    if (isTracker)
                     {
                         ConfigNode saved = new ConfigNode("MODULE");
                         module.Save(saved);
-                        allModules.Add(saved);
+                        _allModules.Add(saved);
                         if (isTracker)
                         {
                             TrackerModule = new TrackerModuleWrapper(saved);
                         }
                     }
+                    _cachedModules.Add(module);
                 }
             }
 
@@ -160,7 +175,7 @@ namespace ScrapYard
                     if (isTracker || moduleNameMatchesAnything(name)) //only save if there is a potential match
                     {
                         ConfigNode saved = module.moduleValues;
-                        allModules.Add(saved);
+                        _allModules.Add(saved);
                         if (isTracker)
                         {
                             TrackerModule = new TrackerModuleWrapper(saved);
@@ -203,7 +218,7 @@ namespace ScrapYard
                     {
                         string name = module.GetValue("name");
                         bool isTracker = name.Equals("ModuleSYPartTracker");
-                        allModules.Add(module);
+                        _allModules.Add(module);
                         if (isTracker)
                         {
                             TrackerModule = new TrackerModuleWrapper(module);
