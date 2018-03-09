@@ -30,21 +30,23 @@ namespace ScrapYard.Utilities
                 long freshTime = 0;
 
                 //foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
-                List<InventoryPart> editorParts = EditorLogic.fetch?.ship?.Parts?.Select(p => new InventoryPart(p))?.ToList();
+                List<InventoryPart> editorParts = null;
+                using (Logging.Timer.StartNew("Convert To IParts"))
+                {
+                    editorParts = EditorLogic.fetch?.ship?.Parts?.Select(p => new InventoryPart(p))?.ToList();
+                }
                 if (editorParts != null)
                 {
                     for (int i = 0; i < editorParts.Count; i++)
                     {
                         Stopwatch constWatch = Stopwatch.StartNew();
                         InventoryPart iPart = editorParts[i];//new InventoryPart(part);
-                        constWatch.Stop();
                         constTime += constWatch.ElapsedMilliseconds;
                         Stopwatch freshWatch = Stopwatch.StartNew();
                         if (iPart.ID == null)
                         {
                             (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                         }
-                        freshWatch.Stop();
                         freshTime += freshWatch.ElapsedMilliseconds;
                         if (iPart.TrackerModule.Inventoried)
                         {
@@ -56,7 +58,6 @@ namespace ScrapYard.Utilities
                                 Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
                                 (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                             }
-                            remWatch.Stop();
                             removeTime += remWatch.ElapsedMilliseconds;
                         }
                         else
@@ -73,7 +74,6 @@ namespace ScrapYard.Utilities
                                     (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                                 }
                             }
-                            findWatch.Stop();
                             findTime += findWatch.ElapsedMilliseconds;
                         }
                     }
