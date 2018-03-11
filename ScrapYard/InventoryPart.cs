@@ -232,7 +232,7 @@ namespace ScrapYard
                 }
 
                 uint id = 0;
-                if (originPartConfigNode.TryGetValue("persistentID", ref id))
+                if (originPartConfigNode.TryGetValue("persistentId", ref id))
                 {
                     ID = id;
                 }
