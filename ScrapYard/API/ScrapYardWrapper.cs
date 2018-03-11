@@ -257,6 +257,20 @@ namespace ScrapYard
             }
             return invokeMethod("GetAllInventoryParts") as IList<ConfigNode>;
         }
+
+        /// <summary>
+        /// Refreshes a part node to be fresh and not from the inventory
+        /// </summary>
+        /// <param name="partNode">The part to refresh</param>
+        /// <returns>Success</returns>
+        public static bool RefreshPart(ConfigNode partNode)
+        {
+            if (!Available)
+            {
+                return false;
+            }
+            return (bool)invokeMethod("RefreshPart_Node", partNode);
+        }
         #endregion Inventory Manipulation
 
 

@@ -286,6 +286,34 @@ namespace ScrapYard
             }
             return null;
         }
+
+        /// <summary>
+        /// Refreshes a part node to be fresh and not from the inventory
+        /// </summary>
+        /// <param name="partNode">The part to refresh</param>
+        /// <returns>Success</returns>
+        public bool RefreshPart_Node(ConfigNode partNode)
+        {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return false;
+            }
+
+            try
+            {
+                InventoryPart iPart = new InventoryPart(partNode);
+                iPart.ID = 0;
+                iPart.TrackerModule.Inventoried = false;
+                iPart.TrackerModule.TimesRecovered = 0;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logging.LogException(ex);
+            }
+            return false;
+        }
         #endregion Inventory Manipulation
 
         #region Vessel Processing
