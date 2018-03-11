@@ -57,11 +57,16 @@ namespace ScrapYard
             set { _doNotStore = value; }
         }
         public TrackerModuleWrapper TrackerModule { get; private set; } = new TrackerModuleWrapper(null);
-        public uint? ID
+        public uint ID
         {
             get
             {
-                return TrackerModule?.ID;
+                if (TrackerModule.ID.GetValueOrDefault() == 0)
+                {
+                    uint id = FlightGlobals.GetUniquepersistentId();
+                    TrackerModule.ID = id;
+                }
+                return TrackerModule.ID.Value;
             }
             set
             {

@@ -441,10 +441,10 @@ namespace ScrapYard
         /// It is recommended to cache this.
         /// </summary>
         /// <param name="part">The part to get the ID of</param>
-        /// <returns>The part's ID (a Guid) as a string or null if it can't be gotten</returns>
+        /// <returns>The part's ID (a uint) as a string or null if it can't be gotten</returns>
         public string GetPartID_Part(Part part)
         {
-            return new InventoryPart(part).ID?.ToString();
+            return new InventoryPart(part).ID.ToString();
         }
 
         /// <summary>
@@ -452,10 +452,10 @@ namespace ScrapYard
         /// It is recommended to cache this.
         /// </summary>
         /// <param name="part">The part to get the ID of</param>
-        /// <returns>The part's ID (a Guid) as a string or null if it can't be gotten</returns>
+        /// <returns>The part's ID (a uint) as a string or null if it can't be gotten</returns>
         public string GetPartID_Node(ConfigNode part)
         {
-            return new InventoryPart(part).ID?.ToString();
+            return new InventoryPart(part).ID.ToString();
         }
 
         /// <summary>

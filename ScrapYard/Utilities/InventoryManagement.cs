@@ -48,7 +48,7 @@ namespace ScrapYard.Utilities
                 InventoryPart iPart = new InventoryPart(part);
                 //find a corresponding one in the inventory and remove it
                 
-                InventoryPart inInventory = copy.RemovePart(iPart.ID.GetValueOrDefault());
+                InventoryPart inInventory = copy.RemovePart(iPart.ID);
                 if (inInventory == null)
                 {
                     inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
@@ -62,7 +62,7 @@ namespace ScrapYard.Utilities
                     if (inInventory.TrackerModule != null && part.Modules?.Contains("ModuleSYPartTracker") == true)
                     {
                         ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                        tracker.ID = inInventory.ID.GetValueOrDefault();
+                        tracker.ID = inInventory.ID;
                         tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
                         tracker.Inventoried = inInventory.TrackerModule.Inventoried;
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
@@ -86,7 +86,7 @@ namespace ScrapYard.Utilities
                 //convert it to an inventorypart
                 InventoryPart iPart = new InventoryPart(partNode);
                 //find a corresponding one in the inventory and remove it
-                InventoryPart inInventory = copy.RemovePart(iPart.ID.GetValueOrDefault());
+                InventoryPart inInventory = copy.RemovePart(iPart.ID);
                 if (inInventory == null)
                 {
                     inInventory = copy.RemovePart(iPart, ComparisonStrength.MODULES);
@@ -100,7 +100,7 @@ namespace ScrapYard.Utilities
                     ConfigNode trackerNode;
                     if (inInventory.TrackerModule != null && (trackerNode = partNode.GetModuleNode("ModuleSYPartTracker")) != null)
                     {
-                        string id = inInventory.ID?.ToString();
+                        string id = inInventory.ID.ToString();
                         int recovered = inInventory.TrackerModule.TimesRecovered;
                         bool inventoried = inInventory.TrackerModule.Inventoried;
                         trackerNode.SetValue("ID", id);

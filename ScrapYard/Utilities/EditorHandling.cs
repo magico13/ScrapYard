@@ -27,7 +27,7 @@ namespace ScrapYard.Utilities
                 long constTime = 0;
                 long removeTime = 0;
                 long findTime = 0;
-                long freshTime = 0;
+                //long freshTime = 0;
 
                 //foreach (Part part in EditorLogic.fetch?.ship?.Parts ?? new List<Part>())
                 List<InventoryPart> editorParts = null;
@@ -42,12 +42,12 @@ namespace ScrapYard.Utilities
                         Stopwatch constWatch = Stopwatch.StartNew();
                         InventoryPart iPart = editorParts[i];//new InventoryPart(part);
                         constTime += constWatch.ElapsedMilliseconds;
-                        Stopwatch freshWatch = Stopwatch.StartNew();
-                        if (iPart.ID == null)
-                        {
-                            (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                        }
-                        freshTime += freshWatch.ElapsedMilliseconds;
+                        //Stopwatch freshWatch = Stopwatch.StartNew();
+                        //if (iPart.ID == null)
+                        //{
+                        //    (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                        //}
+                        //freshTime += freshWatch.ElapsedMilliseconds;
                         if (iPart.TrackerModule.Inventoried)
                         {
                             Stopwatch remWatch = Stopwatch.StartNew();
@@ -64,16 +64,14 @@ namespace ScrapYard.Utilities
                         {
                             //check that we're not sharing an ID with something in the inventory
                             Stopwatch findWatch = Stopwatch.StartNew();
-                            if (iPart.ID.HasValue)
+                            InventoryPart inInventory = copy.FindPart(iPart.ID);
+                            if (inInventory != null)
                             {
-                                InventoryPart inInventory = copy.FindPart(iPart.ID.Value);
-                                if (inInventory != null)
-                                {
-                                    //found a part that is sharing an ID but shouldn't be
-                                    Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
-                                    (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
-                                }
+                                //found a part that is sharing an ID but shouldn't be
+                                Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
+                                (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                             }
+                            
                             findTime += findWatch.ElapsedMilliseconds;
                         }
                     }
@@ -81,7 +79,7 @@ namespace ScrapYard.Utilities
                 Logging.Log($"Constructor: {constTime}");
                 Logging.Log($"Removal: {removeTime}");
                 Logging.Log($"Finding: {findTime}");
-                Logging.Log($"Freshening: {freshTime}");
+                //Logging.Log($"Freshening: {freshTime}");
             }
             using (Logging.Timer.StartNew("Update Part List"))
             {
