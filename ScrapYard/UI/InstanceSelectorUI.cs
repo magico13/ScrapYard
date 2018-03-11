@@ -54,9 +54,25 @@ namespace ScrapYard.UI
                 }
             }
 
-            foreach (PartInstance instance in InstanceVM.Parts)
+            if (InstanceVM.Parts?.Any() == true)
             {
-                instance.Draw();
+                foreach (long uses in InstanceVM.Parts.Keys)
+                {
+                    PartInstance instance = InstanceVM.Parts[uses].FirstOrDefault();
+                    
+                    if (instance != null)
+                    {
+                        //TODO: THIS DOESN'T WORK IF THE MODULES ARE DIFFERENT
+                        GUILayout.BeginVertical(GUI.skin.textArea);
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label($"{uses} Previous Uses");
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label($"{InstanceVM.Parts[uses].Count} In Inventory");
+                        GUILayout.EndHorizontal();
+                        instance.Draw();
+                        GUILayout.EndVertical();
+                    }
+                }
             }
 
 

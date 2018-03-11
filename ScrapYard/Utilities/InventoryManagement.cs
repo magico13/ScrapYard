@@ -62,9 +62,9 @@ namespace ScrapYard.Utilities
                     if (inInventory.TrackerModule != null && part.Modules?.Contains("ModuleSYPartTracker") == true)
                     {
                         ModuleSYPartTracker tracker = part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker;
-                        tracker.ID = inInventory.ID;
                         tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
                         tracker.Inventoried = inInventory.TrackerModule.Inventoried;
+                        tracker.ID = inInventory.ID;
                         Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
                     }
                 }

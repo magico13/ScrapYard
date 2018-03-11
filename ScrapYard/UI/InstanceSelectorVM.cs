@@ -46,7 +46,7 @@ namespace ScrapYard.UI
 
         public string SelectedPartName { get; set; } = "A Part";
 
-        public List<PartInstance> Parts { get; set; }
+        public Dictionary<long, List<PartInstance>> Parts { get; set; }
 
         public InstanceSelectorVM(PartInventory inventory, Part basePart, Part applyToPart, bool shouldSell)
         {
@@ -71,7 +71,7 @@ namespace ScrapYard.UI
 
         public void UpdatePartList(PartInventory inventory, InventoryPart partBase, bool selling)
         {
-            Parts = new List<PartInstance>();
+            Parts = new Dictionary<long, List<PartInstance>>();
             if (partBase == null)
             {
                 return;
@@ -95,7 +95,16 @@ namespace ScrapYard.UI
             {
                 PartInstance instance = new PartInstance(inventory, iPart, selling, ApplyPart);
                 instance.Updated += Instance_Updated;
-                Parts.Add(instance);
+                List<PartInstance> list;
+                if (Parts.TryGetValue(iPart.TrackerModule.TimesRecovered, out list))
+                {
+                    list.Add(instance);
+                }
+                else
+                {
+                    list = new List<PartInstance>() { instance };
+                }
+                Parts[iPart.TrackerModule.TimesRecovered] = list;
             }
         }
 

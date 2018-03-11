@@ -34,9 +34,7 @@ namespace ScrapYard.UI
 
         public void Draw()
         {
-            GUILayout.BeginVertical(GUI.skin.textArea);
-
-            GUILayout.Label(string.Format("Times Used: {0}", _backingPart?.TrackerModule?.TimesRecovered ?? 0));
+            //GUILayout.Label(string.Format("Previous Uses: {0}", _backingPart?.TrackerModule?.TimesRecovered ?? 0));
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(_sellOrDiscard))
@@ -62,8 +60,6 @@ namespace ScrapYard.UI
                 selectPart(_toApply);
             }
             GUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
         }
 
         private void sellPart()

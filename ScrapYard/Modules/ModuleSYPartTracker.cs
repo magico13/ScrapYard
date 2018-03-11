@@ -11,12 +11,15 @@ namespace ScrapYard.Modules
     /// </summary>
     public class ModuleSYPartTracker : PartModule
     {
-        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        [KSPField(isPersistant = true, guiActive = false, guiActiveEditor = false)]
         private uint id = 0;
-        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        [KSPField(isPersistant = true, guiActive = false, guiActiveEditor = false)]
         public int TimesRecovered = 0;
-        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true)]
+        [KSPField(isPersistant = true, guiActive = false, guiActiveEditor = false)]
         public bool Inventoried = false;
+
+        [KSPField(isPersistant = false, guiActive = true, guiActiveEditor = true)]
+        public string ScrapYard = string.Empty;
 
         public uint ID
         {
@@ -25,13 +28,8 @@ namespace ScrapYard.Modules
             {
                 id = value;
                 part.persistentId = value;
+                updateDisplay();
             }
-        }
-
-        [KSPEvent(guiActiveEditor = true, guiName = "Select From Inventory")]
-        public void OpenInventory()
-        {
-            ScrapYard.Instance.InstanceSelectorUI.Show(part, part);
         }
 
         public override void OnStart(StartState state)
@@ -45,6 +43,7 @@ namespace ScrapYard.Modules
             {
                 ID = id; //set it on the part
             }
+            updateDisplay();
         }
         public override void OnInitialize()
         {
@@ -57,6 +56,7 @@ namespace ScrapYard.Modules
             {
                 ID = id; //set it on the part
             }
+            updateDisplay();
         }
 
         public override void OnCopy(PartModule fromModule)
@@ -70,6 +70,19 @@ namespace ScrapYard.Modules
             ID = FlightGlobals.CheckPartpersistentId(0, part, false, true);
             TimesRecovered = 0;
             Inventoried = false;
+            updateDisplay();
+        }
+
+        private void updateDisplay()
+        {
+            if (Inventoried)
+            {
+                ScrapYard = $"{TimesRecovered} Previous Uses";
+            }
+            else
+            {
+                ScrapYard = "Part Is New";
+            }
         }
     }
 }

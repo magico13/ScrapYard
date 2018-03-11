@@ -45,6 +45,7 @@ namespace ScrapYard.UI
                     }
                 }
                 ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
+                ScrapYard.Instance.EditorVerificationRequired = true;
             }
         }
 

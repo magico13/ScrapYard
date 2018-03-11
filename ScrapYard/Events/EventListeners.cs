@@ -23,6 +23,8 @@ namespace ScrapYard
                 GameEvents.onEditorShipModified.Add(OnEditorShipModified);
                 GameEvents.onEditorPodDeleted.Add(shipOrPartModified);
                 GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
+                GameEvents.onPartActionUICreate.Add(OnEditorPartUIShow);
+                GameEvents.onPartActionUIDismiss.Add(OnEditorPartUIHide);
 
                 ScrapYardEvents.OnSYInventoryChanged.Add(InventoryChangedEventListener);
 
@@ -41,6 +43,8 @@ namespace ScrapYard
             GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
             GameEvents.onEditorPodDeleted.Remove(shipOrPartModified);
             GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
+            GameEvents.onPartActionUICreate.Remove(OnEditorPartUIShow);
+            GameEvents.onPartActionUIDismiss.Remove(OnEditorPartUIHide);
 
             ScrapYardEvents.OnSYInventoryChanged.Remove(InventoryChangedEventListener);
 
@@ -141,7 +145,23 @@ namespace ScrapYard
 
         public void OnEditorShipModified(ShipConstruct ship)
         {
-            shipOrPartModified();   
+            shipOrPartModified();
+        }
+
+        public void OnEditorPartUIShow(Part part)
+        {
+            if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            {
+                ScrapYard.Instance.InstanceSelectorUI.Show(part, part);
+            }
+        }
+
+        public void OnEditorPartUIHide(Part part)
+        {
+            if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
+            {
+                ScrapYard.Instance.InstanceSelectorUI.Show(part, null);
+            }
         }
 
         public void OnEditorPartEvent(ConstructionEventType type, Part part)
@@ -155,10 +175,8 @@ namespace ScrapYard
                     ScrapYard.Instance.InstanceSelectorUI.Show(part, null);
                 }
             }
-            //if (ScrapYard.Instance.InstanceSelectorUI.IsVisible)
-            //{
-            //    ScrapYard.Instance.InstanceSelectorUI.Show(part, null);
-            //}
+            //Logging.DebugLog(type);
+
             shipOrPartModified();
         }
 
