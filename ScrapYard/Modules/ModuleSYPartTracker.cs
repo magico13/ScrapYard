@@ -83,6 +83,7 @@ namespace ScrapYard.Modules
             {
                 ScrapYard = "Part Is New";
             }
+            //ScrapYard += $" {ID}";
         }
     }
 }

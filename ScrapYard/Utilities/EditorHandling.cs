@@ -186,7 +186,7 @@ namespace ScrapYard.Utilities
                 if (EditorLogic.SelectedPart != null &&
                     ScrapYard.Instance.InstanceSelectorUI.InstanceVM.SelectedPartName != EditorLogic.SelectedPart.partName)
                 {
-                    ScrapYard.Instance.InstanceSelectorUI.Show(EditorLogic.SelectedPart, EditorLogic.SelectedPart);
+                    ScrapYard.Instance.InstanceSelectorUI.Show(EditorLogic.SelectedPart, null);
                 }
             }
         }

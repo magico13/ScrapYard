@@ -9,6 +9,8 @@ namespace ScrapYard.UI
     public class InstanceSelectorUI : WindowBase
     {
         protected Vector2 scrollPos;
+        protected bool dragging = false;
+        protected Vector2 lastMousePos;
 
         public InstanceSelectorVM InstanceVM { get; set; }
 
@@ -16,8 +18,8 @@ namespace ScrapYard.UI
         {
             SetSize(500, 100, 300, Screen.height-200);
 
-            //OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
-            //OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
+            OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
+            OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
             //OnShow.Add(() => { GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced); });
             //OnClose.Add(() => { GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced); });
         }
@@ -30,7 +32,6 @@ namespace ScrapYard.UI
                 return;
             }
             GUILayout.BeginVertical();
-            scrollPos = GUILayout.BeginScrollView(scrollPos);
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -54,20 +55,22 @@ namespace ScrapYard.UI
                 }
             }
 
+            scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+            //Show sets of parts in the inventory, grouped by usage/modules
             if (InstanceVM.Parts?.Any() == true)
             {
-                foreach (long uses in InstanceVM.Parts.Keys)
+                foreach (List<PartInstance> list in InstanceVM.Parts)
                 {
-                    PartInstance instance = InstanceVM.Parts[uses].FirstOrDefault();
+                    PartInstance instance = list.FirstOrDefault();
                     
                     if (instance != null)
                     {
-                        //TODO: THIS DOESN'T WORK IF THE MODULES ARE DIFFERENT
                         GUILayout.BeginVertical(GUI.skin.textArea);
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label($"{uses} Previous Uses");
+                        GUILayout.Label($"{instance.BackingPart.TrackerModule.TimesRecovered} Previous Uses");
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label($"{InstanceVM.Parts[uses].Count} In Inventory");
+                        GUILayout.Label($"{list.Count} In Inventory");
                         GUILayout.EndHorizontal();
                         instance.Draw();
                         GUILayout.EndVertical();
@@ -75,8 +78,46 @@ namespace ScrapYard.UI
                 }
             }
 
-
             GUILayout.EndScrollView();
+
+            GUILayout.Label("Whole-Vessel Quick Options:");
+            InstanceVM.AutoApplyInventory = GUILayout.Toggle(InstanceVM.AutoApplyInventory, "Automatically Quick Apply");
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Quick Apply"))
+            {
+                InstanceVM.ApplyInventoryToEditorVessel();
+            }
+            if (GUILayout.Button("New Parts"))
+            {
+                InstanceVM.MakeFresh();
+            }
+            GUILayout.EndHorizontal();
+
+            //click near the bottom of the window, then drag
+            if ((Mouse.Left.GetButton() && dragging)
+                || (Mouse.Left.GetButtonDown() && Mouse.screenPos.x > WindowRect.xMin && Mouse.screenPos.x < WindowRect.xMax
+                && Mouse.screenPos.y > WindowRect.yMax - 5 && Mouse.screenPos.y < WindowRect.yMax))
+            {
+                if (!dragging)
+                {
+                    lastMousePos = Mouse.screenPos;
+                }
+
+                float dy = Mouse.screenPos.y - lastMousePos.y;
+
+                //resize
+                Rect oldSize = WindowRect;
+                SetSize(oldSize.xMin, oldSize.yMin, oldSize.width, oldSize.height + dy);
+                dragging = true;
+                Draggable = false;
+                lastMousePos = Mouse.screenPos;
+            }
+            else
+            {
+                dragging = false;
+                Draggable = true;
+            }
+
             GUILayout.EndVertical();
             base.Draw(windowID);    
         }

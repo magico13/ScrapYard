@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace ScrapYard
 {
@@ -73,11 +71,7 @@ namespace ScrapYard
                 foreach (ConfigNode posNode in settingsNode.GetNodes("POSITION"))
                 {
                     string name = posNode.GetValue("name");
-                    if (name == ScrapYard.Instance.ApplyInventoryUI.Title)
-                    {
-                        ScrapYard.Instance.ApplyInventoryUI.LoadPosition(posNode);
-                    }
-                    else if (name == ScrapYard.Instance.InstanceSelectorUI.Title)
+                    if (name == ScrapYard.Instance.InstanceSelectorUI.Title)
                     {
                         ScrapYard.Instance.InstanceSelectorUI.LoadPosition(posNode);
                     }
@@ -117,7 +111,6 @@ namespace ScrapYard
             Directory.CreateDirectory(scrapYardPath + "/PluginData");
             ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
 
-            settingsNode.AddNode(ScrapYard.Instance.ApplyInventoryUI.SavePosition(false));
             settingsNode.AddNode(ScrapYard.Instance.InstanceSelectorUI.SavePosition(true));
             settingsNode.AddNode(ScrapYard.Instance.InstanceModulesUI.SavePosition(false));
             settingsNode.Save(settingsPath);

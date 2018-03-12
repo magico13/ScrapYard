@@ -18,6 +18,7 @@ namespace ScrapYard.UI
         private string _sellOrDiscard = "Discard";
 
         public event EventHandler Updated;
+        public InventoryPart BackingPart { get { return _backingPart; } }
 
         public PartInstance(PartInventory inventory, InventoryPart iPart, bool selling, Part toApply)
         {

@@ -194,7 +194,7 @@ namespace ScrapYard
             {
                 if (EditorLogic.SelectedPart == null)
                 {
-                    ScrapYard.Instance.ApplyInventoryUI.Show();
+                    ScrapYard.Instance.InstanceSelectorUI.Show();
                 }
                 else
                 {
@@ -240,7 +240,7 @@ namespace ScrapYard
             }
             else
             {
-                ScrapYard.Instance.ApplyInventoryUI.Close();
+                ScrapYard.Instance.InstanceSelectorUI.Close();
             }
         }
     }

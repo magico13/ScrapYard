@@ -9,10 +9,10 @@ namespace ScrapYard.UI
 {
     public class InstanceSelectorVM
     {
+        private const string DEFAULT_PART_TITLE = "No Part Active";
         private Part _cachedBasePart;
         private Part _cachedApplyPart;
         private PartInventory _cachedInventory;
-        private InventoryPart _cachedInventoryPart;
         private bool _shouldSell;
 
         public Part BasePart
@@ -21,7 +21,9 @@ namespace ScrapYard.UI
             set
             {
                 _cachedBasePart = value;
-                BackingInventoryPart = value != null ? new InventoryPart(value) : null;
+                BackingPartName = value?.partInfo.name;
+                SelectedPartName = value?.partInfo.title ?? DEFAULT_PART_TITLE;
+                UpdatePartList();
             }
         }
         public Part ApplyPart
@@ -29,24 +31,11 @@ namespace ScrapYard.UI
             get { return _cachedApplyPart; } private set { _cachedApplyPart = value; }
         }
 
-        public InventoryPart BackingInventoryPart
-        {
-            get { return _cachedInventoryPart; }
-            set
-            {
-                _cachedInventoryPart = value;
-                SelectedPartName = "A Part";
-                if (!string.IsNullOrEmpty(_cachedInventoryPart?.Name))
-                {
-                    SelectedPartName = Utils.AvailablePartFromName(_cachedInventoryPart.Name).title;
-                }
-                UpdatePartList();
-            }
-        }
+        public string BackingPartName { get; set; }
 
-        public string SelectedPartName { get; set; } = "A Part";
+        public string SelectedPartName { get; set; } = DEFAULT_PART_TITLE;
 
-        public Dictionary<long, List<PartInstance>> Parts { get; set; }
+        public List<List<PartInstance>> Parts { get; set; }
 
         public InstanceSelectorVM(PartInventory inventory, Part basePart, Part applyToPart, bool shouldSell)
         {
@@ -66,46 +55,35 @@ namespace ScrapYard.UI
 
         public void UpdatePartList()
         {
-            UpdatePartList(_cachedInventory, _cachedInventoryPart, _shouldSell);
+            UpdatePartList(_cachedInventory, BackingPartName, _shouldSell);
         }
 
-        public void UpdatePartList(PartInventory inventory, InventoryPart partBase, bool selling)
+        public void UpdatePartList(PartInventory inventory, string partName, bool selling)
         {
-            Parts = new Dictionary<long, List<PartInstance>>();
-            if (partBase == null)
+            Parts = new List<List<PartInstance>>();
+            if (partName == null)
             {
                 return;
             }
             IEnumerable<InventoryPart> foundParts;
-            foundParts = inventory?.FindParts(partBase, ComparisonStrength.NAME);
-            //if (partBase != null)
-            //{
-                
-            //}
-            //else
-            //{
-            //    foundParts = inventory?.GetAllParts();
-            //}
-
-            foundParts = foundParts ?? new List<InventoryPart>();
-
+            foundParts = inventory?.FindPartsByName(partName) ?? new List<InventoryPart>();
             foundParts = EditorHandling.FilterOutUsedParts(foundParts);
 
             foreach (InventoryPart iPart in foundParts)
             {
                 PartInstance instance = new PartInstance(inventory, iPart, selling, ApplyPart);
                 instance.Updated += Instance_Updated;
-                List<PartInstance> list;
-                if (Parts.TryGetValue(iPart.TrackerModule.TimesRecovered, out list))
+                List<PartInstance> list = Parts.FirstOrDefault(l => l.FirstOrDefault()?.BackingPart.IsSameAs(iPart, ComparisonStrength.TRACKER) == true);
+                if (list == null)
                 {
-                    list.Add(instance);
+                    list = new List<PartInstance>();
+                    Parts.Add(list);
                 }
-                else
-                {
-                    list = new List<PartInstance>() { instance };
-                }
-                Parts[iPart.TrackerModule.TimesRecovered] = list;
+                list.Add(instance);
             }
+
+            //sort by number of uses
+            Parts.Sort(leastToMostSorter);
         }
 
         public void RefreshApplyPart()
@@ -128,26 +106,87 @@ namespace ScrapYard.UI
         public void OnMouseOver()
         {
             //set a lock
-            //EditorLogic.fetch?.Lock(true, true, true, "ScrapYard_EditorLock");   
+            EditorLogic.fetch?.Lock(true, true, true, "ScrapYard_EditorLock");   
         }
 
         public void OnMouseExit()
         {
             //remove a lock
-            //EditorLogic.fetch?.Unlock("ScrapYard_EditorLock");
-        }
-
-        public void PutPartInEditorHand(Part p)
-        {
-            System.Reflection.MethodInfo picker = typeof(EditorLogic).GetMethod("pickPart", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
-            object result = picker?.Invoke(EditorLogic.fetch, new object[] { LayerUtil.DefaultEquivalent | 4 | 2097152, false, false });
-            Logging.DebugLog(result);
+            EditorLogic.fetch?.Unlock("ScrapYard_EditorLock");
         }
 
         private void Instance_Updated(object sender, EventArgs e)
         {
             UpdatePartList();   
+        }
+
+
+        public bool AutoApplyInventory
+        {
+            get
+            {
+                return ScrapYard.Instance.Settings.AutoApplyInventory;
+            }
+            set
+            {
+                if (value != AutoApplyInventory)
+                {
+                    ScrapYard.Instance.EditorVerificationRequired = true;
+                    ScrapYard.Instance.Settings.AutoApplyInventory = value;
+                }
+            }
+        }
+
+        public void ApplyInventoryToEditorVessel()
+        {
+            if (EditorLogic.fetch != null && EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts.Any())
+            {
+                InventoryManagement.ApplyInventoryToVessel(EditorLogic.fetch.ship.Parts);
+            }
+        }
+
+        public void MakeFresh()
+        {
+            if (EditorLogic.fetch != null && EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts.Any())
+            {
+                foreach (Part part in EditorLogic.fetch.ship)
+                {
+                    if (part.Modules.Contains("ModuleSYPartTracker"))
+                    {
+                        (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
+                    }
+                }
+                ScrapYardEvents.OnSYInventoryAppliedToVessel.Fire();
+                ScrapYard.Instance.EditorVerificationRequired = true;
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// Sorts the part instances from least to most uses
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>-1 if a is used less, 0 if equal, 1 if a is used more</returns>
+        private int leastToMostSorter(List<PartInstance> a, List<PartInstance> b)
+        {
+            int? usedA = a?.FirstOrDefault()?.BackingPart?.TrackerModule?.TimesRecovered;
+            int? usedB = b?.FirstOrDefault()?.BackingPart?.TrackerModule?.TimesRecovered;
+            if (usedA == null)
+            {
+                if (usedB != null)
+                {
+                    return 1;
+                }
+                return 0;
+            }
+            if (usedB == null)
+            {
+                return -1;
+            }
+            return usedA.Value.CompareTo(usedB.Value);
         }
     }
 }
