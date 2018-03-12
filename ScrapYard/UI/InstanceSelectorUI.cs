@@ -20,8 +20,6 @@ namespace ScrapYard.UI
 
             OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
             OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
-            //OnShow.Add(() => { GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced); });
-            //OnClose.Add(() => { GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced); });
         }
 
         public override void Draw(int windowID)
@@ -68,7 +66,9 @@ namespace ScrapYard.UI
                     {
                         GUILayout.BeginVertical(GUI.skin.textArea);
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label($"{instance.BackingPart.TrackerModule.TimesRecovered} Previous Uses");
+                        int recovered = instance.BackingPart.TrackerModule.TimesRecovered;
+                        string use = recovered != 1 ? "Uses" : "Use";
+                        GUILayout.Label($"{recovered} Previous {use}");
                         GUILayout.FlexibleSpace();
                         GUILayout.Label($"{list.Count} In Inventory");
                         GUILayout.EndHorizontal();

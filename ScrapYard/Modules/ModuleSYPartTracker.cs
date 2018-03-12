@@ -77,7 +77,8 @@ namespace ScrapYard.Modules
         {
             if (Inventoried)
             {
-                ScrapYard = $"{TimesRecovered} Previous Uses";
+                string use = TimesRecovered != 1 ? "Uses" : "Use";
+                ScrapYard = $"{TimesRecovered} Previous {use}";
             }
             else
             {

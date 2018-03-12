@@ -35,8 +35,6 @@ namespace ScrapYard.UI
 
         public void Draw()
         {
-            //GUILayout.Label(string.Format("Previous Uses: {0}", _backingPart?.TrackerModule?.TimesRecovered ?? 0));
-
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(_sellOrDiscard))
             {
