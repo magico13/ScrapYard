@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSP.UI.Screens;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,14 +10,15 @@ namespace ScrapYard.UI
     public class InstanceSelectorUI : WindowBase
     {
         protected Vector2 scrollPos;
-        protected bool dragging = false;
-        protected Vector2 lastMousePos;
+        
         
         public InstanceSelectorVM InstanceVM { get; set; }
 
         public InstanceSelectorUI() : base(3742, "Inventory", true, false)
         {
+            SetVisibleScenes(GameScenes.EDITOR);
             SetSize(500, 100, 300, Screen.height-200);
+            SetResizeable(true, true);
 
             OnMouseOver.Add(() => { InstanceVM.OnMouseOver(); });
             OnMouseExit.Add(() => { InstanceVM.OnMouseExit(); });
@@ -28,6 +30,10 @@ namespace ScrapYard.UI
             {
                 Close();
                 return;
+            }
+            if (ApplicationLauncher.Ready)
+            {
+                EventListeners.Instance.Button.SetTrue(false);
             }
             GUILayout.BeginVertical();
 
@@ -92,32 +98,6 @@ namespace ScrapYard.UI
                 InstanceVM.MakeFresh();
             }
             GUILayout.EndHorizontal();
-
-            //click near the bottom of the window, then drag
-            if ((Mouse.Left.GetButton() && dragging)
-                || (Mouse.Left.GetButtonDown() && Mouse.screenPos.x > WindowRect.xMin && Mouse.screenPos.x < WindowRect.xMax
-                && Mouse.screenPos.y > WindowRect.yMax - 10 && Mouse.screenPos.y < WindowRect.yMax))
-            {
-                if (!dragging)
-                {
-                    lastMousePos = Mouse.screenPos;
-                }
-
-                float dy = Mouse.screenPos.y - lastMousePos.y;
-
-                //resize
-                Rect oldSize = WindowRect;
-                SetSize(oldSize.xMin, oldSize.yMin, oldSize.width, oldSize.height + dy);
-                dragging = true;
-                Draggable = false;
-                lastMousePos = Mouse.screenPos;
-            }
-            else
-            {
-                dragging = false;
-                Draggable = true;
-            }
-
             GUILayout.EndVertical();
             base.Draw(windowID);
 

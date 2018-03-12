@@ -70,8 +70,6 @@
     <Compile Include="UI\InstanceModulesVM.cs" />
     <Compile Include="UI\InstanceSelectorUI.cs" />
     <Compile Include="UI\InstanceSelectorVM.cs" />
-    <Compile Include="UI\InventoryApplyUI.cs" />
-    <Compile Include="UI\InventoryApplyVM.cs" />
     <Compile Include="UI\PartInstance.cs" />
     <Compile Include="UI\WindowBase.cs" />
     <Compile Include="Utilities\EditorApplySpecialCases.cs" />

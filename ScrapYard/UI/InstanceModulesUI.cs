@@ -14,7 +14,9 @@ namespace ScrapYard.UI
         protected InstanceModulesVM _viewModel;
         public InstanceModulesUI() : base(3743, "Modules", true, false)
         {
+            SetVisibleScenes(GameScenes.EDITOR);
             SetSize((Screen.width - 500) / 2, 500, 500, 500);
+            SetResizeable(true, true);
         }
 
         public void SetUp(InstanceModulesVM viewModel)

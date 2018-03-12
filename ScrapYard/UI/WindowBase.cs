@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ScrapYard.UI
@@ -19,7 +20,7 @@ namespace ScrapYard.UI
             CenterWindow = centered;
         }
 
-        //public UIScenes VisibleScenes { get; set; } = UIScenes.All;
+        public List<GameScenes> VisibleScenes { get; set; } = new List<GameScenes>() { GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION };
 
         public int ID { get; private set; } = 8234;
         protected Rect _windowRect = new Rect((Screen.width - 300) / 2, (Screen.height / 4), 300, 1);
@@ -53,6 +54,8 @@ namespace ScrapYard.UI
 
         public bool CenterWindow { get; set; }
         public bool Draggable { get; set; } = true; //True by default
+        public bool ResizeHeight { get; set; }
+        public bool ResizeWidth { get; set; }
 
         public GUISkin Skin { get; set; }
 
@@ -67,6 +70,12 @@ namespace ScrapYard.UI
         /// Fires when the mouse leaves the window
         /// </summary>
         public EventVoid OnMouseExit = new EventVoid("OnMouseExit");
+
+        protected bool _resizingVertically = false;
+        protected bool _resizingHorizontally = false;
+        protected bool _resizing = false;
+        protected bool _shouldAllowDragging = false;
+        protected Vector2 _lastMousePos;
 
         protected bool _mouseOver;
         /// <summary>
@@ -115,6 +124,47 @@ namespace ScrapYard.UI
         /// <param name="windowID">The window's id</param>
         public virtual void Draw(int windowID)
         {
+            if (ResizeHeight && !_resizingVertically)
+            {
+                //check if left clicked near bottom edge of window
+                _resizingVertically = (Mouse.Left.GetButtonDown() && Mouse.screenPos.x > WindowRect.xMin && Mouse.screenPos.x < WindowRect.xMax
+                && Mouse.screenPos.y > WindowRect.yMax - 10 && Mouse.screenPos.y < WindowRect.yMax);
+            }
+            if (ResizeWidth && !_resizingHorizontally)
+            {
+                //check if left clicked near right edge of window
+                _resizingHorizontally = (Mouse.Left.GetButtonDown() && Mouse.screenPos.x > WindowRect.xMax-10 && Mouse.screenPos.x < WindowRect.xMax
+                && Mouse.screenPos.y > WindowRect.yMin && Mouse.screenPos.y < WindowRect.yMax);
+            }
+
+            //click near the bottom of the window, then drag
+            if ((Mouse.Left.GetButton() && (_resizing || _resizingHorizontally || _resizingVertically)))
+            {
+                if (!_resizing)
+                {
+                    _lastMousePos = Mouse.screenPos;
+                    _resizing = true;
+                    _shouldAllowDragging = Draggable;
+                    Draggable = false;
+                }
+
+                float dx = _resizingHorizontally ? (Mouse.screenPos.x - _lastMousePos.x) : 0;
+                float dy = _resizingVertically ? (Mouse.screenPos.y - _lastMousePos.y) : 0;
+
+                //resize
+                Rect oldSize = WindowRect;
+                SetSize(oldSize.xMin, oldSize.yMin, oldSize.width + dx, oldSize.height + dy);
+                
+                _lastMousePos = Mouse.screenPos;
+            }
+            else if (_resizing)
+            {
+                _resizing = false;
+                _resizingHorizontally = false;
+                _resizingVertically = false;
+                Draggable = _shouldAllowDragging;
+            }
+
             if (Draggable)
             {
                 dragWindow();
@@ -124,11 +174,9 @@ namespace ScrapYard.UI
         /// <summary>
         /// Handles all drawing of the window and handling of the Rect object. Call from OnGUI and magic happens.
         /// </summary>
-        /// <param name="id">The (preferably unique) int ID of the window.</param>
-        /// <param name="title">The window's title.</param>
         public void OnGUIHandler()
         {
-            if (IsVisible)
+            if (IsVisible && VisibleScenes.Contains(HighLogic.LoadedScene)) //don't draw if not in a supported scene
             {
                 _windowRect = GUILayout.Window(ID, _windowRect, Draw, Title);
                 if (CenterWindow)
@@ -138,6 +186,17 @@ namespace ScrapYard.UI
             }
             //trigger mouse events if hovering on/off
             MouseIsOver = checkMouseOver();
+        }
+
+        /// <summary>
+        /// Sets whether the window can be resized
+        /// </summary>
+        /// <param name="vertical">Set true to allow vertically resizing</param>
+        /// <param name="horizontal">Set true to allow horizontally resizing</param>
+        public void SetResizeable(bool vertical, bool horizontal)
+        {
+            ResizeHeight = vertical;
+            ResizeWidth = horizontal;
         }
 
         /// <summary>
@@ -153,13 +212,30 @@ namespace ScrapYard.UI
             _windowRect = new Rect((float)left, (float)top, (float)width, (float)height);
         }
 
-
         /// <summary>
         /// Sets the height of the window to 1 so it can automatically resize to the correct height
         /// </summary>
         public void MinimizeHeight()
         {
             _windowRect.height = 1;
+        }
+
+        /// <summary>
+        /// Sets the scenes that this window should be visible in
+        /// </summary>
+        /// <param name="scenes">Enumerable of scenes</param>
+        public void SetVisibleScenes(IEnumerable<GameScenes> scenes)
+        {
+            VisibleScenes = scenes.ToList();
+        }
+
+        /// <summary>
+        /// Sets the scenes that this window should be visible in
+        /// </summary>
+        /// <param name="scenes">Params array of scenes</param>
+        public void SetVisibleScenes(params GameScenes[] scenes)
+        {
+            VisibleScenes = scenes.ToList();
         }
 
         /// <summary>
