@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ScrapYard
 {
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT })]
-    class ScrapYard : ScenarioModule
+    public class ScrapYard : ScenarioModule
     {
         public static ScrapYard Instance { get; private set; }
         public PartInventory TheInventory { get; } = new PartInventory();
