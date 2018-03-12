@@ -11,7 +11,7 @@ namespace ScrapYard.UI
         protected Vector2 scrollPos;
         protected bool dragging = false;
         protected Vector2 lastMousePos;
-
+        
         public InstanceSelectorVM InstanceVM { get; set; }
 
         public InstanceSelectorUI() : base(3742, "Inventory", true, false)
@@ -96,7 +96,7 @@ namespace ScrapYard.UI
             //click near the bottom of the window, then drag
             if ((Mouse.Left.GetButton() && dragging)
                 || (Mouse.Left.GetButtonDown() && Mouse.screenPos.x > WindowRect.xMin && Mouse.screenPos.x < WindowRect.xMax
-                && Mouse.screenPos.y > WindowRect.yMax - 5 && Mouse.screenPos.y < WindowRect.yMax))
+                && Mouse.screenPos.y > WindowRect.yMax - 10 && Mouse.screenPos.y < WindowRect.yMax))
             {
                 if (!dragging)
                 {
@@ -119,7 +119,20 @@ namespace ScrapYard.UI
             }
 
             GUILayout.EndVertical();
-            base.Draw(windowID);    
+            base.Draw(windowID);
+
+            //if clicked and holding a part, disable the on_partDropped event
+            if (MouseIsOver)
+            {
+                if (Mouse.Left.GetButtonDown())
+                {
+                    InstanceVM.DisablePartDropping();
+                }
+            }
+            else
+            {
+                InstanceVM.RestorePartDropping();
+            }
         }
 
         public void Show(Part basePart, Part applyTo)
@@ -136,18 +149,5 @@ namespace ScrapYard.UI
             base.Show();
             InstanceVM = new InstanceSelectorVM();
         }
-
-
-        /// <summary>
-        /// Used to put the part back in the editor's hand, since no locks will stop placement
-        /// </summary>
-        /// <param name="p"></param>
-        //private void OnEditorPartPlaced(Part p)
-        //{
-        //    if (MouseIsOver)
-        //    {
-        //        InstanceVM.PutPartInEditorHand(p);
-        //    }
-        //}
     }
 }

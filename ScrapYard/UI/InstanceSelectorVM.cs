@@ -15,6 +15,9 @@ namespace ScrapYard.UI
         private PartInventory _cachedInventory;
         private bool _shouldSell;
 
+        private static KFSMEventCondition on_partDropped_Backup = null;
+        private static KFSMState st_place_Backup = null;
+
         public Part BasePart
         {
             get { return _cachedBasePart; }
@@ -161,7 +164,57 @@ namespace ScrapYard.UI
             }
         }
 
+        /// <summary>
+        /// Forcibly disables the ability to drop parts in the editor
+        /// </summary>
+        public void DisablePartDropping()
+        {
+            if (on_partDropped_Backup == null)
+            {
+                KFSMEvent on_partDropped = EditorLogic.fetch.GetType().GetField("on_partDropped", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(EditorLogic.fetch) as KFSMEvent;
+                if (on_partDropped != null)
+                {
+                    on_partDropped_Backup = on_partDropped.OnCheckCondition;
+                    on_partDropped.OnCheckCondition = (s) => false;
+                    Logging.DebugLog("Disabled on_partDropped");
+                }
+            }
+            if (st_place_Backup == null)
+            {
+                KFSMState st_place = EditorLogic.fetch.GetType().GetField("st_place", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(EditorLogic.fetch) as KFSMState;
+                if (st_place != null)
+                {
+                    st_place_Backup = st_place;
+                    EditorLogic.fetch.GetType().GetField("st_place", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.SetValue(EditorLogic.fetch, null);
+                    Logging.DebugLog("Disabled st_place");
+                }
+            }
+        }
 
+        /// <summary>
+        /// Forcibly restores the ability to drop parts in the editor
+        /// </summary>
+        public void RestorePartDropping()
+        {
+            if (st_place_Backup != null)
+            {
+                EditorLogic.fetch.GetType().GetField("st_place", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.SetValue(EditorLogic.fetch, st_place_Backup);
+                st_place_Backup = null;
+                Logging.DebugLog("Restored st_place");
+            }
+            if (on_partDropped_Backup != null)
+            {
+                KFSMEvent on_partDropped = EditorLogic.fetch.GetType().GetField("on_partDropped", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(EditorLogic.fetch) as KFSMEvent;
+                if (on_partDropped != null)
+                {
+                    on_partDropped.OnCheckCondition = on_partDropped_Backup;
+                    on_partDropped_Backup = null;
+                    Logging.DebugLog("Restored on_partDropped");
+                    
+                }
+                
+            }
+        }
 
 
         /// <summary>
