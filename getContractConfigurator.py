@@ -1,10 +1,10 @@
 import urllib
-import ast
+import json
 import os
 
 #get the latest artifact name
 latestBuild = "https://api.github.com/repos/jrossignol/ContractConfigurator/releases/latest"
-tree = ast.literal_eval(urllib.urlopen(latestBuild).read())
+tree = json.loads(urllib.urlopen(latestBuild).read())
 
 downloadLink = ""
 name = ""
