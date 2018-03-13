@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ScrapYard_ContractConfigurator
 {
-    public class ChangeInventoryPartsBehaviourFactory : BehaviourFactory
+    public class ChangeInventoryPartsFactory : BehaviourFactory
     {
         protected bool _adding = false;
         protected List<ConfigNode> _partNodes = new List<ConfigNode>();
@@ -36,7 +36,7 @@ namespace ScrapYard_ContractConfigurator
 
         public override ContractBehaviour Generate(ConfiguredContract contract)
         {
-            return new ChangeInventoryPartsBehaviour(_adding, _partNodes);
+            return new ChangeInventoryParts(_adding, _partNodes);
         }
     }
 }

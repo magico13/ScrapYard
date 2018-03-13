@@ -48,8 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChangeInventoryPartsBehaviour.cs" />
-    <Compile Include="ChangeInventoryPartsBehaviourFactory.cs" />
+    <Compile Include="ChangeInventoryParts.cs" />
+    <Compile Include="ChangeInventoryPartsFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,4 +59,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Users\magico13\Desktop\KSP_Modding\Tools\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"
+xcopy /Y "$(TargetPath)" "D:\SteamLibrary\SteamApps\common\Kerbal Space Program\GameData\ScrapYard\"
+xcopy /Y "$(TargetDir)$(TargetName).pdb" "D:\SteamLibrary\SteamApps\common\Kerbal Space Program\GameData\ScrapYard\"
+xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "D:\SteamLibrary\SteamApps\common\Kerbal Space Program\GameData\ScrapYard\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

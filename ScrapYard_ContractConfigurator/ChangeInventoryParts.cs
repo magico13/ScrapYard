@@ -8,24 +8,26 @@ using ScrapYard;
 
 namespace ScrapYard_ContractConfigurator
 {
-    public class ChangeInventoryPartsBehaviour : ContractBehaviour
+    public class ChangeInventoryParts : ContractBehaviour
     {
         protected bool _adding;
         protected List<ConfigNode> _parts;
 
-        public ChangeInventoryPartsBehaviour(bool adding, List<ConfigNode> parts)
+        public ChangeInventoryParts() { }
+
+        public ChangeInventoryParts(bool adding, List<ConfigNode> parts)
         {
             _adding = adding;
             _parts = parts;
         }
 
-        protected override void OnAccepted() { }
-        protected override void OnCancelled() { }
-        protected override void OnCompleted() { }
-        protected override void OnDeadlineExpired() { }
+        protected override void OnAccepted() { ChangeParts(); }
+        protected override void OnCancelled() { ChangeParts(); }
+        protected override void OnCompleted() { ChangeParts(); }
+        protected override void OnDeadlineExpired() { ChangeParts(); }
         protected override void OnDeclined() { }
-        protected override void OnFailed() { }
-        protected override void OnFinished() { }
+        protected override void OnFailed() { ChangeParts(); }
+        protected override void OnFinished() { ChangeParts(); }
         protected override void OnGenerateFailed() { }
         protected override void OnOffered() { }
         protected override void OnOfferExpired() { }
@@ -33,7 +35,7 @@ namespace ScrapYard_ContractConfigurator
         protected override void OnRegister() { }
         protected override void OnUnregister() { }
         protected override void OnUpdate() { }
-        protected override void OnWithdrawn() { }
+        protected override void OnWithdrawn() { ChangeParts(); }
         protected override void OnLoad(ConfigNode configNode)
         {
             _adding = ConfigNodeUtil.ParseValue<bool>(configNode, "ShouldAdd");
@@ -48,8 +50,6 @@ namespace ScrapYard_ContractConfigurator
                 configNode.AddNode(node);
             }
         }
-
-
 
         protected void ChangeParts()
         {

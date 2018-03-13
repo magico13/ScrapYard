@@ -194,3 +194,4 @@ ModelManifest.xml
 /.vs/ScrapYard/v15/Server/sqlite3/db.lock
 /.vs/slnx.sqlite
 *.dll
+/.vs/config/applicationhost.config
