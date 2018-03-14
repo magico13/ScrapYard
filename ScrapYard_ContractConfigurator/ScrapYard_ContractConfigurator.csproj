@@ -48,8 +48,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChangeInventoryParts.cs" />
-    <Compile Include="ChangeInventoryPartsFactory.cs" />
+    <Compile Include="Behaviour\ChangeInventoryParts.cs" />
+    <Compile Include="BehaviourFactory\ChangeInventoryPartsFactory.cs" />
+    <Compile Include="Helpers\IntermediateInventoryPart.cs" />
+    <Compile Include="Helpers\ChangeInventoryPartsHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

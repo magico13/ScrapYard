@@ -72,7 +72,7 @@ namespace ScrapYard
                 }
             }
 
-            Logging.DebugLog($"InventoryChangedEvent - part: {p.Name} - added: {added}");
+            Logging.Log($"InventoryChangedEvent - part: '{p.Name}' added? {added}");
         }
 
         public void VesselRecovered(ProtoVessel vessel, bool someBool)

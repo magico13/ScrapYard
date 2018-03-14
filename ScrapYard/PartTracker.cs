@@ -52,7 +52,7 @@ namespace ScrapYard
             {
                 return;
             }
-            Logging.DebugLog("Adding build (parts)");
+            Logging.Log("Adding build (parts)");
             Dictionary<InventoryPart, TrackType> uniqueParts = new Dictionary<InventoryPart, TrackType>();
             foreach (Part part in parts) //add a use for each part and get the unique parts for the build tracker
             {
@@ -94,7 +94,7 @@ namespace ScrapYard
             {
                 return;
             }
-            Logging.DebugLog("Adding build (nodes)");
+            Logging.Log("Adding build (nodes)");
             Dictionary<InventoryPart, TrackType> uniqueParts = new Dictionary<InventoryPart, TrackType>();
             foreach (ConfigNode partNode in partNodes) //add a use for each part and get the unique parts for the build tracker
             {
@@ -220,7 +220,7 @@ namespace ScrapYard
             {
                 _buildTracker[found].usesNew++;
             }
-            Logging.DebugLog($"{found.Name} has been used {_buildTracker[found].usesTotal}/{_buildTracker[found].usesNew}/{_buildTracker[found].usesInventoried} (T/N/I) times.");
+            Logging.Log($"{found.Name} has been used {_buildTracker[found].usesTotal}/{_buildTracker[found].usesNew}/{_buildTracker[found].usesInventoried} (T/N/I) times.");
             return found;
         }
 
@@ -251,7 +251,7 @@ namespace ScrapYard
             {
                 _buildTracker[found].buildsNew++;
             }
-            Logging.DebugLog($"{found.Name} has been used {_buildTracker[found].buildsTotal}/{_buildTracker[found].buildsNew}/{_buildTracker[found].buildsInventoried} (T/N/I) times.");
+            Logging.Log($"{found.Name} has been used {_buildTracker[found].buildsTotal}/{_buildTracker[found].buildsNew}/{_buildTracker[found].buildsInventoried} (T/N/I) times.");
             return found;
         }
 
@@ -360,7 +360,7 @@ namespace ScrapYard
                     }
                     catch (Exception ex)
                     {
-                        Logging.Log("Error while loading part tracker with node: " + node.name);
+                        Logging.Log("Error while loading part tracker with node: " + node.name, Logging.LogType.ERROR);
                         Logging.LogException(ex);
                     }
                 }

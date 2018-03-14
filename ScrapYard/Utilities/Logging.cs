@@ -26,7 +26,7 @@ namespace ScrapYard
             public void Dispose()
             {
                 _watch.Stop();
-                Log($"{_msg}: {_watch.ElapsedMilliseconds}ms");
+                DebugLog($"{_msg}: {_watch.ElapsedMilliseconds}ms");
             }
 
             internal static Timer StartNew(string message)
@@ -47,9 +47,14 @@ namespace ScrapYard
         /// <param name="type">The type of message being logged (severity)</param>
         internal static void DebugLog(object msg, LogType type = LogType.INFO)
         {
+            bool shouldLog = ScrapYard.Instance.Settings.CurrentSaveSettings.DebugLogging;
 #if DEBUG
-            Log(msg, type);
+            shouldLog = true;
 #endif
+            if (shouldLog)
+            {
+                Log(msg, type);
+            }
         }
 
         /// <summary>

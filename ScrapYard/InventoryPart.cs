@@ -489,10 +489,8 @@ namespace ScrapYard
                         value.TryGetValue("_timesRecovered", ref timesRecovered) |
                         value.TryGetValue("_inventoried", ref inventoried)) // the single | makes all of them happen, we need at least one to succeed
                     {
-                        if (uint.TryParse(idStr, out uint id))
-                        {
-                            TrackerModule = new TrackerModuleWrapper(id, timesRecovered, inventoried);
-                        }
+                        uint.TryParse(idStr, out uint id);
+                        TrackerModule = new TrackerModuleWrapper(id, timesRecovered, inventoried);
                     }
 
 

@@ -65,7 +65,7 @@ namespace ScrapYard.Utilities
                         tracker.TimesRecovered = inInventory.TrackerModule.TimesRecovered;
                         tracker.Inventoried = inInventory.TrackerModule.Inventoried;
                         tracker.ID = inInventory.ID;
-                        Logging.DebugLog($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
+                        Logging.Log($"Copied tracker. Recovered {tracker.TimesRecovered} times with id {tracker.ID}");
                     }
                 }
             }
@@ -146,7 +146,7 @@ namespace ScrapYard.Utilities
                         //basically we say that you cant bring your own inventory parts and must buy ours for 4x the cost :P
 
                         //reset their tracker status
-                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                        Logging.Log($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
                         (part.Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                     }
                 }
@@ -188,7 +188,7 @@ namespace ScrapYard.Utilities
                     else
                     {
                         //reset their tracker status
-                        Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                        Logging.Log($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
                         ConfigNode tracker = partNode.GetNodes("MODULE").FirstOrDefault(n => n.GetValue("name") == "ModuleSYPartTracker");
                         tracker.SetValue("ID", Guid.NewGuid().ToString());
                         tracker.SetValue("TimeRecovered", 0);

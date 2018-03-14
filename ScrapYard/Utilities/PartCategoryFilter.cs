@@ -19,7 +19,6 @@ namespace ScrapYard.Utilities
         {
             IconLoader loader = UnityEngine.Object.FindObjectOfType<IconLoader>();
             Icon icon = loader.icons.FirstOrDefault(i => string.Equals(i.name, "stockIcon_structural", StringComparison.Ordinal));
-            Logging.DebugLog(icon.name);
             PartCategorizer.Category category =  PartCategorizer.AddCustomFilter("ScrapYard", "ScrapYard", icon, new UnityEngine.Color(0.75f, 0.75f, 0.75f));
             category.displayType = EditorPartList.State.PartsList;
             category.exclusionFilter = PartCategorizer.Instance.filterGenericNothing;

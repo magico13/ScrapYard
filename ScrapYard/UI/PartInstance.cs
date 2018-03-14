@@ -78,7 +78,7 @@ namespace ScrapYard.UI
                     InventoryPart removed = _backingInventory.RemovePart(_backingPart, ComparisonStrength.STRICT);
                     if (removed != null)
                     {
-                        Logging.DebugLog($"Sold/Discarded {removed.Name}:{removed.ID}");
+                        Logging.Log($"Sold/Discarded {removed.Name}:{removed.ID}");
                         if (_selling)
                         {
                             Funding.Instance?.AddFunds(removed.DryCost, TransactionReasons.Vessels);

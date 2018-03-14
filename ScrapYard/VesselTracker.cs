@@ -29,7 +29,7 @@ namespace ScrapYard
             tracker.TryGetValue(id, out originalState);
             tracker[id] = partsProcessed;
 
-            Logging.DebugLog($"Tracking vessel '{id}'. Original state: {originalState} New state: {partsProcessed}");
+            Logging.Log($"Tracking vessel '{id}'. Original state: {originalState} New state: {partsProcessed}");
 
             return originalState;
         }
@@ -88,7 +88,7 @@ namespace ScrapYard
                 return false;
             }
 
-            Logging.DebugLog($"Removing tracking of vessel '{vesselID}'.");
+            Logging.Log($"Removing tracking of vessel '{vesselID}'.");
             return tracker.Remove(vesselID.GetValueOrDefault());
         }
 
@@ -129,7 +129,7 @@ namespace ScrapYard
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log("Exception while assigning VesselTracker");
+                    Logging.Log("Exception while assigning VesselTracker", Logging.LogType.ERROR);
                     Logging.LogException(ex);
                 }
             }

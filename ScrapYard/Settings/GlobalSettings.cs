@@ -87,7 +87,7 @@ namespace ScrapYard
             {
                 _partBlacklist.AddRange(blacklistNode.GetValues("name"));
             }
-            Logging.DebugLog($"Blacklisted {PartBlacklist.Count()} parts.");
+            Logging.Log($"Blacklisted {PartBlacklist.Count()} parts.");
 
             ModuleTemplates.Clear();
             ForbiddenTemplates.Clear();
@@ -103,7 +103,7 @@ namespace ScrapYard
                 ModuleTemplate template = new ModuleTemplate(moduleTemplate);
                 ForbiddenTemplates.Add(template);
             }
-            Logging.DebugLog($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
+            Logging.Log($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
         }
 
         public void SaveSettings()

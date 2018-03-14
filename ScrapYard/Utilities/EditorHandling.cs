@@ -55,7 +55,7 @@ namespace ScrapYard.Utilities
                             if (inInventory == null)
                             {
                                 //reset their tracker status
-                                Logging.DebugLog($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
+                                Logging.Log($"Found inventory part on vessel that is not in inventory. Resetting. {iPart.Name}:{iPart.ID}");
                                 (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                             }
                             removeTime += remWatch.ElapsedMilliseconds;
@@ -68,7 +68,7 @@ namespace ScrapYard.Utilities
                             if (inInventory != null)
                             {
                                 //found a part that is sharing an ID but shouldn't be
-                                Logging.DebugLog($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
+                                Logging.Log($"Found part on vessel with same ID as inventory part, but not matching. Resetting. {iPart.Name}:{iPart.ID}");
                                 (EditorLogic.fetch.ship.Parts[i].Modules["ModuleSYPartTracker"] as ModuleSYPartTracker).MakeFresh();
                             }
                             
@@ -76,9 +76,9 @@ namespace ScrapYard.Utilities
                         }
                     }
                 }
-                Logging.Log($"Constructor: {constTime}");
-                Logging.Log($"Removal: {removeTime}");
-                Logging.Log($"Finding: {findTime}");
+                Logging.DebugLog($"Constructor: {constTime}");
+                Logging.DebugLog($"Removal: {removeTime}");
+                Logging.DebugLog($"Finding: {findTime}");
                 //Logging.Log($"Freshening: {freshTime}");
             }
             using (Logging.Timer.StartNew("Update Part List"))
