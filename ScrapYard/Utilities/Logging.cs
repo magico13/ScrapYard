@@ -47,7 +47,7 @@ namespace ScrapYard
         /// <param name="type">The type of message being logged (severity)</param>
         internal static void DebugLog(object msg, LogType type = LogType.INFO)
         {
-            bool shouldLog = ScrapYard.Instance.Settings.CurrentSaveSettings.DebugLogging;
+            bool shouldLog = ScrapYard.Instance?.Settings?.CurrentSaveSettings?.DebugLogging ?? false;
 #if DEBUG
             shouldLog = true;
 #endif
