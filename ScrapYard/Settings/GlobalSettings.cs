@@ -6,8 +6,9 @@ namespace ScrapYard
 {
     public class GlobalSettings
     {
-        private static string scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
-        private static string settingsPath = scrapYardPath + "/PluginData/ScrapYard.cfg";
+        private static string _scrapYardPath;
+        private static string _settingsPath;
+        private static bool _initialized = false;
 
 
         [Persistent]
@@ -60,12 +61,24 @@ namespace ScrapYard
             
         }
 
+        public void Initialize()
+        {
+            if (!_initialized)
+            {
+                Logging.DebugLog("Initializing GlobalSettings");
+                _scrapYardPath = KSPUtil.ApplicationRootPath + "/GameData/ScrapYard";
+                _settingsPath = _scrapYardPath + "/PluginData/ScrapYard.cfg";
+                _initialized = true;
+            }
+        }
+
         public void LoadSettings()
         {
+            Initialize();
             //load the setting file, a confignode
-            if (File.Exists(settingsPath))
+            if (File.Exists(_settingsPath))
             {
-                ConfigNode settingsNode = ConfigNode.Load(settingsPath);
+                ConfigNode settingsNode = ConfigNode.Load(_settingsPath);
                 ConfigNode.LoadObjectFromConfig(this, settingsNode);
 
                 foreach (ConfigNode posNode in settingsNode.GetNodes("POSITION"))
@@ -108,12 +121,13 @@ namespace ScrapYard
 
         public void SaveSettings()
         {
-            Directory.CreateDirectory(scrapYardPath + "/PluginData");
+            Initialize();
+            Directory.CreateDirectory(_scrapYardPath + "/PluginData");
             ConfigNode settingsNode = ConfigNode.CreateConfigFromObject(this);
 
             settingsNode.AddNode(ScrapYard.Instance.InstanceSelectorUI.SavePosition(true));
             settingsNode.AddNode(ScrapYard.Instance.InstanceModulesUI.SavePosition(false));
-            settingsNode.Save(settingsPath);
+            settingsNode.Save(_settingsPath);
         }
     }
 }

@@ -364,7 +364,7 @@ namespace ScrapYard
             }
             //try to get the ID out of the list
             uint ID = 0;
-            if (partNodes.FirstOrDefault()?.TryGetValue("persistentID", ref ID) != true)
+            if (partNodes.FirstOrDefault()?.TryGetValue("persistentId", ref ID) != true)
             {
                 return false; //for now we can't process this vessel. Sorry. Maybe later we'll be able to add the module
             }

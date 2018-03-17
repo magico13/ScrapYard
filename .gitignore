@@ -195,3 +195,4 @@ ModelManifest.xml
 /.vs/slnx.sqlite
 *.dll
 /.vs/config/applicationhost.config
+/.vs/VSWorkspaceState.json

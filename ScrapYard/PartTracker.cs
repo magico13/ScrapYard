@@ -251,7 +251,7 @@ namespace ScrapYard
             {
                 _buildTracker[found].buildsNew++;
             }
-            Logging.Log($"{found.Name} has been used {_buildTracker[found].buildsTotal}/{_buildTracker[found].buildsNew}/{_buildTracker[found].buildsInventoried} (T/N/I) times.");
+            Logging.Log($"{found.Name} has been used in {_buildTracker[found].buildsTotal}/{_buildTracker[found].buildsNew}/{_buildTracker[found].buildsInventoried} (T/N/I) builds.");
             return found;
         }
 
