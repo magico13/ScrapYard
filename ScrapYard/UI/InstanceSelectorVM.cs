@@ -94,6 +94,7 @@ namespace ScrapYard.UI
             if (ApplyPart != null)
             {
                 ApplyPart.Modules.GetModule<ModuleSYPartTracker>()?.MakeFresh();
+                ScrapYardEvents.OnSYInventoryAppliedToPart.Fire(ApplyPart);
                 UpdatePartList();
             }
         }

@@ -83,13 +83,13 @@ namespace ScrapYard
         /// <returns>True if removed, false otherwise.</returns>
         public bool Remove(uint? vesselID)
         {
-            if (!IsProcessed(vesselID))
-            {
-                return false;
-            }
+            bool status = tracker.Remove(vesselID.GetValueOrDefault());
 
-            Logging.Log($"Removing tracking of vessel '{vesselID}'.");
-            return tracker.Remove(vesselID.GetValueOrDefault());
+            if (status)
+            {
+                Logging.Log($"Removing tracking of vessel '{vesselID}'.");
+            }
+            return status;
         }
 
         /// <summary>

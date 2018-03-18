@@ -413,7 +413,12 @@ namespace ScrapYard
         {
             if (uint.TryParse(id, out uint vesselID))
             {
-                return ScrapYard.Instance.ProcessedTracker.TrackVessel(vesselID, newStatus);
+                bool previous = ScrapYard.Instance.ProcessedTracker.TrackVessel(vesselID, newStatus);
+                if (!newStatus)
+                {
+                    //fully remove tracking
+                    ScrapYard.Instance.ProcessedTracker.Remove(vesselID);
+                }
             }
             return false;
         }

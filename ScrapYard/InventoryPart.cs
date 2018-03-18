@@ -549,6 +549,8 @@ namespace ScrapYard
             {
                 copy.TrackerModule = new TrackerModuleWrapper(TrackerModule.ID.Value, TrackerModule.TimesRecovered, TrackerModule.Inventoried);
             }
+            //force the ID just to be sure
+            copy.ID = ID;
 
             return copy;
         }
