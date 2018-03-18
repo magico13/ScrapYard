@@ -427,6 +427,8 @@ namespace ScrapYard
                     tracker.ID = TrackerModule.ID.GetValueOrDefault();
                 }
             }
+            //fire part changed event
+            ScrapYardEvents.OnSYInventoryAppliedToPart.Fire(part);
             return true;
         }
 
