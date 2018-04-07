@@ -28,7 +28,7 @@ patch = fileJSON["VERSION"]["PATCH"]
 
 version = '{0}.{1}.{2}.{3}'.format(major, minor, patch, build)
 
-print('Version is '+version+'\n')
+print('Version is '+version)
 
 #update the VersionInfo.cs file
 print("Setting .dll version")

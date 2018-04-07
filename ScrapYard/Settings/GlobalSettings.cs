@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ScrapYard.Refurbishment;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -24,6 +25,7 @@ namespace ScrapYard
 
         public ModuleTemplateList ForbiddenTemplates { get; private set; } = new ModuleTemplateList();
 
+        public List<BasicRefurb> AutomaticRefurbishment { get; private set; } = new List<BasicRefurb>();
 
         private List<string> _partBlacklist = new List<string>();
         public IEnumerable<string> PartBlacklist
@@ -117,6 +119,14 @@ namespace ScrapYard
                 ForbiddenTemplates.Add(template);
             }
             Logging.Log($"Loaded {ModuleTemplates.Count} module templates and {ForbiddenTemplates.Count} forbidden templates.");
+
+            AutomaticRefurbishment.Clear();
+            foreach (ConfigNode refurbTemplate in GameDatabase.Instance.GetConfigNodes("SY_AUTO_REFURB"))
+            {
+                BasicRefurb refurb = new BasicRefurb(refurbTemplate);
+                AutomaticRefurbishment.Add(refurb);
+            }
+            Logging.Log($"Automatically refurbishing {AutomaticRefurbishment.Count} modules.");
         }
 
         public void SaveSettings()

@@ -48,6 +48,8 @@ namespace ScrapYard
                 return null;
             }
             part.TrackerModule.Inventoried = true;
+            //run auto-refurbishment
+            ScrapYard.Instance.Settings.AutomaticRefurbishment.ForEach(r => r.Refurbish(part));
             internalInventory.Add(part);
             if (!disableEvents)
             {
