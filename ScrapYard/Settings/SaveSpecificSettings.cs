@@ -67,6 +67,9 @@ namespace ScrapYard
         [GameParameters.CustomParameterUI("Override Funds (WIP)", toolTip = "Enable this to make it so pulling parts from the inventory reduces costs, but recovery costs funds.\nStill under development.")]
         public bool OverrideFunds = false;
 
+        [GameParameters.CustomIntParameterUI("Sale Percentage", toolTip = "When overriding funds, defines the percentage you get back from selling used parts.", minValue = 0, maxValue = 100, stepSize = 1)]
+        public int FundsSalePercent = 100;
+
         [GameParameters.CustomParameterUI("Debug Logging", toolTip = "Enabling this turns on debug logging, which provides additional information in the KSP log for ScrapYard.")]
         public bool DebugLogging = false;
 

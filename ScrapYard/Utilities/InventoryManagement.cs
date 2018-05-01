@@ -114,6 +114,35 @@ namespace ScrapYard.Utilities
             GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
         }
 
+        /// <summary>
+        /// Sells/Discards parts from the inventory. Removes the parts from the inventory and refunds the correct amount.
+        /// </summary>
+        /// <param name="parts">The parts to sell</param>
+        /// <returns>The total value of the sale</returns>
+        public static double SellParts(IEnumerable<InventoryPart> parts)
+        {
+            double totalValue = 0;
+            foreach (InventoryPart part in parts)
+            {
+                double value = 0;
+                if (part.TrackerModule.Inventoried)
+                {
+                    InventoryPart inInventory = ScrapYard.Instance.TheInventory.RemovePart(part, ComparisonStrength.STRICT); //strict, we only remove parts that are exact
+                    if (inInventory != null)
+                    {
+                        value = inInventory.DryCost * ScrapYard.Instance.Settings.CurrentSaveSettings.FundsSalePercent / 100.0;
+                        Logging.DebugLog($"Selling/Discarding a part in inventory for {inInventory.Name} for {value} funds ({ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds}). id: {inInventory.ID}");
+                        //add funds back if active
+                        if (ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds)
+                        {
+                            Funding.Instance?.AddFunds(value, TransactionReasons.VesselRollout);
+                        }
+                    }
+                }
+                totalValue += value;
+            }
+            return totalValue;
+        }
 
         /// <summary>
         /// Removes any inventory parts from the inventory (vessel rollout, KCT construction)

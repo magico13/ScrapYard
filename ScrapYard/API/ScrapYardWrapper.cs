@@ -201,6 +201,34 @@ namespace ScrapYard
         }
 
         /// <summary>
+        /// Sells/Discards parts out of the inventory
+        /// </summary>
+        /// <param name="parts">The parts to sell</param>
+        /// <returns>The total value of the sale</returns>
+        public static double SellParts(IEnumerable<Part> parts)
+        {
+            if (!Available)
+            {
+                return 0;
+            }
+            return (double)invokeMethod("SellParts_Parts", parts);
+        }
+
+        /// <summary>
+        /// Sells/Discards parts out of the inventory
+        /// </summary>
+        /// <param name="parts">The parts to sell</param>
+        /// <returns>The total value of the sale</returns>
+        public static double SellParts(IEnumerable<ConfigNode> parts)
+        {
+            if (!Available)
+            {
+                return 0;
+            }
+            return (double)invokeMethod("SellParts_Nodes", parts);
+        }
+
+        /// <summary>
         /// Finds a part in the inventory for the given part
         /// </summary>
         /// <param name="part">The part to search for</param>
@@ -564,6 +592,17 @@ namespace ScrapYard
             get
             {
                 return Available ? (bool)invokeMethod("GetSetting_OverrideFunds") : false;
+            }
+        }
+
+        /// <summary>
+        /// The percentage of funds returned for selling parts when OverrideFunds is active, for this save
+        /// </summary>
+        public static int FundsSalePercent
+        {
+            get
+            {
+                return Available ? (int)invokeMethod("GetSetting_FundsSalePercent") : 100;
             }
         }
         #endregion Settings

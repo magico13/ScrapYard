@@ -202,7 +202,7 @@ namespace ScrapYard
                     {
                         EditorLogic.SelectedPart
                     };
-                    List<Part> inventoriedParts = new List<Part>();
+                    List<InventoryPart> inventoriedParts = new List<InventoryPart>();
                     double cost = 0;
                     uint count = 0;
                     foreach (Part p in selectedParts)
@@ -210,22 +210,22 @@ namespace ScrapYard
                         InventoryPart iP = new InventoryPart(p);
                         if (iP.TrackerModule.Inventoried)
                         {
-                            cost += iP.DryCost;
+                            cost += iP.DryCost * ScrapYard.Instance.Settings.CurrentSaveSettings.FundsSalePercent;
                             count++;
-                            inventoriedParts.Add(p);
+                            inventoriedParts.Add(iP);
                         }
                     }
                     string descriptor = (ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds ? "Sell" : "Discard");
                     if (count > 0)
                     {
-                        string message = $"Are you sure you'd like to {descriptor.ToLower()} the selected {count} parts for {cost} funds?";
+                        string message = $"Are you sure you'd like to sell the selected {count} parts for {cost} funds?";
                         if (!ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds)
                         {
-                            message = $"Are you sure you'd like to {descriptor.ToLower()} the selected {count} parts?";
+                            message = $"Are you sure you'd like to discard the selected {count} parts?";
                         }
                         MultiOptionDialog diag = new MultiOptionDialog("discardMsg", message,
                             descriptor + "Parts", HighLogic.UISkin,
-                            new DialogGUIButton("Yes", () => InventoryManagement.RemovePartsFromInventory(inventoriedParts)),
+                            new DialogGUIButton("Yes", () => InventoryManagement.SellParts(inventoriedParts)),
                             new DialogGUIButton("No", () => { }));
                         PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
                     }

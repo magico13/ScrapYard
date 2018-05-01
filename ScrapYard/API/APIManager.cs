@@ -206,6 +206,36 @@ namespace ScrapYard
         }
 
         /// <summary>
+        /// Sells/Discards the list of parts out of the inventory
+        /// </summary>
+        /// <param name="parts">The parts to sell</param>
+        /// <returns>The total value of the sale</returns>
+        public double SellParts_Parts(IEnumerable<Part> parts)
+        {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return 0;
+            }
+
+            return InventoryManagement.SellParts(parts.Select(p => new InventoryPart(p)));
+        }
+
+        /// <summary>
+        /// Sells/Discards the list of parts out of the inventory
+        /// </summary>
+        /// <param name="parts">The parts to sell</param>
+        /// <returns>The total value of the sale</returns>
+        public double SellParts_Nodes(IEnumerable<ConfigNode> parts)
+        {
+            if (!ScrapYard.Instance.TheInventory.InventoryEnabled)
+            {
+                return 0;
+            }
+
+            return InventoryManagement.SellParts(parts.Select(p => new InventoryPart(p)));
+        }
+
+        /// <summary>
         /// Finds an InventoryPart for a given part
         /// </summary>
         /// <param name="sourcePart">The part to search for</param>
@@ -602,6 +632,15 @@ namespace ScrapYard
         public bool GetSetting_OverrideFunds()
         {
             return ScrapYard.Instance.Settings.CurrentSaveSettings.OverrideFunds;
+        }
+
+        /// <summary>
+        /// The percentage of funds returned for selling parts when OverrideFunds is active, for this save
+        /// </summary>
+        /// <returns>The value of the setting</returns>
+        public int GetSetting_FundsSalePercent()
+        {
+            return ScrapYard.Instance.Settings.CurrentSaveSettings.FundsSalePercent;
         }
 
         #endregion Settings
